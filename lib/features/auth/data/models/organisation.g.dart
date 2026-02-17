@@ -12,8 +12,11 @@ Organisation _$OrganisationFromJson(Map<String, dynamic> json) => Organisation(
   registrationNumber: json['registrationNumber'] as String,
   sector: json['sector'] as String,
   description: json['description'] as String,
+  priorFundingHistory: json['priorFundingHistory'] as String?,
+  repaymentHistory: json['repaymentHistory'] as String?,
   currentCredibilityScore: (json['currentCredibilityScore'] as num?)
       ?.toDouble(),
+  monthlyRevenue: (json['monthlyRevenue'] as num?)?.toDouble(),
 );
 
 Map<String, dynamic> _$OrganisationToJson(Organisation instance) =>
@@ -23,5 +26,8 @@ Map<String, dynamic> _$OrganisationToJson(Organisation instance) =>
       'registrationNumber': instance.registrationNumber,
       'sector': instance.sector,
       'description': instance.description,
+      'priorFundingHistory': instance.priorFundingHistory,
+      'repaymentHistory': instance.repaymentHistory,
       'currentCredibilityScore': instance.currentCredibilityScore,
+      'monthlyRevenue': instance.monthlyRevenue,
     };

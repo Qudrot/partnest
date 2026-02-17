@@ -4,7 +4,7 @@ part 'user_model.g.dart';
 
 enum UserRole {
     @JsonValue("admin") admin,
-    @JsonValue("ngo") ngo,
+    @JsonValue("sme") sme,
     @JsonValue("investor") investor,
 }
 

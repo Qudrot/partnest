@@ -10,6 +10,8 @@ class CredibilityScore {
   final double financialHeadlthScore;
   final double transparencyScore;
   final double impactScore;
+  final String riskLevel;
+  final String explanation;
   final DateTime calculatedAt;
 
   CredibilityScore({
@@ -19,6 +21,8 @@ class CredibilityScore {
     required this.financialHeadlthScore,
     required this.transparencyScore,
     required this.impactScore,
+    required this.riskLevel,
+    required this.explanation,
     required this.calculatedAt,
   });
 
