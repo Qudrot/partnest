@@ -8,10 +8,15 @@ part of 'organisation.dart';
 
 Organisation _$OrganisationFromJson(Map<String, dynamic> json) => Organisation(
   id: json['id'] as String,
-  name: json['name'] as String,
+  businessName: json['businessName'] as String,
   registrationNumber: json['registrationNumber'] as String,
-  sector: json['sector'] as String,
+  industry: json['industry'] as String,
   description: json['description'] as String,
+  location: json['location'] as String,
+  yearsOfOperation: (json['yearsOfOperation'] as num).toInt(),
+  numbersOfEmployee: (json['numbersOfEmployee'] as num).toInt(),
+  annualRevenue: (json['annualRevenue'] as num).toDouble(),
+  monthlyExpenses: (json['monthlyExpenses'] as num).toDouble(),
   priorFundingHistory: json['priorFundingHistory'] as String?,
   repaymentHistory: json['repaymentHistory'] as String?,
   currentCredibilityScore: (json['currentCredibilityScore'] as num?)
@@ -22,10 +27,15 @@ Organisation _$OrganisationFromJson(Map<String, dynamic> json) => Organisation(
 Map<String, dynamic> _$OrganisationToJson(Organisation instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'name': instance.name,
+      'businessName': instance.businessName,
       'registrationNumber': instance.registrationNumber,
-      'sector': instance.sector,
+      'industry': instance.industry,
       'description': instance.description,
+      'location': instance.location,
+      'yearsOfOperation': instance.yearsOfOperation,
+      'numbersOfEmployee': instance.numbersOfEmployee,
+      'annualRevenue': instance.annualRevenue,
+      'monthlyExpenses': instance.monthlyExpenses,
       'priorFundingHistory': instance.priorFundingHistory,
       'repaymentHistory': instance.repaymentHistory,
       'currentCredibilityScore': instance.currentCredibilityScore,

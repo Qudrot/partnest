@@ -5,10 +5,15 @@ part 'organisation.g.dart';
 @JsonSerializable()
 class Organisation {
   final String id;
-  final String name;
+  final String businessName;
   final String registrationNumber;
-  final String sector;
+  final String industry;
   final String description;
+  final String location;
+  final int yearsOfOperation;
+  final int numbersOfEmployee;
+  final double annualRevenue;
+  final double monthlyExpenses;
   final String? priorFundingHistory;
   final String? repaymentHistory;
   final double? currentCredibilityScore;
@@ -16,10 +21,15 @@ class Organisation {
 
   Organisation({
     required this.id,
-    required this.name,
+    required this.businessName,
     required this.registrationNumber,
-    required this.sector,
+    required this.industry,
     required this.description,
+    required this.location,
+    required this.yearsOfOperation,
+    required this.numbersOfEmployee,
+    required this.annualRevenue,
+    required this.monthlyExpenses,
     this.priorFundingHistory,
     this.repaymentHistory,
     this.currentCredibilityScore,

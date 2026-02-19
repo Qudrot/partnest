@@ -2,6 +2,12 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'credibility_score.g.dart';
 
+enum RiskLevel {
+    @JsonValue("low") low,
+    @JsonValue("medium") medium,
+    @JsonValue("High") high,
+}
+
 @JsonSerializable()
 class CredibilityScore {
   final String id;
@@ -10,7 +16,7 @@ class CredibilityScore {
   final double financialHeadlthScore;
   final double transparencyScore;
   final double impactScore;
-  final String riskLevel;
+  final RiskLevel riskLevel;
   final String explanation;
   final DateTime calculatedAt;
 
