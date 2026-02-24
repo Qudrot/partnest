@@ -36,7 +36,8 @@ class CustomCurrencyField extends StatelessWidget {
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+            ThousandsSeparatorInputFormatter(),
           ],
           onChanged: onChanged,
           validator: validator,
@@ -116,6 +117,39 @@ class CustomCurrencyField extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+class ThousandsSeparatorInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) return newValue;
+
+    String cleanString = newValue.text.replaceAll(RegExp(r'[^0-9.]'), '');
+    List<String> parts = cleanString.split('.');
+    String whole = parts[0];
+    
+    whole = whole.replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (match) => '${match[1]},');
+    
+    String result = whole;
+    if (parts.length > 1) {
+      String decimal = parts[1];
+      if (decimal.length > 2) decimal = decimal.substring(0, 2);
+      result = '$whole.$decimal';
+    } else if (cleanString.endsWith('.')) {
+      result = '$whole.';
+    }
+
+    final newOffset = result.length - (newValue.text.length - newValue.selection.end);
+
+    return TextEditingValue(
+      text: result,
+      selection: TextSelection.collapsed(
+        offset: newOffset.clamp(0, result.length),
+      ),
     );
   }
 }

@@ -4,9 +4,11 @@ import 'package:partnest/core/theme/app_colors.dart';
 import 'package:partnest/core/theme/app_typography.dart';
 import 'package:partnest/core/theme/widgets/custom_button.dart';
 import 'package:partnest/core/theme/widgets/custom_dropdown_field.dart';
-import 'package:partnest/core/theme/widgets/custom_progress_indicator.dart';
 import 'package:partnest/core/theme/widgets/custom_input_field.dart';
+import 'package:partnest/core/theme/widgets/custom_progress_indicator.dart';
 import 'package:partnest/features/auth/presentation/pages/onboarding/revenue_expenses_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:partnest/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 
 class BusinessProfilePage extends StatefulWidget {
   const BusinessProfilePage({super.key});
@@ -199,6 +201,15 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                       isDisabled: !_isFormValid,
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
+                          // Save state to Cubit
+                          context.read<SmeProfileCubit>().updateBusinessProfile(
+                            businessName: _nameController.text,
+                            industry: _selectedIndustry!,
+                            location: _locationController.text,
+                            yearsOfOperation: int.parse(_yearsController.text),
+                            numberOfEmployees: int.parse(_employeesController.text),
+                          );
+                          
                           Navigator.push(
                             context,
                             MaterialPageRoute(

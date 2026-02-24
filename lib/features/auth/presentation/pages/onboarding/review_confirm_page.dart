@@ -5,6 +5,11 @@ import 'package:partnest/core/theme/app_typography.dart';
 import 'package:partnest/core/theme/widgets/custom_button.dart';
 import 'package:partnest/core/theme/widgets/custom_progress_indicator.dart';
 import 'package:partnest/features/auth/presentation/pages/onboarding/success_next_steps_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:partnest/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
+import 'package:partnest/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:partnest/features/auth/presentation/blocs/auth_event.dart';
+import 'package:partnest/features/auth/presentation/blocs/auth_state.dart';
 
 class ReviewConfirmPage extends StatefulWidget {
   const ReviewConfirmPage({super.key});
@@ -15,20 +20,9 @@ class ReviewConfirmPage extends StatefulWidget {
 
 class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
   bool _isConfirmed = false;
-  bool _isSubmitting = false;
-
-  void _submitData() async {
-    setState(() => _isSubmitting = true);
-
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const SuccessNextStepsPage()),
-      );
-    }
+  void _submitData() {
+    final state = context.read<SmeProfileCubit>().state;
+    context.read<AuthBloc>().add(SubmitSmeProfileEvent(state.toMap()));
   }
 
   Widget _buildSummarySection({
@@ -107,7 +101,24 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is SmeProfileSubmittedSuccess) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SuccessNextStepsPage()),
+          );
+        } else if (state is SmeProfileSubmissionError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
+          );
+        }
+      },
+      builder: (context, authState) {
+        final profileState = context.watch<SmeProfileCubit>().state;
+        final _isSubmitting = authState is SmeProfileSubmitting;
+
+        return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -156,11 +167,11 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                     _buildSummarySection(
                       title: 'Business Profile',
                       data: {
-                        'Business Name': 'Acme Manufacturing',
-                        'Industry': 'Manufacturing',
-                        'Location': 'Lagos, Nigeria',
-                        'Years of Operation': '5',
-                        'Employees': '25',
+                        'Business Name': profileState.businessName,
+                        'Industry': profileState.industry,
+                        'Location': profileState.location,
+                        'Years of Operation': profileState.yearsOfOperation.toString(),
+                        'Employees': profileState.numberOfEmployees.toString(),
                       },
                       onEdit: () {
                         // TODO: Navigate to Edit Business Profile
@@ -176,11 +187,11 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                     _buildSummarySection(
                       title: 'Revenue & Expenses',
                       data: {
-                        'Annual Revenue (Year 1)': '₦500,000',
-                        'Annual Revenue (Year 2)': '₦600,000',
-                        'Annual Revenue (Year 3)': '₦750,000',
-                        'Monthly Revenue': '₦50,000',
-                        'Monthly Expenses': '₦30,000',
+                        'Annual Revenue (Year 1)': '₦${profileState.year1Revenue.toStringAsFixed(0)}',
+                        'Annual Revenue (Year 2)': '₦${profileState.year2Revenue.toStringAsFixed(0)}',
+                        'Annual Revenue (Year 3)': profileState.year3Revenue != null ? '₦${profileState.year3Revenue!.toStringAsFixed(0)}' : 'N/A',
+                        'Monthly Revenue': '₦${profileState.monthlyAvgRevenue.toStringAsFixed(0)}',
+                        'Monthly Expenses': '₦${profileState.monthlyAvgExpenses.toStringAsFixed(0)}',
                       },
                       onEdit: () {
                         // TODO: Navigate to Edit Revenue
@@ -190,14 +201,14 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                     _buildSummarySection(
                       title: 'Liabilities & History',
                       data: {
-                        'Existing Liabilities': '₦200,000',
-                        'Liability Type': 'Bank Loans',
-                        'Prior Funding': 'Yes',
-                        'Prior Funding Amount': '₦100,000',
-                        'Funding Source': 'Venture Capital',
-                        'Funding Year': '2022',
-                        'Defaulted': 'No',
-                        'Payment Timeliness': 'Always on time',
+                        'Existing Liabilities': '₦${profileState.existingLiabilities.toStringAsFixed(0)}',
+                        'Liability Type': profileState.liabilityType ?? 'None',
+                        'Prior Funding': profileState.hasPriorFunding == true ? 'Yes' : 'No',
+                        'Prior Funding Amount': profileState.priorFundingAmount != null ? '₦${profileState.priorFundingAmount!.toStringAsFixed(0)}' : 'N/A',
+                        'Funding Source': profileState.priorFundingSource ?? 'N/A',
+                        'Funding Year': profileState.fundingYear?.toString() ?? 'N/A',
+                        'Defaulted': profileState.hasDefaulted == true ? 'Yes' : 'No',
+                        'Payment Timeliness': profileState.paymentTimeliness ?? 'N/A',
                       },
                       onEdit: () {
                         // TODO: Navigate to Edit Hub
@@ -274,6 +285,8 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
           ],
         ),
       ),
-    );
+     );
+    },
+   );
   }
 }

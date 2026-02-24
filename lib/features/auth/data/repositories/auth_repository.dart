@@ -1,4 +1,5 @@
 import 'package:partnest/features/auth/data/models/user_model.dart';
+import 'package:partnest/features/auth/data/models/credibility_score.dart';
 
 abstract class AuthRepository {
 
@@ -20,4 +21,7 @@ abstract class AuthRepository {
 
   //Clears token from secure storage
   Future<void> logout();
+
+  // Submits the SME onboarding data and returns the resulting CredibilityScore
+  Future<CredibilityScore> submitSmeProfile(Map<String, dynamic> data);
 }

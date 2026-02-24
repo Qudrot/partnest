@@ -9,6 +9,8 @@ import 'package:partnest/core/theme/widgets/custom_input_field.dart';
 import 'package:partnest/core/theme/widgets/custom_progress_indicator.dart';
 import 'package:partnest/core/theme/widgets/custom_yes_no_field.dart';
 import 'package:partnest/features/auth/presentation/pages/onboarding/review_confirm_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:partnest/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 
 class LiabilitiesHistoryPage extends StatefulWidget {
   const LiabilitiesHistoryPage({super.key});
@@ -57,7 +59,7 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
   ];
 
   bool get _validateLiabilities {
-    final l = double.tryParse(_liabilitiesController.text);
+    final l = double.tryParse(_liabilitiesController.text.replaceAll(',', ''));
     if (l == null) return false;
     if (l > 0 && _liabilityType == null) return false;
     return true;
@@ -99,25 +101,27 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
   }
 
   Widget _buildConditionalField(Widget child, bool isVisible) {
-    return AnimatedContainer(
+    return AnimatedSize(
       duration: const Duration(milliseconds: 200),
-      height: isVisible ? null : 0,
-      margin: isVisible
-          ? const EdgeInsets.only(top: 20, left: 16)
-          : EdgeInsets.zero,
-      padding: isVisible ? const EdgeInsets.all(16) : EdgeInsets.zero,
-      decoration: BoxDecoration(
-        color: AppColors.slate50,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.slate200),
-      ),
-      child: isVisible ? child : const SizedBox.shrink(),
+      curve: Curves.easeInOut,
+      child: isVisible
+          ? Container(
+              margin: const EdgeInsets.only(top: 20, left: 16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.slate50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.slate200),
+              ),
+              child: child,
+            )
+          : const SizedBox.shrink(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final liabilitiesVal = double.tryParse(_liabilitiesController.text) ?? 0;
+    final liabilitiesVal = double.tryParse(_liabilitiesController.text.replaceAll(',', '')) ?? 0;
     final showLiabilityType = liabilitiesVal > 0;
 
     return Scaffold(
@@ -187,7 +191,7 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
                         onChanged: _onFieldChanged,
                         validator: (val) {
                           if (val == null || val.isEmpty) return 'Required';
-                          final num = double.tryParse(val);
+                          final num = double.tryParse(val.replaceAll(',', ''));
                           if (num == null || num < 0)
                             return 'Must be a positive number';
                           if (num > 1000000000) return 'Max 1 billion';
@@ -249,7 +253,7 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
                                 if (_hasPriorFunding == true) {
                                   if (val == null || val.isEmpty)
                                     return 'Required';
-                                  final num = double.tryParse(val);
+                                  final num = double.tryParse(val.replaceAll(',', ''));
                                   if (num == null || num <= 0)
                                     return 'Must be a positive number';
                                 }
@@ -371,6 +375,18 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
                       isDisabled: !_isFormValid,
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
+                          context.read<SmeProfileCubit>().updateLiabilitiesHistory(
+                            existingLiabilities: double.parse(_liabilitiesController.text.replaceAll(',', '')),
+                            liabilityType: _liabilityType,
+                            hasPriorFunding: _hasPriorFunding,
+                            priorFundingAmount: _fundingAmountController.text.isEmpty ? null : double.parse(_fundingAmountController.text.replaceAll(',', '')),
+                            priorFundingSource: _fundingSource,
+                            fundingYear: _fundingYearController.text.isEmpty ? null : int.parse(_fundingYearController.text),
+                            hasDefaulted: _hasDefaulted,
+                            defaultDetails: _defaultDetailsController.text.isEmpty ? null : _defaultDetailsController.text,
+                            paymentTimeliness: _paymentTimeliness,
+                          );
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(

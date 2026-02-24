@@ -6,6 +6,8 @@ import 'package:partnest/core/theme/widgets/custom_button.dart';
 import 'package:partnest/core/theme/widgets/custom_currency_field.dart';
 import 'package:partnest/core/theme/widgets/custom_progress_indicator.dart';
 import 'package:partnest/features/auth/presentation/pages/onboarding/liabilities_history_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:partnest/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 
 class RevenueExpensesPage extends StatefulWidget {
   const RevenueExpensesPage({super.key});
@@ -36,8 +38,8 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
   void _onFieldChanged(String value) {
     if (_monthlyRevController.text.isNotEmpty &&
         _monthlyExpController.text.isNotEmpty) {
-      final rev = double.tryParse(_monthlyRevController.text);
-      final exp = double.tryParse(_monthlyExpController.text);
+      final rev = double.tryParse(_monthlyRevController.text.replaceAll(',', ''));
+      final exp = double.tryParse(_monthlyExpController.text.replaceAll(',', ''));
       if (rev != null && exp != null && exp > rev) {
         _expenseWarning =
             'Your expenses exceed revenue. Please review your figures.';
@@ -130,7 +132,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                         onChanged: _onFieldChanged,
                         validator: (val) {
                           if (val == null || val.isEmpty) return 'Required';
-                          final num = double.tryParse(val);
+                          final num = double.tryParse(val.replaceAll(',', ''));
                           if (num == null || num < 0)
                             return 'Must be a positive number';
                           if (num > 1000000000) return 'Max 1 billion';
@@ -145,7 +147,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                         onChanged: _onFieldChanged,
                         validator: (val) {
                           if (val == null || val.isEmpty) return 'Required';
-                          final num = double.tryParse(val);
+                          final num = double.tryParse(val.replaceAll(',', ''));
                           if (num == null || num < 0)
                             return 'Must be a positive number';
                           if (num > 1000000000) return 'Max 1 billion';
@@ -160,7 +162,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                         onChanged: _onFieldChanged,
                         validator: (val) {
                           if (val != null && val.isNotEmpty) {
-                            final num = double.tryParse(val);
+                            final num = double.tryParse(val.replaceAll(',', ''));
                             if (num == null || num < 0)
                               return 'Must be a positive number';
                             if (num > 1000000000) return 'Max 1 billion';
@@ -191,7 +193,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                         onChanged: _onFieldChanged,
                         validator: (val) {
                           if (val == null || val.isEmpty) return 'Required';
-                          final num = double.tryParse(val);
+                          final num = double.tryParse(val.replaceAll(',', ''));
                           if (num == null || num < 0)
                             return 'Must be a positive number';
                           if (num > 100000000) return 'Max 100 million';
@@ -207,7 +209,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                         warningText: _expenseWarning,
                         validator: (val) {
                           if (val == null || val.isEmpty) return 'Required';
-                          final num = double.tryParse(val);
+                          final num = double.tryParse(val.replaceAll(',', ''));
                           if (num == null || num < 0)
                             return 'Must be a positive number';
                           if (num > 100000000) return 'Max 100 million';
@@ -242,6 +244,14 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                       isDisabled: !_isFormValid,
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
+                          context.read<SmeProfileCubit>().updateRevenueExpenses(
+                            year1Revenue: double.parse(_year1Controller.text.replaceAll(',', '')),
+                            year2Revenue: double.parse(_year2Controller.text.replaceAll(',', '')),
+                            year3Revenue: _year3Controller.text.isEmpty ? null : double.parse(_year3Controller.text.replaceAll(',', '')),
+                            monthlyAvgRevenue: double.parse(_monthlyRevController.text.replaceAll(',', '')),
+                            monthlyAvgExpenses: double.parse(_monthlyExpController.text.replaceAll(',', '')),
+                          );
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
