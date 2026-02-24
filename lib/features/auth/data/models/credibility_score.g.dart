@@ -11,11 +11,11 @@ CredibilityScore _$CredibilityScoreFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       organisationId: json['organisationId'] as String,
       totalScore: (json['totalScore'] as num).toDouble(),
-      financialHeadlthScore: (json['financialHeadlthScore'] as num).toDouble(),
-      transparencyScore: (json['transparencyScore'] as num).toDouble(),
-      impactScore: (json['impactScore'] as num).toDouble(),
       riskLevel: $enumDecode(_$RiskLevelEnumMap, json['riskLevel']),
-      explanation: json['explanation'] as String,
+      topContributingFactors: (json['topContributingFactors'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
+      generalExplanation: json['generalExplanation'] as String?,
       calculatedAt: DateTime.parse(json['calculatedAt'] as String),
     );
 
@@ -24,16 +24,14 @@ Map<String, dynamic> _$CredibilityScoreToJson(CredibilityScore instance) =>
       'id': instance.id,
       'organisationId': instance.organisationId,
       'totalScore': instance.totalScore,
-      'financialHeadlthScore': instance.financialHeadlthScore,
-      'transparencyScore': instance.transparencyScore,
-      'impactScore': instance.impactScore,
       'riskLevel': _$RiskLevelEnumMap[instance.riskLevel]!,
-      'explanation': instance.explanation,
+      'topContributingFactors': instance.topContributingFactors,
+      'generalExplanation': instance.generalExplanation,
       'calculatedAt': instance.calculatedAt.toIso8601String(),
     };
 
 const _$RiskLevelEnumMap = {
   RiskLevel.low: 'low',
   RiskLevel.medium: 'medium',
-  RiskLevel.high: 'High',
+  RiskLevel.high: 'high',
 };

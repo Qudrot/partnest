@@ -26,7 +26,7 @@ class ProgressIndicatorWidget extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: AppColors.trustBlue,
-             borderRadius: BorderRadius.circular(height / 2),
+            borderRadius: BorderRadius.circular(height / 2),
           ),
         ),
       ),

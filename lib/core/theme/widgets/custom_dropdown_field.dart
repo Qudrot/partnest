@@ -1,29 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:partnest/core/theme/app_colors.dart';
 import 'package:partnest/core/theme/app_typography.dart';
 
-class CustomInputField extends StatelessWidget {
+class CustomDropdownField extends StatelessWidget {
   final String label;
   final String? placeholder;
+  final String? value;
+  final List<String> items;
+  final void Function(String?)? onChanged;
   final String? errorText;
-  final bool obscureText;
-  final TextEditingController? controller;
-  final Widget? suffixIcon;
-  final String? Function(String?)? validator;
-  final int? maxLines;
-  final void Function(String)? onChanged;
 
-  const CustomInputField({
+  const CustomDropdownField({
     super.key,
     required this.label,
+    required this.items,
     this.placeholder,
-    this.errorText,
-    this.obscureText = false,
-    this.controller,
-    this.suffixIcon,
-    this.validator,
-    this.maxLines = 1,
+    this.value,
     this.onChanged,
+    this.errorText,
   });
 
   @override
@@ -33,15 +28,10 @@ class CustomInputField extends StatelessWidget {
       children: [
         Text(label, style: AppTypography.textTheme.labelLarge),
         const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          obscureText: obscureText,
-          validator: validator,
-          maxLines: maxLines,
-          onChanged: onChanged,
-          style: AppTypography.textTheme.bodyLarge?.copyWith(
-            color: AppColors.slate900,
-          ),
+        DropdownButtonFormField<String>(
+          isExpanded: true,
+          value: value,
+          icon: const Icon(LucideIcons.chevronDown, color: AppColors.slate600),
           decoration: InputDecoration(
             hintText: placeholder,
             hintStyle: AppTypography.textTheme.bodyLarge?.copyWith(
@@ -57,7 +47,6 @@ class CustomInputField extends StatelessWidget {
               vertical: 12,
               horizontal: 14,
             ),
-            suffixIcon: suffixIcon,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
               borderSide: const BorderSide(color: AppColors.slate200),
@@ -88,6 +77,14 @@ class CustomInputField extends StatelessWidget {
               ),
             ),
           ),
+          dropdownColor: AppColors.neutralWhite,
+          style: AppTypography.textTheme.bodyLarge?.copyWith(
+            color: AppColors.slate900,
+          ),
+          items: items.map((String item) {
+            return DropdownMenuItem<String>(value: item, child: Text(item));
+          }).toList(),
+          onChanged: onChanged,
         ),
       ],
     );

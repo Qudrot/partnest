@@ -7,11 +7,7 @@ class CustomBadge extends StatelessWidget {
   final String text;
   final RiskLevel riskLevel;
 
-  const CustomBadge({
-    super.key,
-    required this.text,
-    required this.riskLevel,
-  });
+  const CustomBadge({super.key, required this.text, required this.riskLevel});
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +46,7 @@ class CustomBadge extends StatelessWidget {
 class NeutralBadge extends StatelessWidget {
   final String text;
 
-  const NeutralBadge({
-    super.key,
-    required this.text,
-  });
+  const NeutralBadge({super.key, required this.text});
 
   @override
   Widget build(BuildContext context) {
