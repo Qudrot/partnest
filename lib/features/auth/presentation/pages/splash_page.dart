@@ -18,11 +18,12 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 2), // 2s cycle
       vsync: this,
     )..repeat(reverse: true);
 
-    _animation = Tween<double>(begin: 0.3, end: 1.0).animate(CurvedAnimation(
+    // Pulse animation (2-3px scale change on a 64px logo means ~1.0 to 1.05 scale)
+    _animation = Tween<double>(begin: 1.0, end: 1.04).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOut,
     ));
@@ -31,6 +32,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   }
 
   Future<void> _navigateToNext() async {
+    // 2-3 seconds before automatically transitioning to the login screen
     await Future.delayed(const Duration(milliseconds: 2500));
     if (mounted) {
       Navigator.pushReplacement(
@@ -59,7 +61,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          // Allow skipping
+          // Tap anywhere to skip
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
@@ -75,47 +77,41 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Try to load favicon, fallback to text logo
-              Image.asset(
-                'assets/images/favicon_1.png',
-                height: 64,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 64,
-                    width: 64,
-                    decoration: BoxDecoration(
-                      color: AppColors.trustBlue,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'P',
-                        style: AppTypography.textTheme.displayMedium?.copyWith(
-                          color: AppColors.neutralWhite,
-                          fontWeight: FontWeight.w700,
+              ScaleTransition(
+                scale: _animation,
+                child: Image.asset(
+                  'assets/images/favicon_1.png',
+                  height: 64,
+                  width: 64,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 64,
+                      width: 64,
+                      decoration: BoxDecoration(
+                        color: AppColors.trustBlue,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'P',
+                          style: AppTypography.textTheme.displayMedium?.copyWith(
+                            color: AppColors.neutralWhite,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Unlock SME Credibility',
-                style: AppTypography.textTheme.bodyLarge?.copyWith(
-                  color: AppColors.slate600,
+                    );
+                  },
                 ),
               ),
-              const SizedBox(height: 24),
-              FadeTransition(
-                opacity: _animation,
-                child: Container(
-                  height: 4,
-                  width: 200,
-                  decoration: BoxDecoration(
-                    color: AppColors.trustBlue,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+              const SizedBox(height: 16),
+              // Optional Tagline
+              Text(
+                'Unlock SME Credibility',
+                style: AppTypography.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.slate600,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ],

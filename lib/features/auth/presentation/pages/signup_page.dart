@@ -23,8 +23,6 @@ class _SignupPageState extends State<SignupPage> {
   
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  bool _termsAccepted = false;
-  String _selectedRole = 'SME'; // Default
   bool _isLoading = false;
 
   // Password Strength
@@ -76,12 +74,6 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   void _handleSignUp() async {
-    if (!_termsAccepted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You must accept the terms to continue')),
-      );
-      return;
-    }
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       
@@ -260,94 +252,12 @@ class _SignupPageState extends State<SignupPage> {
                       ),
 
                       const SizedBox(height: 24),
-
-                      Text(
-                        'How will you use Partnex?',
-                        style: AppTypography.textTheme.labelLarge,
-                      ),
-                      const SizedBox(height: 12),
-                      
-                      // Role Selection (Radio Buttons)
-                      _buildRoleOption(
-                        title: "I'm an SME",
-                        subtitle: "Get your credibility score and access funding",
-                        value: 'SME',
-                      ),
-                      const SizedBox(height: 12),
-                      _buildRoleOption(
-                        title: "I'm an Investor",
-                        subtitle: "Discover and evaluate credible SMEs",
-                        value: 'Investor',
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Terms
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: Checkbox(
-                              value: _termsAccepted,
-                              onChanged: (val) {
-                                if (val != null) setState(() => _termsAccepted = val);
-                              },
-                              activeColor: AppColors.trustBlue,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              side: const BorderSide(color: AppColors.slate200),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Wrap(
-                              children: [
-                                Text(
-                                  'I agree to the ',
-                                  style: AppTypography.textTheme.bodySmall?.copyWith(
-                                    color: AppColors.slate700,
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {},
-                                  child: Text(
-                                    'Terms of Service',
-                                    style: AppTypography.textTheme.bodySmall?.copyWith(
-                                      color: AppColors.trustBlue,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  ' and ',
-                                  style: AppTypography.textTheme.bodySmall?.copyWith(
-                                    color: AppColors.slate700,
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {},
-                                  child: Text(
-                                    'Privacy Policy',
-                                    style: AppTypography.textTheme.bodySmall?.copyWith(
-                                      color: AppColors.trustBlue,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      
-                      const SizedBox(height: 24),
                       
                       CustomButton(
                         text: 'Create Account',
                         onPressed: _handleSignUp,
                         isLoading: _isLoading,
-                        isDisabled: !_termsAccepted,
+                        // Terms are assumed accepted by clicking the button in this flow now
                       ),
                       
                       const SizedBox(height: 16),
@@ -369,60 +279,35 @@ class _SignupPageState extends State<SignupPage> {
                 ),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRoleOption({required String title, required String subtitle, required String value}) {
-    final isSelected = _selectedRole == value;
-    return InkWell(
-      onTap: () => setState(() => _selectedRole = value),
-      borderRadius: BorderRadius.circular(6),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.trustBlue : AppColors.neutralWhite,
-          border: Border.all(
-            color: isSelected ? AppColors.trustBlue : AppColors.slate200,
-          ),
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Row(
-          children: [
-            Radio<String>(
-              value: value,
-              groupValue: _selectedRole,
-              onChanged: (val) {
-                if (val != null) setState(() => _selectedRole = val);
-              },
-              activeColor: AppColors.neutralWhite,
-              fillColor: MaterialStateProperty.resolveWith((states) {
-                if (isSelected) return AppColors.neutralWhite;
-                return AppColors.slate400;
-              }),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: AppTypography.textTheme.bodyMedium?.copyWith(
-                      color: isSelected ? AppColors.neutralWhite : AppColors.slate900,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    ),
+            
+            // Shared Footer matching WelcomeRoleSelectionPage
+            Padding(
+              padding: const EdgeInsets.only(bottom: 24.0, top: 16.0),
+              child: Text.rich(
+                TextSpan(
+                  text: 'By continuing, you agree to our ',
+                  style: AppTypography.textTheme.bodySmall?.copyWith(
+                    color: AppColors.slate600,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: AppTypography.textTheme.bodySmall?.copyWith(
-                      color: isSelected ? AppColors.neutralWhite.withValues(alpha: 0.8) : AppColors.slate600,
+                  children: [
+                    TextSpan(
+                      text: 'Terms of Service',
+                      style: AppTypography.textTheme.bodySmall?.copyWith(
+                        color: AppColors.trustBlue,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                ],
+                    const TextSpan(text: ' and '),
+                    TextSpan(
+                      text: 'Privacy Policy',
+                      style: AppTypography.textTheme.bodySmall?.copyWith(
+                        color: AppColors.trustBlue,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
           ],

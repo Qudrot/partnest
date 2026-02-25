@@ -1,0 +1,4 @@
+"problemMessage","location"
+"The value of the field '_selectedRole' isn't used.","@{file=C:\Users\HP\Videos\partnest\lib\features\auth\presentation\pages\signup_page.dart; range=}"
+"The private field _termsAccepted could be 'final'.","@{file=C:\Users\HP\Videos\partnest\lib\features\auth\presentation\pages\signup_page.dart; range=}"
+"The private field _selectedRole could be 'final'.","@{file=C:\Users\HP\Videos\partnest\lib\features\auth\presentation\pages\signup_page.dart; range=}"

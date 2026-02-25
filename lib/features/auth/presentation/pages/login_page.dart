@@ -204,40 +204,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            
-            // Footer
-            Padding(
-              padding: const EdgeInsets.only(bottom: 24.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Terms',
-                      style: AppTypography.textTheme.bodySmall?.copyWith(
-                        color: AppColors.slate500,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    '•',
-                    style: AppTypography.textTheme.bodySmall?.copyWith(
-                      color: AppColors.slate500,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Privacy',
-                      style: AppTypography.textTheme.bodySmall?.copyWith(
-                        color: AppColors.slate500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
