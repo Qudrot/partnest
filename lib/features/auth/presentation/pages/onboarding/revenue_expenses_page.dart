@@ -19,44 +19,74 @@ class RevenueExpensesPage extends StatefulWidget {
 class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
   final _formKey = GlobalKey<FormState>();
 
-  final _year1Controller = TextEditingController();
-  final _year2Controller = TextEditingController();
-  final _year3Controller = TextEditingController();
+  final _annualRevController = TextEditingController();
+  final _annualExpController = TextEditingController();
 
   final _monthlyRevController = TextEditingController();
   final _monthlyExpController = TextEditingController();
 
   bool get _isFormValid {
-    return _year1Controller.text.isNotEmpty &&
-        _year2Controller.text.isNotEmpty &&
+    return _annualRevController.text.isNotEmpty &&
+        _annualExpController.text.isNotEmpty &&
         _monthlyRevController.text.isNotEmpty &&
         _monthlyExpController.text.isNotEmpty;
   }
 
   String? _expenseWarning;
+  double? _profitMargin;
+  double? _expenseRatio;
+  double? _annualProfit;
 
   void _onFieldChanged(String value) {
     if (_monthlyRevController.text.isNotEmpty &&
         _monthlyExpController.text.isNotEmpty) {
-      final rev = double.tryParse(_monthlyRevController.text.replaceAll(',', ''));
-      final exp = double.tryParse(_monthlyExpController.text.replaceAll(',', ''));
-      if (rev != null && exp != null && exp > rev) {
-        _expenseWarning =
-            'Your expenses exceed revenue. Please review your figures.';
+      final mRev = double.tryParse(_monthlyRevController.text.replaceAll(',', ''));
+      final mExp = double.tryParse(_monthlyExpController.text.replaceAll(',', ''));
+      
+      if (mRev != null && mExp != null) {
+        if (mExp > mRev) {
+          _expenseWarning = 'Your expenses exceed your revenue. Please verify this is correct.';
+        } else {
+          _expenseWarning = null;
+        }
+
+        if (mRev > 0) {
+          _profitMargin = ((mRev - mExp) / mRev) * 100;
+          _expenseRatio = (mExp / mRev) * 100;
+        } else {
+          _profitMargin = null;
+          _expenseRatio = null;
+        }
       } else {
         _expenseWarning = null;
+        _profitMargin = null;
+        _expenseRatio = null;
       }
     } else {
       _expenseWarning = null;
+      _profitMargin = null;
+      _expenseRatio = null;
     }
+
+    if (_annualRevController.text.isNotEmpty && _annualExpController.text.isNotEmpty) {
+      final aRev = double.tryParse(_annualRevController.text.replaceAll(',', ''));
+      final aExp = double.tryParse(_annualExpController.text.replaceAll(',', ''));
+      if (aRev != null && aExp != null) {
+        _annualProfit = aRev - aExp;
+      } else {
+        _annualProfit = null;
+      }
+    } else {
+      _annualProfit = null;
+    }
+
     setState(() {});
   }
 
   @override
   void dispose() {
-    _year1Controller.dispose();
-    _year2Controller.dispose();
-    _year3Controller.dispose();
+    _annualRevController.dispose();
+    _annualExpController.dispose();
     _monthlyRevController.dispose();
     _monthlyExpController.dispose();
     super.dispose();
@@ -111,78 +141,55 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Section A
+                      // Section: Annual
                       Text(
-                        'Annual Revenue (Past 2-3 Years)',
+                        'Annual Financials',
                         style: AppTypography.textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Enter revenue for the past 2-3 years. This helps us assess growth trends.',
-                        style: AppTypography.textTheme.bodySmall?.copyWith(
-                          color: AppColors.slate600,
-                        ),
                       ),
                       const SizedBox(height: 16),
 
                       CustomCurrencyField(
-                        label: 'Year 1 Annual Revenue',
+                        label: 'Annual Revenue',
                         placeholder: 'e.g., 500,000',
-                        controller: _year1Controller,
+                        controller: _annualRevController,
                         onChanged: _onFieldChanged,
                         validator: (val) {
-                          if (val == null || val.isEmpty) return 'Required';
+                          if (val == null || val.isEmpty) return 'Please enter a valid revenue amount';
                           final num = double.tryParse(val.replaceAll(',', ''));
-                          if (num == null || num < 0)
-                            return 'Must be a positive number';
-                          if (num > 1000000000) return 'Max 1 billion';
+                          if (num == null || num < 0) return 'Please enter a valid revenue amount';
                           return null;
                         },
                       ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Total revenue for the last 12 months',
+                        style: AppTypography.textTheme.bodySmall?.copyWith(color: AppColors.slate600),
+                      ),
                       const SizedBox(height: 20),
+                      
                       CustomCurrencyField(
-                        label: 'Year 2 Annual Revenue',
-                        placeholder: 'e.g., 600,000',
-                        controller: _year2Controller,
+                        label: 'Annual Expenses',
+                        placeholder: 'e.g., 300,000',
+                        controller: _annualExpController,
                         onChanged: _onFieldChanged,
                         validator: (val) {
-                          if (val == null || val.isEmpty) return 'Required';
+                          if (val == null || val.isEmpty) return 'Please enter a valid expense amount';
                           final num = double.tryParse(val.replaceAll(',', ''));
-                          if (num == null || num < 0)
-                            return 'Must be a positive number';
-                          if (num > 1000000000) return 'Max 1 billion';
+                          if (num == null || num < 0) return 'Please enter a valid expense amount';
                           return null;
                         },
                       ),
-                      const SizedBox(height: 20),
-                      CustomCurrencyField(
-                        label: 'Year 3 Annual Revenue (Optional)',
-                        placeholder: 'e.g., 750,000',
-                        controller: _year3Controller,
-                        onChanged: _onFieldChanged,
-                        validator: (val) {
-                          if (val != null && val.isNotEmpty) {
-                            final num = double.tryParse(val.replaceAll(',', ''));
-                            if (num == null || num < 0)
-                              return 'Must be a positive number';
-                            if (num > 1000000000) return 'Max 1 billion';
-                          }
-                          return null;
-                        },
+                      const SizedBox(height: 4),
+                      Text(
+                        'Total operating expenses for the last 12 months',
+                        style: AppTypography.textTheme.bodySmall?.copyWith(color: AppColors.slate600),
                       ),
                       const SizedBox(height: 32),
 
-                      // Section B
+                      // Section: Monthly
                       Text(
-                        'Monthly Financials (Current Year)',
+                        'Monthly Financials (Average)',
                         style: AppTypography.textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Enter average monthly figures for the current year.',
-                        style: AppTypography.textTheme.bodySmall?.copyWith(
-                          color: AppColors.slate600,
-                        ),
                       ),
                       const SizedBox(height: 16),
 
@@ -192,15 +199,19 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                         controller: _monthlyRevController,
                         onChanged: _onFieldChanged,
                         validator: (val) {
-                          if (val == null || val.isEmpty) return 'Required';
+                          if (val == null || val.isEmpty) return 'Please enter a valid revenue amount';
                           final num = double.tryParse(val.replaceAll(',', ''));
-                          if (num == null || num < 0)
-                            return 'Must be a positive number';
-                          if (num > 100000000) return 'Max 100 million';
+                          if (num == null || num < 0) return 'Please enter a valid revenue amount';
                           return null;
                         },
                       ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Average monthly revenue',
+                        style: AppTypography.textTheme.bodySmall?.copyWith(color: AppColors.slate600),
+                      ),
                       const SizedBox(height: 20),
+                      
                       CustomCurrencyField(
                         label: 'Monthly Expenses (Average)',
                         placeholder: 'e.g., 30,000',
@@ -208,14 +219,68 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                         onChanged: _onFieldChanged,
                         warningText: _expenseWarning,
                         validator: (val) {
-                          if (val == null || val.isEmpty) return 'Required';
+                          if (val == null || val.isEmpty) return 'Please enter a valid expense amount';
                           final num = double.tryParse(val.replaceAll(',', ''));
-                          if (num == null || num < 0)
-                            return 'Must be a positive number';
-                          if (num > 100000000) return 'Max 100 million';
+                          if (num == null || num < 0) return 'Please enter a valid expense amount';
                           return null;
                         },
                       ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Average monthly operating expenses',
+                        style: AppTypography.textTheme.bodySmall?.copyWith(color: AppColors.slate600),
+                      ),
+
+                      // Real-time Calculations
+                      if (_profitMargin != null || _annualProfit != null) ...[
+                        const SizedBox(height: 24),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: AppColors.slate50,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: AppColors.slate200),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                'Real-Time Calculations',
+                                style: AppTypography.textTheme.labelLarge?.copyWith(
+                                  color: AppColors.slate900,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              if (_profitMargin != null) ...[
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Profit Margin', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate600)),
+                                    Text('${_profitMargin!.toStringAsFixed(1)}%', style: AppTypography.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: AppColors.slate900)),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Expense Ratio', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate600)),
+                                    Text('${_expenseRatio!.toStringAsFixed(1)}%', style: AppTypography.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: AppColors.slate900)),
+                                  ],
+                                ),
+                              ],
+                              if (_annualProfit != null && _profitMargin != null) const SizedBox(height: 8),
+                              if (_annualProfit != null)
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Estimated Annual Profit', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate600)),
+                                    Text('NGN ${_annualProfit!.toStringAsFixed(0).replaceAll(RegExp(r'\B(?=(\d{3})+(?!\d))'), ',')}', style: AppTypography.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: AppColors.slate900)),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
 
                       const SizedBox(height: 32),
                     ],
@@ -245,9 +310,8 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           context.read<SmeProfileCubit>().updateRevenueExpenses(
-                            year1Revenue: double.parse(_year1Controller.text.replaceAll(',', '')),
-                            year2Revenue: double.parse(_year2Controller.text.replaceAll(',', '')),
-                            year3Revenue: _year3Controller.text.isEmpty ? null : double.parse(_year3Controller.text.replaceAll(',', '')),
+                            annualRevenue: double.parse(_annualRevController.text.replaceAll(',', '')),
+                            annualExpenses: double.parse(_annualExpController.text.replaceAll(',', '')),
                             monthlyAvgRevenue: double.parse(_monthlyRevController.text.replaceAll(',', '')),
                             monthlyAvgExpenses: double.parse(_monthlyExpController.text.replaceAll(',', '')),
                           );

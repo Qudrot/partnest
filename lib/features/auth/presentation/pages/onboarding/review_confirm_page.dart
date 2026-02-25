@@ -191,9 +191,8 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                     _buildSummarySection(
                       title: 'Revenue & Expenses',
                       data: {
-                        'Annual Revenue (Year 1)': '₦${profileState.year1Revenue.toStringAsFixed(0)}',
-                        'Annual Revenue (Year 2)': '₦${profileState.year2Revenue.toStringAsFixed(0)}',
-                        'Annual Revenue (Year 3)': profileState.year3Revenue != null ? '₦${profileState.year3Revenue!.toStringAsFixed(0)}' : 'N/A',
+                        'Annual Revenue': '₦${profileState.annualRevenue.toStringAsFixed(0)}',
+                        'Annual Expenses': '₦${profileState.annualExpenses.toStringAsFixed(0)}',
                         'Monthly Revenue': '₦${profileState.monthlyAvgRevenue.toStringAsFixed(0)}',
                         'Monthly Expenses': '₦${profileState.monthlyAvgExpenses.toStringAsFixed(0)}',
                       },
@@ -205,14 +204,13 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                     _buildSummarySection(
                       title: 'Liabilities & History',
                       data: {
-                        'Existing Liabilities': '₦${profileState.existingLiabilities.toStringAsFixed(0)}',
-                        'Liability Type': profileState.liabilityType ?? 'None',
+                        'Total Liabilities': '₦${profileState.totalLiabilities.toStringAsFixed(0)}',
+                        'Outstanding Loans': '₦${profileState.outstandingLoans.toStringAsFixed(0)}',
                         'Prior Funding': profileState.hasPriorFunding == true ? 'Yes' : 'No',
                         'Prior Funding Amount': profileState.priorFundingAmount != null ? '₦${profileState.priorFundingAmount!.toStringAsFixed(0)}' : 'N/A',
                         'Funding Source': profileState.priorFundingSource ?? 'N/A',
                         'Funding Year': profileState.fundingYear?.toString() ?? 'N/A',
-                        'Defaulted': profileState.hasDefaulted == true ? 'Yes' : 'No',
-                        'Payment Timeliness': profileState.paymentTimeliness ?? 'N/A',
+                        'On-Time Payment Rate': profileState.onTimePaymentRate != null ? '${profileState.onTimePaymentRate}%' : 'N/A',
                       },
                       onEdit: () {
                         // TODO: Navigate to Edit Hub

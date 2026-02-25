@@ -13,6 +13,13 @@ class InputMethodSelectionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text(
+          'How would you like to provide your data?',
+          style: AppTypography.textTheme.headlineMedium?.copyWith(
+            fontSize: 24,
+          ),
+        ),
+        centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
@@ -36,12 +43,6 @@ class InputMethodSelectionPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 16),
-              Text(
-                'How would you like to provide your data?',
-                style: AppTypography.textTheme.displaySmall,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
               Text(
                 'Choose the method that works best for you. You can always edit your information later.',
                 style: AppTypography.textTheme.bodyMedium?.copyWith(

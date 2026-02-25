@@ -261,8 +261,8 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                                 columns: const [
                                   DataColumn(label: Text('Business Name')),
                                   DataColumn(label: Text('Industry')),
-                                  DataColumn(label: Text('Rev (Y1)')),
-                                  DataColumn(label: Text('Rev (Y2)')),
+                                  DataColumn(label: Text('Annual Rev')),
+                                  DataColumn(label: Text('Annual Exp')),
                                 ],
                                 rows: List.generate(
                                   3,
@@ -279,7 +279,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                                       DataCell(Text('Acme Mfg')),
                                       DataCell(Text('Manufacturing')),
                                       DataCell(Text('500,000')),
-                                      DataCell(Text('600,000')),
+                                      DataCell(Text('300,000')),
                                     ],
                                   ),
                                 ),

@@ -4,6 +4,7 @@ import 'package:partnest/core/theme/app_colors.dart';
 import 'package:partnest/core/theme/app_typography.dart';
 import 'package:partnest/features/auth/presentation/pages/onboarding/input_method_selection_page.dart';
 import 'package:partnest/features/auth/presentation/pages/investor/investor_onboarding_page.dart';
+import 'package:partnest/core/theme/widgets/custom_button.dart';
 
 class WelcomeRoleSelectionPage extends StatelessWidget {
   const WelcomeRoleSelectionPage({super.key});
@@ -18,27 +19,9 @@ class WelcomeRoleSelectionPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 32),
-              // Header: Logo
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(LucideIcons.hexagon, color: AppColors.trustBlue, size: 32),
-                    const SizedBox(width: 8),
-                    Text(
-                      'PARTNEX',
-                      style: AppTypography.textTheme.displayMedium?.copyWith(
-                        color: AppColors.trustBlue,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
               // Hero Section
               Text(
-                'Welcome to Partnex',
+                'How will you use Partnex?',
                 style: AppTypography.textTheme.displayMedium?.copyWith(
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
@@ -48,7 +31,7 @@ class WelcomeRoleSelectionPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Unlock funding opportunities with a transparent credibility score. Let\'s get started.',
+                'Choose how you want to use Partnex.',
                 style: AppTypography.textTheme.bodyLarge?.copyWith(
                   color: AppColors.slate600,
                 ),
@@ -63,8 +46,7 @@ class WelcomeRoleSelectionPage extends StatelessWidget {
                     children: [
                       _RoleCard(
                         title: 'I\'m an SME',
-                        description:
-                            'Create a profile and get your credibility score',
+                        description: 'Get your credibility score and access funding opportunities',
                         ctaText: 'Continue as SME',
                         icon: LucideIcons.building,
                         isPrimary: true,
@@ -198,7 +180,7 @@ class _RoleCardState extends State<_RoleCard> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: widget.isPrimary
-                      ? AppColors.trustBlue.withOpacity(0.1)
+                      ? AppColors.trustBlue.withValues(alpha: 0.1)
                       : AppColors.slate200,
                   shape: BoxShape.circle,
                 ),
@@ -226,26 +208,12 @@ class _RoleCardState extends State<_RoleCard> {
                 ),
               ),
               const SizedBox(height: 24),
-              Row(
-                children: [
-                  Text(
-                    widget.ctaText,
-                    style: AppTypography.textTheme.labelLarge?.copyWith(
-                      fontSize: 14,
-                      color: widget.isPrimary
-                          ? AppColors.trustBlue
-                          : AppColors.slate900,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(
-                    LucideIcons.arrowRight,
-                    size: 16,
-                    color: widget.isPrimary
-                        ? AppColors.trustBlue
-                        : AppColors.slate900,
-                  ),
-                ],
+              IgnorePointer(
+                child: CustomButton(
+                  text: widget.ctaText,
+                  onPressed: () {},
+                  variant: widget.isPrimary ? ButtonVariant.primary : ButtonVariant.secondary,
+                ),
               ),
             ],
           ),

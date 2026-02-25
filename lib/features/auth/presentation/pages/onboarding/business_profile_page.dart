@@ -117,8 +117,8 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                         controller: _nameController,
                         onChanged: _onFieldChanged,
                         validator: (val) {
-                          if (val == null || val.length < 2)
-                            return 'Required (min 2 chars)';
+                          if (val == null || val.length < 2 || val.length > 100)
+                            return 'Business name must be between 2 and 100 characters';
                           return null;
                         },
                       ),
@@ -142,7 +142,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                         onChanged: _onFieldChanged,
                         validator: (val) {
                           if (val == null || val.isEmpty)
-                            return 'Location is required';
+                            return 'Please enter a valid location';
                           return null;
                         },
                       ),
@@ -156,7 +156,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                           if (val == null || val.isEmpty) return 'Required';
                           final num = int.tryParse(val);
                           if (num == null || num < 0 || num > 100)
-                            return 'Must be between 0 and 100';
+                            return 'Please enter a valid number between 0 and 100';
                           return null;
                         },
                       ),
@@ -169,8 +169,8 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                         validator: (val) {
                           if (val == null || val.isEmpty) return 'Required';
                           final num = int.tryParse(val);
-                          if (num == null || num < 1 || num > 10000)
-                            return 'Must be between 1 and 10,000';
+                          if (num == null || num < 0 || num > 10000)
+                            return 'Please enter a valid number';
                           return null;
                         },
                       ),

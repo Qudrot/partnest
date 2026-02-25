@@ -21,7 +21,7 @@ class CredibilityDashboardPage extends StatelessWidget {
         if (state is ScoreLoading || state is ScoreInitial) {
           return const Scaffold(
             backgroundColor: Colors.white,
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(child: CircularProgressIndicator(color: AppColors.trustBlue)),
           );
         }
 
@@ -45,469 +45,359 @@ class CredibilityDashboardPage extends StatelessWidget {
           riskColor = AppColors.warningAmber;
         }
 
-        final formattedDate = DateFormat('MMM d, yyyy \\at h:mm a').format(scoreData.calculatedAt);
+        final formattedDate = DateFormat('MMM d, yyyy \\a\\t h:mm a').format(scoreData.calculatedAt);
 
         return Scaffold(
           backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Your Credibility Score',
-          style: AppTypography.textTheme.headlineMedium,
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(LucideIcons.menu, color: AppColors.slate900),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProfileManagementPage()),
-              );
-            },
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: Text(
+              'Your Credibility Score',
+              style: AppTypography.textTheme.headlineMedium?.copyWith(
+                color: AppColors.slate900,
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            centerTitle: true,
+            actions: [
+              IconButton(
+                icon: const Icon(LucideIcons.menu, color: AppColors.slate900),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ProfileManagementPage()),
+                  );
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Hero Section: Score Circle
-              Center(
-                child: Column(
-                  children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: riskColor,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: riskColor.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          scoreData.totalScore.toInt().toString(),
-                          style: AppTypography.textTheme.displayLarge?.copyWith(
-                            fontSize: 56,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: riskColor,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        riskLevelString,
-                        style: AppTypography.textTheme.bodyMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Primary Score Area
+                  const SizedBox(height: 8),
+                  Center(
+                    child: Column(
                       children: [
-                        const Icon(LucideIcons.calendar, size: 16, color: AppColors.slate400),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Generated on $formattedDate',
-                          style: AppTypography.textTheme.bodySmall?.copyWith(
-                            color: AppColors.slate600,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const ScoreDriversDetailPage()),
+                            );
+                          },
+                          child: Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              color: riskColor,
+                              shape: BoxShape.circle,
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color.fromRGBO(0, 0, 0, 0.1),
+                                  blurRadius: 12,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Text(
+                                scoreData.totalScore.toInt().toString(),
+                                style: AppTypography.textTheme.displayLarge?.copyWith(
+                                  fontSize: 56,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
                           ),
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: riskColor,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            riskLevelString,
+                            style: AppTypography.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(LucideIcons.clock, size: 14, color: AppColors.slate400),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Generated on $formattedDate',
+                              style: AppTypography.textTheme.bodySmall?.copyWith(
+                                color: AppColors.slate600,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Key Metrics Area
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 1.8,
+                    children: [
+                      _buildMetricMiniCard(
+                        label: 'Revenue Trend',
+                        value: '↑ 115%',
+                        icon: LucideIcons.trendingUp,
+                        statusColor: AppColors.successGreen,
+                      ),
+                      _buildMetricMiniCard(
+                        label: 'Expenses',
+                        value: '60%',
+                        icon: LucideIcons.pieChart,
+                        statusColor: AppColors.successGreen, // "Healthy" matching success green on screen 9 spec
+                      ),
+                      _buildMetricMiniCard(
+                        label: 'Liabilities',
+                        value: '₦200K',
+                        icon: LucideIcons.alertCircle,
+                        statusColor: AppColors.warningAmber,
+                      ),
+                      _buildMetricMiniCard(
+                        label: 'Payment History',
+                        value: 'On Time ✓',
+                        icon: LucideIcons.checkCircle,
+                        statusColor: AppColors.successGreen,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Score Drivers Area
+                  Text(
+                    'What Drives Your Score',
+                    style: AppTypography.textTheme.headlineMedium?.copyWith(
+                      color: AppColors.slate900,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Top 3 factors contributing to your credibility score',
+                    style: AppTypography.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.slate600,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  _buildDriverBar(
+                     driverName: 'Payment History',
+                     points: '90',
+                     percentage: 0.30,
+                     statusColor: AppColors.successGreen,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildDriverBar(
+                     driverName: 'Revenue Trend',
+                     points: '75',
+                     percentage: 0.25,
+                     statusColor: AppColors.successGreen,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildDriverBar(
+                     driverName: 'Expense Ratio',
+                     points: '60',
+                     percentage: 0.20,
+                     statusColor: AppColors.warningAmber,
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Actions Area
+                  CustomButton(
+                    text: 'Apply for Funding',
+                    variant: ButtonVariant.primary,
+                    onPressed: () {},
+                  ),
+                  const SizedBox(height: 12),
+                  CustomButton(
+                    text: 'View Detailed Breakdown',
+                    variant: ButtonVariant.secondary,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ScoreDriversDetailPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(LucideIcons.download, size: 20, color: AppColors.trustBlue),
+                        label: Text('Download', style: AppTypography.textTheme.bodyMedium?.copyWith(
+                          color: AppColors.trustBlue,
+                          fontWeight: FontWeight.w600,
+                        )),
+                      ),
+                      TextButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(LucideIcons.share2, size: 20, color: AppColors.trustBlue),
+                        label: Text('Share', style: AppTypography.textTheme.bodyMedium?.copyWith(
+                          color: AppColors.trustBlue,
+                          fontWeight: FontWeight.w600,
+                        )),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                ],
               ),
-
-              const SizedBox(height: 32),
-
-              // Key Metrics Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1.5,
-                  children: [
-                    _MetricCard(
-                      label: 'Revenue Trend',
-                      value: '+15% YoY',
-                      trendText: 'Positive',
-                      trendColor: AppColors.successGreen,
-                      icon: LucideIcons.trendingUp,
-                      iconColor: AppColors.successGreen,
-                    ),
-                    _MetricCard(
-                      label: 'Expense Ratio',
-                      value: '60%',
-                      trendText: 'Healthy',
-                      trendColor: AppColors.trustBlue,
-                      icon: LucideIcons.pieChart,
-                      iconColor: AppColors.trustBlue,
-                    ),
-                    _MetricCard(
-                      label: 'Liabilities',
-                      value: '₦200,000',
-                      trendText: 'Moderate',
-                      trendColor: AppColors.warningAmber,
-                      icon: LucideIcons.alertCircle,
-                      iconColor: AppColors.warningAmber,
-                    ),
-                    _MetricCard(
-                      label: 'Payment History',
-                      value: 'On Time',
-                      trendText: 'Positive',
-                      trendColor: AppColors.successGreen,
-                      icon: LucideIcons.checkCircle,
-                      iconColor: AppColors.successGreen,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Score Drivers Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'What Drives Your Score',
-                      style: AppTypography.textTheme.headlineMedium?.copyWith(
-                        color: AppColors.slate900,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Top 3 factors contributing to your credibility',
-                      style: AppTypography.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.slate600,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    if (scoreData.topContributingFactors.isNotEmpty)
-                      _DriverCard(
-                        rank: '1st',
-                        title: 'Years of Operation',
-                        contribution: 'High Impact',
-                        contributionColor: AppColors.successGreen,
-                        icon: LucideIcons.calendarClock,
-                        iconColor: AppColors.successGreen,
-                        status: 'Positive',
-                        explanation: scoreData.topContributingFactors[0],
-                      ),
-                    const SizedBox(height: 12),
-                    if (scoreData.topContributingFactors.length > 1)
-                      _DriverCard(
-                        rank: '2nd',
-                        title: 'Company Scale',
-                        contribution: 'High Impact',
-                        contributionColor: AppColors.trustBlue,
-                        icon: LucideIcons.users,
-                        iconColor: AppColors.trustBlue,
-                        status: 'Neutral',
-                        explanation: scoreData.topContributingFactors[1],
-                      ),
-                    const SizedBox(height: 12),
-                    if (scoreData.generalExplanation?.isNotEmpty == true)
-                      _DriverCard(
-                        rank: 'Data Notice',
-                        title: 'AI MVP Boundary',
-                        contribution: 'Limited Data Scope',
-                        contributionColor: AppColors.warningAmber,
-                        icon: LucideIcons.info,
-                        iconColor: AppColors.warningAmber,
-                        status: 'Notice',
-                        explanation: scoreData.generalExplanation ?? '',
-                      ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Action Buttons
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    CustomButton(
-                      text: 'View Detailed Breakdown',
-                      variant: ButtonVariant.primary,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ScoreDriversDetailPage(),
-                          ),
-                        );
-                      },
-                      // Add trailing icon for chevron inside CustomButton logic if needed,
-                      // or just use standard button
-                    ),
-                    const SizedBox(height: 12),
-                    CustomButton(
-                      text: 'Download Report',
-                      variant: ButtonVariant.secondary,
-                      onPressed: () {},
-                    ),
-                    const SizedBox(height: 12),
-                    CustomButton(
-                      text: 'Share Score',
-                      variant: ButtonVariant.tertiary,
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-            ],
+            ),
           ),
-        ),
-      ),
-     );
-    },
-   );
+        );
+      },
+    );
   }
-}
 
-class _MetricCard extends StatelessWidget {
-  final String label;
-  final String value;
-  final String trendText;
-  final Color trendColor;
-  final IconData icon;
-  final Color iconColor;
-
-  const _MetricCard({
-    required this.label,
-    required this.value,
-    required this.trendText,
-    required this.trendColor,
-    required this.icon,
-    required this.iconColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildMetricMiniCard({
+    required String label,
+    required String value,
+    required IconData icon,
+    required Color statusColor,
+  }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.slate50,
-        borderRadius: BorderRadius.circular(6),
         border: Border.all(color: AppColors.slate200),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(icon, size: 20, color: iconColor),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  label,
-                  style: AppTypography.textTheme.labelMedium?.copyWith(
-                    color: AppColors.slate600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
+               Text(
+                 label,
+                 style: AppTypography.textTheme.labelMedium?.copyWith(
+                   color: AppColors.slate600,
+                   fontWeight: FontWeight.w600,
+                   fontSize: 12,
+                 ),
+                 overflow: TextOverflow.ellipsis,
+               ),
+              Icon(icon, size: 20, color: statusColor),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             value,
             style: AppTypography.textTheme.headlineSmall?.copyWith(
               color: AppColors.slate900,
-              fontSize: 18,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            trendText,
-            style: AppTypography.textTheme.bodySmall?.copyWith(
-              color: trendColor,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
             ),
           ),
         ],
       ),
     );
   }
-}
 
-class _DriverCard extends StatefulWidget {
-  final String rank;
-  final String title;
-  final String contribution;
-  final Color contributionColor;
-  final IconData icon;
-  final Color iconColor;
-  final String status;
-  final String explanation;
-
-  const _DriverCard({
-    required this.rank,
-    required this.title,
-    required this.contribution,
-    required this.contributionColor,
-    required this.icon,
-    required this.iconColor,
-    required this.status,
-    required this.explanation,
-  });
-
-  @override
-  State<_DriverCard> createState() => _DriverCardState();
-}
-
-class _DriverCardState extends State<_DriverCard> {
-  bool _isExpanded = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildDriverBar({
+    required String driverName,
+    required String points,
+    required double percentage,
+    required Color statusColor,
+  }) {
     return Container(
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
+        border: Border.all(color: AppColors.slate200),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: _isExpanded ? AppColors.trustBlue : AppColors.slate200,
-          width: _isExpanded ? 2.0 : 1.0,
-        ),
-        boxShadow: [
-          if (_isExpanded)
-            BoxShadow(
-              color: AppColors.slate200.withValues(alpha: 0.5),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            )
-        ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => setState(() => _isExpanded = !_isExpanded),
-          borderRadius: BorderRadius.circular(6),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              driverName,
+              style: AppTypography.textTheme.bodyMedium?.copyWith(
+                color: AppColors.slate900,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 3,
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AppColors.slate100,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        widget.rank,
-                        style: AppTypography.textTheme.labelSmall?.copyWith(
-                          color: AppColors.slate600,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        widget.title,
-                        style: AppTypography.textTheme.headlineSmall?.copyWith(
-                          fontSize: 16,
-                          color: AppColors.slate900,
-                        ),
-                      ),
-                    ),
-                    Icon(
-                      _isExpanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
-                      color: AppColors.slate400,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(widget.icon, size: 20, color: widget.iconColor),
-                    const SizedBox(width: 8),
-                    Text(
-                      widget.contribution,
-                      style: AppTypography.textTheme.bodyMedium?.copyWith(
-                        color: widget.contributionColor,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      widget.status,
-                      style: AppTypography.textTheme.bodyMedium?.copyWith(
-                        color: widget.contributionColor,
-                      ),
-                    ),
-                  ],
-                ),
-                if (_isExpanded) ...[
-                  const SizedBox(height: 16),
-                  Divider(color: AppColors.slate200),
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.explanation,
-                    style: AppTypography.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.slate700,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Mini chart placeholder
-                  Container(
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.slate50,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '[ Chart Visualization ]',
-                        style: AppTypography.textTheme.bodySmall?.copyWith(
-                          color: AppColors.slate400,
-                        ),
-                      ),
-                    ),
-                  )
-                ],
+                 Expanded(
+                   child: Container(
+                     height: 4,
+                     decoration: BoxDecoration(
+                       color: AppColors.slate100,
+                       borderRadius: BorderRadius.circular(2),
+                     ),
+                     child: FractionallySizedBox(
+                       alignment: Alignment.centerLeft,
+                       widthFactor: 1.0, // Visual bar represents the max weight of the bar
+                       child: Container(
+                         decoration: BoxDecoration(
+                           color: statusColor,
+                           borderRadius: BorderRadius.circular(2),
+                         ),
+                       ),
+                     ),
+                   ),
+                 ),
               ],
             ),
           ),
-        ),
+          const SizedBox(width: 16),
+          Text(
+            points,
+            style: AppTypography.textTheme.bodyMedium?.copyWith(
+              color: AppColors.slate900,
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
+        ],
       ),
     );
   }

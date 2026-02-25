@@ -9,22 +9,19 @@ class SmeProfileState extends Equatable {
   final int numberOfEmployees;
 
   // Step 2: Revenue & Expenses
-  final double year1Revenue;
-  final double year2Revenue;
-  final double? year3Revenue;
+  final double annualRevenue;
+  final double annualExpenses;
   final double monthlyAvgRevenue;
   final double monthlyAvgExpenses;
 
   // Step 3: Liabilities & History
-  final double existingLiabilities;
-  final String? liabilityType;
+  final double totalLiabilities;
+  final double outstandingLoans;
   final bool? hasPriorFunding;
   final double? priorFundingAmount;
   final String? priorFundingSource;
   final int? fundingYear;
-  final bool? hasDefaulted;
-  final String? defaultDetails;
-  final String? paymentTimeliness;
+  final int? onTimePaymentRate;
 
   const SmeProfileState({
     this.businessName = '',
@@ -32,20 +29,17 @@ class SmeProfileState extends Equatable {
     this.location = '',
     this.yearsOfOperation = 0,
     this.numberOfEmployees = 0,
-    this.year1Revenue = 0,
-    this.year2Revenue = 0,
-    this.year3Revenue,
+    this.annualRevenue = 0,
+    this.annualExpenses = 0,
     this.monthlyAvgRevenue = 0,
     this.monthlyAvgExpenses = 0,
-    this.existingLiabilities = 0,
-    this.liabilityType,
+    this.totalLiabilities = 0,
+    this.outstandingLoans = 0,
     this.hasPriorFunding,
     this.priorFundingAmount,
     this.priorFundingSource,
     this.fundingYear,
-    this.hasDefaulted,
-    this.defaultDetails,
-    this.paymentTimeliness,
+    this.onTimePaymentRate,
   });
 
   SmeProfileState copyWith({
@@ -54,20 +48,17 @@ class SmeProfileState extends Equatable {
     String? location,
     int? yearsOfOperation,
     int? numberOfEmployees,
-    double? year1Revenue,
-    double? year2Revenue,
-    double? year3Revenue,
+    double? annualRevenue,
+    double? annualExpenses,
     double? monthlyAvgRevenue,
     double? monthlyAvgExpenses,
-    double? existingLiabilities,
-    String? liabilityType,
+    double? totalLiabilities,
+    double? outstandingLoans,
     bool? hasPriorFunding,
     double? priorFundingAmount,
     String? priorFundingSource,
     int? fundingYear,
-    bool? hasDefaulted,
-    String? defaultDetails,
-    String? paymentTimeliness,
+    int? onTimePaymentRate,
   }) {
     return SmeProfileState(
       businessName: businessName ?? this.businessName,
@@ -75,20 +66,17 @@ class SmeProfileState extends Equatable {
       location: location ?? this.location,
       yearsOfOperation: yearsOfOperation ?? this.yearsOfOperation,
       numberOfEmployees: numberOfEmployees ?? this.numberOfEmployees,
-      year1Revenue: year1Revenue ?? this.year1Revenue,
-      year2Revenue: year2Revenue ?? this.year2Revenue,
-      year3Revenue: year3Revenue ?? this.year3Revenue,
+      annualRevenue: annualRevenue ?? this.annualRevenue,
+      annualExpenses: annualExpenses ?? this.annualExpenses,
       monthlyAvgRevenue: monthlyAvgRevenue ?? this.monthlyAvgRevenue,
       monthlyAvgExpenses: monthlyAvgExpenses ?? this.monthlyAvgExpenses,
-      existingLiabilities: existingLiabilities ?? this.existingLiabilities,
-      liabilityType: liabilityType ?? this.liabilityType,
+      totalLiabilities: totalLiabilities ?? this.totalLiabilities,
+      outstandingLoans: outstandingLoans ?? this.outstandingLoans,
       hasPriorFunding: hasPriorFunding ?? this.hasPriorFunding,
       priorFundingAmount: priorFundingAmount ?? this.priorFundingAmount,
       priorFundingSource: priorFundingSource ?? this.priorFundingSource,
       fundingYear: fundingYear ?? this.fundingYear,
-      hasDefaulted: hasDefaulted ?? this.hasDefaulted,
-      defaultDetails: defaultDetails ?? this.defaultDetails,
-      paymentTimeliness: paymentTimeliness ?? this.paymentTimeliness,
+      onTimePaymentRate: onTimePaymentRate ?? this.onTimePaymentRate,
     );
   }
 
@@ -100,20 +88,17 @@ class SmeProfileState extends Equatable {
       'location': location,
       'yearsOfOperation': yearsOfOperation,
       'numberOfEmployees': numberOfEmployees,
-      'year1Revenue': year1Revenue,
-      'year2Revenue': year2Revenue,
-      'year3Revenue': year3Revenue,
+      'annualRevenue': annualRevenue,
+      'annualExpenses': annualExpenses,
       'monthlyAvgRevenue': monthlyAvgRevenue,
       'monthlyAvgExpenses': monthlyAvgExpenses,
-      'existingLiabilities': existingLiabilities,
-      'liabilityType': liabilityType,
+      'totalLiabilities': totalLiabilities,
+      'outstandingLoans': outstandingLoans,
       'hasPriorFunding': hasPriorFunding,
       'priorFundingAmount': priorFundingAmount,
       'priorFundingSource': priorFundingSource,
       'fundingYear': fundingYear,
-      'hasDefaulted': hasDefaulted,
-      'defaultDetails': defaultDetails,
-      'paymentTimeliness': paymentTimeliness,
+      'onTimePaymentRate': onTimePaymentRate,
     };
   }
 
@@ -124,19 +109,16 @@ class SmeProfileState extends Equatable {
         location,
         yearsOfOperation,
         numberOfEmployees,
-        year1Revenue,
-        year2Revenue,
-        year3Revenue,
+        annualRevenue,
+        annualExpenses,
         monthlyAvgRevenue,
         monthlyAvgExpenses,
-        existingLiabilities,
-        liabilityType,
+        totalLiabilities,
+        outstandingLoans,
         hasPriorFunding,
         priorFundingAmount,
         priorFundingSource,
         fundingYear,
-        hasDefaulted,
-        defaultDetails,
-        paymentTimeliness,
+        onTimePaymentRate,
       ];
 }

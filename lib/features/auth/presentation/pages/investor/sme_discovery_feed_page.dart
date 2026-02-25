@@ -3,6 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:partnest/core/theme/app_colors.dart';
 import 'package:partnest/core/theme/app_typography.dart';
 import 'package:partnest/features/auth/presentation/pages/investor/sme_profile_expanded_page.dart';
+import 'package:partnest/features/auth/presentation/pages/investor/deep_dive_evidence_page.dart';
 
 class SmeDiscoveryFeedPage extends StatefulWidget {
   const SmeDiscoveryFeedPage({super.key});
@@ -12,12 +13,19 @@ class SmeDiscoveryFeedPage extends StatefulWidget {
 }
 
 class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
-  final List<String> _activeFilters = ['Manufacturing', 'Score: 80+', 'Lagos'];
+  final List<String> _activeFilters = ['Manufacturing', 'Score: 80+', 'Revenue: ₦500K+'];
 
   void _navigateToProfile() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const SmeProfileExpandedPage()),
+    );
+  }
+
+  void _navigateToEvidence() {
+     Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const DeepDiveEvidencePage()),
     );
   }
 
@@ -34,78 +42,67 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                 children: [
+                   // The redesigned SME Profile Card (Investor-Centric)
                   _buildSmeCard(
                     companyName: 'Acme Manufacturing',
                     industry: 'Manufacturing',
                     location: 'Lagos, Nigeria',
-                    years: '5 years',
-                    score: 85,
-                    scoreColor: AppColors.successGreen,
-                    riskLevel: 'Low Risk',
-                    traction: '↑ 22% YoY',
-                    tractionColor: AppColors.successGreen,
-                    revenue: '₦750K',
                     employees: '25',
-                    liabilities: '₦200K',
+                    revenue: '₦750K',
+                    growthSignal: '↑ 22% YoY',
+                    isGrowthPositive: true,
                     trustFunded: true,
                     trustPayments: true,
-                    trustStability: true,
+                    trustStable: true,
+                    score: 85,
+                    riskLevel: 'Low',
+                    scoreColor: AppColors.successGreen,
                   ),
-                  _buildSmeCard(
+                   _buildSmeCard(
                     companyName: 'TechStart Solutions',
                     industry: 'Technology',
                     location: 'Abuja, Nigeria',
-                    years: '2 years',
-                    score: 62,
-                    scoreColor: AppColors.warningAmber,
-                    riskLevel: 'Medium Risk',
-                    traction: '↑ 45% YoY',
-                    tractionColor: AppColors.successGreen,
-                    revenue: '₦500K',
                     employees: '12',
-                    liabilities: '₦150K',
+                    revenue: '₦500K',
+                    growthSignal: '↑ 45% YoY',
+                    isGrowthPositive: true,
                     trustFunded: true,
                     trustPayments: true,
-                    trustStability: false,
+                    trustStable: false,
+                    score: 62,
+                    riskLevel: 'Med',
+                    scoreColor: AppColors.warningAmber,
                   ),
                   _buildSmeCard(
                     companyName: 'Traditional Retail Ltd',
                     industry: 'Retail',
                     location: 'Kano, Nigeria',
-                    years: '8 years',
-                    score: 45,
-                    scoreColor: AppColors.dangerRed,
-                    riskLevel: 'High Risk',
-                    traction: '↓ 5% YoY',
-                    tractionColor: AppColors.dangerRed,
-                    revenue: '₦300K',
                     employees: '8',
-                    liabilities: '₦400K',
+                    revenue: '₦300K',
+                    growthSignal: '↓ 5% YoY',
+                    isGrowthPositive: false,
                     trustFunded: false,
                     trustPayments: false,
-                    trustStability: false,
+                    trustStable: false,
+                    score: 45,
+                    riskLevel: 'High',
+                    scoreColor: AppColors.dangerRed,
                   ),
                   const SizedBox(height: 16),
                   Center(
-                    child: TextButton.icon(
+                    child: TextButton(
                       onPressed: () {},
-                      icon: const Icon(LucideIcons.chevronDown, size: 16, color: AppColors.slate600),
-                      label: Text(
-                        'Load More SMEs',
+                      child: Text(
+                        'Load More',
                         style: AppTypography.textTheme.labelLarge?.copyWith(
                           color: AppColors.slate600,
-                        ),
-                      ),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(color: AppColors.slate200),
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 32),
+                   _buildFooter(),
                 ],
               ),
             ),
@@ -118,7 +115,7 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
   Widget _buildHeader() {
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       child: Row(
         children: [
           const Icon(LucideIcons.hexagon, color: AppColors.trustBlue, size: 28),
@@ -131,9 +128,9 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(color: AppColors.slate200),
               ),
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Row(
                 children: [
-                  const SizedBox(width: 12),
                   const Icon(LucideIcons.search, size: 16, color: AppColors.slate400),
                   const SizedBox(width: 8),
                   Expanded(
@@ -142,12 +139,14 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
                         hintText: 'Search by company name, industry...',
                         hintStyle: AppTypography.textTheme.bodyMedium?.copyWith(
                           color: AppColors.slate400,
+                          fontSize: 14,
                         ),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.only(bottom: 12),
+                        contentPadding: const EdgeInsets.only(bottom: 14), // Align text vertically
                       ),
                       style: AppTypography.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.slate900,
+                        color: AppColors.slate700,
+                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -155,19 +154,16 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Material(
             color: Colors.transparent,
             child: InkWell(
               onTap: () {},
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(6),
+              hoverColor: AppColors.slate50,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    const Icon(LucideIcons.sliders, size: 20, color: AppColors.slate600),
-                  ],
-                ),
+                child: Icon(LucideIcons.sliders, size: 20, color: AppColors.slate600),
               ),
             ),
           ),
@@ -178,57 +174,46 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
 
   Widget _buildFilterBar() {
     return Container(
-      height: 48,
+      height: 44,
       color: Colors.white,
       width: double.infinity,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(
-          children: [
-            ..._activeFilters.map((filter) {
-              return Container(
-                margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.trustBlue.withValues(alpha: 0.1),
-                  border: Border.all(color: AppColors.trustBlue),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      filter,
-                      style: AppTypography.textTheme.labelSmall?.copyWith(
-                        color: AppColors.trustBlue,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          _activeFilters.remove(filter);
-                        });
-                      },
-                      child: const Icon(LucideIcons.x, size: 12, color: AppColors.slate600),
-                    ),
-                  ],
-                ),
-              );
-            }),
-            TextButton.icon(
-              onPressed: () {},
-              icon: const Icon(LucideIcons.plus, size: 14, color: AppColors.trustBlue),
-              label: Text(
-                'Add Filter',
-                style: AppTypography.textTheme.labelSmall?.copyWith(
-                  color: AppColors.trustBlue,
-                  fontWeight: FontWeight.w600,
-                ),
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: _activeFilters.map((filter) {
+            return Container(
+              margin: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.slate100,
+                border: Border.all(color: AppColors.slate200),
+                borderRadius: BorderRadius.circular(4),
               ),
-            ),
-          ],
+              child: Row(
+                children: [
+                  Text(
+                    filter,
+                    style: AppTypography.textTheme.labelSmall?.copyWith(
+                      color: AppColors.slate900,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        _activeFilters.remove(filter);
+                      });
+                    },
+                    child: const Icon(LucideIcons.x, size: 14, color: AppColors.slate400),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
         ),
       ),
     );
@@ -238,30 +223,28 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
     required String companyName,
     required String industry,
     required String location,
-    required String years,
-    required int score,
-    required Color scoreColor,
-    required String riskLevel,
-    required String traction,
-    required Color tractionColor,
-    required String revenue,
     required String employees,
-    required String liabilities,
+    required String revenue,
+    required String growthSignal,
+    required bool isGrowthPositive,
     required bool trustFunded,
     required bool trustPayments,
-    required bool trustStability,
+    required bool trustStable,
+    required int score,
+    required String riskLevel,
+    required Color scoreColor,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.slate200),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: AppColors.slate200.withValues(alpha: 0.5),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
+            color: Color.fromRGBO(0, 0, 0, 0.05),
+            blurRadius: 2,
+            offset: Offset(0, 1),
           )
         ],
       ),
@@ -270,137 +253,140 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
         child: InkWell(
           onTap: _navigateToProfile,
           borderRadius: BorderRadius.circular(8),
+          hoverColor: AppColors.slate50,
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(12.0),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Left Section (40%)
+                // Left Section (Business Information) ~70% width logically
                 Expanded(
-                  flex: 40,
+                  flex: 5,
+                  child: Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     mainAxisAlignment: MainAxisAlignment.center,
+                     children: [
+                       Text(
+                         companyName,
+                         style: AppTypography.textTheme.bodyMedium?.copyWith(
+                           fontWeight: FontWeight.w600,
+                           fontSize: 16,
+                           color: AppColors.slate900,
+                         ),
+                         maxLines: 1,
+                         overflow: TextOverflow.ellipsis,
+                       ),
+                       const SizedBox(height: 4),
+                       Row(
+                         children: [
+                            const Icon(LucideIcons.mapPin, size: 12, color: AppColors.slate400),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                '$industry · $location',
+                                style: AppTypography.textTheme.bodySmall?.copyWith(
+                                  color: AppColors.slate600,
+                                  fontSize: 12,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                         ],
+                       ),
+                       const SizedBox(height: 4),
+                       Row(
+                         children: [
+                            const Icon(LucideIcons.users, size: 12, color: AppColors.slate400),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                '$employees employees · $revenue revenue',
+                                style: AppTypography.textTheme.bodySmall?.copyWith(
+                                  color: AppColors.slate600,
+                                  fontSize: 12,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                         ],
+                       ),
+                     ],
+                  ),
+                ),
+                // Center Section (Growth & Trust Signals)
+                Expanded(
+                  flex: 3,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: AppColors.slate100,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Icon(LucideIcons.building, size: 16, color: AppColors.slate400),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              companyName,
-                              style: AppTypography.textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.slate900,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
                       Text(
-                        '$industry · $location',
-                        style: AppTypography.textTheme.bodySmall?.copyWith(
-                          color: AppColors.slate600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        years,
-                        style: AppTypography.textTheme.bodySmall?.copyWith(
-                          color: AppColors.slate600,
+                        growthSignal,
+                        style: AppTypography.textTheme.bodyMedium?.copyWith(
+                           fontWeight: FontWeight.w600,
+                           fontSize: 14,
+                           color: isGrowthPositive ? AppColors.successGreen : AppColors.dangerRed,
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                
-                // Center Section (30%)
-                Expanded(
-                  flex: 30,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: scoreColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Text(
-                            score.toString(),
-                            style: AppTypography.textTheme.headlineSmall?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: scoreColor,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          riskLevel,
-                          style: AppTypography.textTheme.labelSmall?.copyWith(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        traction,
-                        style: AppTypography.textTheme.labelSmall?.copyWith(
-                          color: tractionColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                // Right Section (30%)
-                Expanded(
-                  flex: 30,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      _buildFinancialRow('Rev', revenue),
-                      const SizedBox(height: 4),
-                      _buildFinancialRow('Emp', employees),
-                      const SizedBox(height: 4),
-                      _buildFinancialRow('Lia', liabilities),
                       const SizedBox(height: 8),
+                      // Trust Signals Row
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          _buildTrustIcon(trustFunded),
-                          const SizedBox(width: 4),
-                          _buildTrustIcon(trustPayments),
-                          const SizedBox(width: 4),
-                          _buildTrustIcon(trustStability),
-                        ],
+                         children: [
+                           if(trustFunded) const Icon(LucideIcons.checkCircle, size: 12, color: AppColors.successGreen),
+                           if(trustFunded) const SizedBox(width: 2),
+                           if(trustPayments) const Icon(LucideIcons.checkCircle, size: 12, color: AppColors.successGreen),
+                           if(trustPayments) const SizedBox(width: 2),
+                           if(trustStable) const Icon(LucideIcons.checkCircle, size: 12, color: AppColors.successGreen),
+                         ],
                       ),
                     ],
                   ),
+                ),
+                // Right Section (Score Badge)
+                const SizedBox(width: 12),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                     GestureDetector(
+                       onTap: _navigateToEvidence,
+                       child: Container(
+                         width: 48,
+                         height: 48,
+                         decoration: BoxDecoration(
+                           color: scoreColor,
+                           shape: BoxShape.circle,
+                           boxShadow: const [
+                             BoxShadow(
+                               color: Color.fromRGBO(0, 0, 0, 0.05),
+                               blurRadius: 2,
+                               offset: Offset(0, 1),
+                             )
+                           ],
+                         ),
+                         child: Center(
+                           child: Text(
+                             score.toString(),
+                             style: AppTypography.textTheme.headlineSmall?.copyWith(
+                               color: Colors.white,
+                               fontSize: 20,
+                               fontWeight: FontWeight.w700,
+                             ),
+                           ),
+                         ),
+                       ),
+                     ),
+                     const SizedBox(height: 4),
+                     Text(
+                       riskLevel,
+                       style: AppTypography.textTheme.labelSmall?.copyWith(
+                         color: scoreColor, // Using colored text or can be a small badge
+                         fontSize: 10,
+                         fontWeight: FontWeight.w600,
+                       ),
+                     ),
+                  ],
                 ),
               ],
             ),
@@ -410,35 +396,40 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
     );
   }
 
-  Widget _buildFinancialRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Text(
-          '$label:',
-          style: AppTypography.textTheme.labelSmall?.copyWith(
-            color: AppColors.slate600,
-            fontSize: 11,
+  Widget _buildFooter() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TextButton(
+            onPressed: () {},
+            child: Text(
+              'Help',
+              style: AppTypography.textTheme.bodySmall?.copyWith(
+                color: AppColors.slate600,
+              ),
+            ),
           ),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          value,
-          style: AppTypography.textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: AppColors.slate900,
-            fontSize: 12,
+          const SizedBox(width: 16),
+          Text(
+             '·',
+             style: AppTypography.textTheme.bodySmall?.copyWith(
+               color: AppColors.slate400,
+             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTrustIcon(bool isTrustworthy) {
-    return Icon(
-      isTrustworthy ? LucideIcons.checkCircle : LucideIcons.xCircle,
-      size: 14,
-      color: isTrustworthy ? AppColors.successGreen : AppColors.slate400,
+          const SizedBox(width: 16),
+          TextButton(
+            onPressed: () {},
+            child: Text(
+              'Contact Support',
+              style: AppTypography.textTheme.bodySmall?.copyWith(
+                color: AppColors.slate600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
