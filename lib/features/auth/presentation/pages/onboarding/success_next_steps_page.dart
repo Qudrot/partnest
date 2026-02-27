@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:partnex/core/theme/app_colors.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
+import 'package:partnex/core/theme/widgets/partnex_logo.dart';
 import 'package:partnex/features/auth/presentation/pages/dashboard/credibility_dashboard_page.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_state.dart';
@@ -98,20 +99,8 @@ class _SuccessNextStepsPageState extends State<SuccessNextStepsPage> with Single
         children: [
           const SizedBox(height: 32),
           // Logo Header
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(LucideIcons.hexagon, color: AppColors.trustBlue, size: 32),
-                const SizedBox(width: 8),
-                Text(
-                  'PARTNEX',
-                  style: AppTypography.textTheme.displayMedium?.copyWith(
-                    color: AppColors.trustBlue,
-                  ),
-                ),
-              ],
-            ),
+          const Center(
+            child: PartnexLogo(size: 64, variant: PartnexLogoVariant.iconOnly),
           ),
           const SizedBox(height: 32),
 

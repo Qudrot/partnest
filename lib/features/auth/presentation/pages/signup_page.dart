@@ -117,27 +117,11 @@ class _SignupPageState extends State<SignupPage> {
             // Header
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => const LoginPage()),
-                      );
-                    },
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        'Create Account',
-                        style: AppTypography.textTheme.headlineMedium,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 48), // Balance for back button
-                ],
+              child: Center(
+                child: Text(
+                  'Create Account',
+                  style: AppTypography.textTheme.headlineMedium,
+                ),
               ),
             ),
             

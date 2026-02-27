@@ -5,9 +5,14 @@ import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
 import 'package:partnex/features/auth/presentation/pages/dashboard/score_drivers_detail_page.dart';
 import 'package:partnex/features/auth/presentation/pages/dashboard/profile_management_page.dart';
+import 'package:partnex/features/auth/presentation/pages/investor/sme_discovery_feed_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_state.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
+import 'package:partnex/features/auth/presentation/pages/login_page.dart';
 import 'package:partnex/features/auth/data/models/credibility_score.dart';
 import 'package:intl/intl.dart';
 
@@ -18,10 +23,93 @@ class CredibilityDashboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ScoreCubit, ScoreState>(
       builder: (context, state) {
-        if (state is ScoreLoading || state is ScoreInitial) {
+        // Active loading (score fetch in progress) — show spinner
+        if (state is ScoreLoading) {
           return const Scaffold(
             backgroundColor: Colors.white,
             body: Center(child: CircularProgressIndicator(color: AppColors.trustBlue)),
+          );
+        }
+
+        // No score submitted yet — show welcome dashboard
+        if (state is ScoreInitial) {
+          return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              title: Text(
+                'Dashboard',
+                style: AppTypography.textTheme.headlineMedium?.copyWith(
+                  color: AppColors.slate900,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              centerTitle: true,
+              actions: [
+                _buildLogoutMenu(context),
+                const SizedBox(width: 8),
+              ],
+            ),
+            body: BlocListener<AuthBloc, AuthState>(
+              listener: (context, state) {
+                if (state is AuthUnauthenticated) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const LoginPage()),
+                    (route) => false,
+                  );
+                }
+              },
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: AppColors.trustBlue.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(LucideIcons.barChart2, size: 40, color: AppColors.trustBlue),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Welcome to Partnex!',
+                      style: AppTypography.textTheme.headlineMedium?.copyWith(
+                        color: AppColors.slate900,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'No credibility score yet. Submit your business profile to generate your AI-powered credibility score.',
+                      textAlign: TextAlign.center,
+                      style: AppTypography.textTheme.bodyMedium?.copyWith(
+                        color: AppColors.slate600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    CustomButton(
+                      text: 'Explore SMEs (Investor)',
+                      variant: ButtonVariant.primary,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const SmeDiscoveryFeedPage()),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            ),
           );
         }
 
@@ -52,10 +140,6 @@ class CredibilityDashboardPage extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: Colors.white,
             elevation: 0,
-            leading: IconButton(
-              icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
-              onPressed: () => Navigator.pop(context),
-            ),
             title: Text(
               'Your Credibility Score',
               style: AppTypography.textTheme.headlineMedium?.copyWith(
@@ -66,20 +150,22 @@ class CredibilityDashboardPage extends StatelessWidget {
             ),
             centerTitle: true,
             actions: [
-              IconButton(
-                icon: const Icon(LucideIcons.menu, color: AppColors.slate900),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ProfileManagementPage()),
-                  );
-                },
-              ),
+              _buildLogoutMenu(context),
+              const SizedBox(width: 8),
             ],
           ),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+          body: BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is AuthUnauthenticated) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                  (route) => false,
+                );
+              }
+            },
+            child: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -255,32 +341,11 @@ class CredibilityDashboardPage extends StatelessWidget {
                       );
                     },
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      TextButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(LucideIcons.download, size: 20, color: AppColors.trustBlue),
-                        label: Text('Download', style: AppTypography.textTheme.bodyMedium?.copyWith(
-                          color: AppColors.trustBlue,
-                          fontWeight: FontWeight.w600,
-                        )),
-                      ),
-                      TextButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(LucideIcons.share2, size: 20, color: AppColors.trustBlue),
-                        label: Text('Share', style: AppTypography.textTheme.bodyMedium?.copyWith(
-                          color: AppColors.trustBlue,
-                          fontWeight: FontWeight.w600,
-                        )),
-                      ),
-                    ],
-                  ),
                   const SizedBox(height: 24),
                 ],
               ),
             ),
+          ),
           ),
         );
       },
@@ -395,6 +460,89 @@ class CredibilityDashboardPage extends StatelessWidget {
               color: AppColors.slate900,
               fontWeight: FontWeight.w600,
               fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLogoutMenu(BuildContext context) {
+    return PopupMenuButton<String>(
+      onSelected: (value) {
+        if (value == 'logout') {
+          _showLogoutConfirmation(context);
+        } else if (value == 'profile') {
+           Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ProfileManagementPage()),
+          );
+        }
+      },
+      icon: const Icon(LucideIcons.menu, size: 24, color: AppColors.slate900),
+      position: PopupMenuPosition.under,
+      color: Colors.white,
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: const BorderSide(color: AppColors.slate200),
+      ),
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        PopupMenuItem<String>(
+          value: 'profile',
+          child: Text('My Profile', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate900)),
+        ),
+        PopupMenuItem<String>(
+          value: 'settings',
+          child: Text('Settings', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate900)),
+        ),
+        const PopupMenuDivider(height: 1),
+        PopupMenuItem<String>(
+          value: 'logout',
+          child: Text(
+            'Log Out', 
+            style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.dangerRed, fontWeight: FontWeight.w600),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showLogoutConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          'Log Out',
+          style: AppTypography.textTheme.headlineSmall?.copyWith(color: AppColors.slate900, fontWeight: FontWeight.w700),
+        ),
+        content: Text(
+          'Are you sure you want to end your session?',
+          style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate600),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(
+              'Cancel',
+              style: AppTypography.textTheme.labelLarge?.copyWith(color: AppColors.slate600, fontWeight: FontWeight.w600),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext); // close dialog
+              context.read<AuthBloc>().add(LogoutEvent()); // Trigger logout
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.dangerRed,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+            ),
+            child: Text(
+              'Log Out',
+              style: AppTypography.textTheme.labelLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
             ),
           ),
         ],

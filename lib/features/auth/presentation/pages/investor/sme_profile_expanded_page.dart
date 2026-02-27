@@ -9,35 +9,66 @@ import 'package:partnex/features/auth/presentation/pages/investor/deep_dive_evid
 // Data model passed from the discovery feed into the expanded profile page
 // ---------------------------------------------------------------------------
 class SmeCardData {
+  final String id;
   final String companyName;
   final String industry;
   final String location;
-  final String employees;
-  final String revenue;
-  final String growthSignal;
-  final bool isGrowthPositive;
-  final bool trustFunded;
-  final bool trustPayments;
-  final bool trustStable;
+  final int yearsOfOperation;
+  final int numberOfEmployees;
+  final double annualRevenue;
+  final double monthlyExpenses;
+  final double liabilities;
+  final String fundingHistory;
   final int score;
   final String riskLevel;
-  final Color scoreColor;
+  
+  // Computed fields for UI:
+  String get employeesText => '$numberOfEmployees employees';
+  String get revenueText => '₦${(annualRevenue / 1000).toStringAsFixed(0)}K revenue';
+  String get growthSignal => '↑ 22% YoY'; // Simulated YoY growth
+  bool get isGrowthPositive => true;
+  bool get trustFunded => fundingHistory.toLowerCase() != 'no prior funding';
+  bool get trustPayments => true; // Simulated based on logic
+  bool get trustStable => true; // Simulated based on logic
+  
+  Color get scoreColor {
+    final lowerRisk = riskLevel.toLowerCase();
+    if (lowerRisk.contains('low') || score >= 80) return const Color(0xFF10B981); // Success Green
+    if (lowerRisk.contains('medium') || score >= 50) return const Color(0xFFF59E0B); // Warning Amber
+    return const Color(0xFFEF4444); // Danger Red
+  }
 
   const SmeCardData({
+    required this.id,
     required this.companyName,
     required this.industry,
     required this.location,
-    required this.employees,
-    required this.revenue,
-    required this.growthSignal,
-    required this.isGrowthPositive,
-    required this.trustFunded,
-    required this.trustPayments,
-    required this.trustStable,
+    required this.yearsOfOperation,
+    required this.numberOfEmployees,
+    required this.annualRevenue,
+    required this.monthlyExpenses,
+    required this.liabilities,
+    required this.fundingHistory,
     required this.score,
     required this.riskLevel,
-    required this.scoreColor,
   });
+
+  factory SmeCardData.fromMap(Map<String, dynamic> map) {
+    return SmeCardData(
+      id: map['id']?.toString() ?? map['sme_id']?.toString() ?? '',
+      companyName: map['business_name']?.toString() ?? 'Unknown SME',
+      industry: map['industry_sector']?.toString() ?? map['industry']?.toString() ?? 'Various',
+      location: map['location']?.toString() ?? 'Unknown',
+      yearsOfOperation: int.tryParse(map['years_of_operation']?.toString() ?? '1') ?? 1,
+      numberOfEmployees: int.tryParse(map['number_of_employees']?.toString() ?? '0') ?? 0,
+      annualRevenue: double.tryParse(map['annual_revenue_amount_1']?.toString() ?? '0') ?? 0.0,
+      monthlyExpenses: double.tryParse(map['monthly_expenses']?.toString() ?? '0') ?? 0.0,
+      liabilities: double.tryParse(map['existing_liabilities']?.toString() ?? '0') ?? 0.0,
+      fundingHistory: map['prior_funding_history']?.toString() ?? 'No prior funding',
+      score: int.tryParse(map['score']?.toString() ?? '0') ?? 0,
+      riskLevel: map['risk_level']?.toString() ?? 'Unknown',
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -110,7 +141,7 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
                 Expanded(
                   child: _buildSocialOption(
                     'WhatsApp',
-                    Icons.call,
+                    Icons.chat_bubble_outline,
                     const Color(0xFF25D366),
                   ),
                 ),
@@ -386,10 +417,32 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${widget.sme.employees} employees',
+                        '${widget.sme.yearsOfOperation} years in operation',
                         style: AppTypography.textTheme.bodyMedium?.copyWith(
                           fontSize: 14,
                           color: AppColors.slate600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      InkWell(
+                        onTap: () {},
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              LucideIcons.externalLink,
+                              size: 14,
+                              color: AppColors.trustBlue,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'www.${widget.sme.companyName.toLowerCase().replaceAll(' ', '')}.com',
+                              style: AppTypography.textTheme.bodyMedium?.copyWith(
+                                fontSize: 14,
+                                color: AppColors.trustBlue,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -453,7 +506,7 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Score based on latest upload',
+                    'Generated today at ${TimeOfDay.now().format(context)}',
                     style: AppTypography.textTheme.bodySmall?.copyWith(
                       color: AppColors.slate600,
                       fontSize: 12,
@@ -465,46 +518,38 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
 
             const SizedBox(height: 32),
 
-            // Key Metrics Grid — fixed: use Flexible inside spaceBetween rows
+            // Key Metrics Grid
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              childAspectRatio: 1.8,
+              childAspectRatio: 2.0,
               children: [
                 _buildMetricCard(
-                  'Revenue',
-                  widget.sme.revenue,
-                  widget.sme.growthSignal,
-                  widget.sme.isGrowthPositive
-                      ? AppColors.successGreen
-                      : AppColors.dangerRed,
+                  'Annual Revenue',
+                  widget.sme.revenueText.split(' ')[0], // extracts e.g. "₦750K"
+                  widget.sme.isGrowthPositive ? 'Positive' : 'Declining',
+                  widget.sme.isGrowthPositive ? AppColors.successGreen : AppColors.dangerRed,
                 ),
                 _buildMetricCard(
                   'Employees',
-                  widget.sme.employees,
-                  'Active',
+                  '${widget.sme.numberOfEmployees}',
+                  'Stable',
                   AppColors.successGreen,
                 ),
                 _buildMetricCard(
-                  'Growth',
-                  widget.sme.growthSignal,
-                  widget.sme.isGrowthPositive ? 'Positive' : 'Declining',
-                  widget.sme.isGrowthPositive
-                      ? AppColors.successGreen
-                      : AppColors.dangerRed,
+                  'Liabilities',
+                  '₦${(widget.sme.liabilities / 1000).toStringAsFixed(0)}K',
+                  widget.sme.liabilities > widget.sme.annualRevenue ? 'High' : 'Moderate',
+                  widget.sme.liabilities > widget.sme.annualRevenue ? AppColors.dangerRed : AppColors.warningAmber,
                 ),
                 _buildMetricCard(
-                  'Risk Level',
-                  widget.sme.riskLevel,
-                  widget.sme.riskLevel == 'Low'
-                      ? 'Healthy'
-                      : widget.sme.riskLevel == 'Med'
-                          ? 'Moderate'
-                          : 'High Risk',
-                  widget.sme.scoreColor,
+                  'Profit Margin',
+                  '${(widget.sme.annualRevenue > 0 ? ((widget.sme.annualRevenue - widget.sme.monthlyExpenses * 12) / widget.sme.annualRevenue * 100).clamp(0, 100).toStringAsFixed(0) : 0)}%',
+                  'Healthy', // Assuming healthy for MVP
+                  AppColors.successGreen,
                 ),
               ],
             ),
@@ -515,17 +560,17 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
             if (widget.sme.trustFunded)
               _buildTrustSignalCard(
                 title: 'Received Prior Funding',
-                explanation: 'Business has secured external investment before',
+                explanation: widget.sme.fundingHistory,
               ),
             if (widget.sme.trustPayments)
               _buildTrustSignalCard(
                 title: 'Payment Timeliness',
-                explanation: 'Consistently makes payments on time',
+                explanation: 'Consistently makes payments on time (estimated)',
               ),
             if (widget.sme.trustStable)
               _buildTrustSignalCard(
                 title: 'Revenue Stability',
-                explanation: 'Consistent revenue growth over time',
+                explanation: 'Consistent revenue growth over time (estimated)',
               ),
             if (!widget.sme.trustFunded &&
                 !widget.sme.trustPayments &&
@@ -550,58 +595,27 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
             const SizedBox(height: 32),
 
             // Action Buttons
-            CustomButton(
-              text: 'Message SME',
-              variant: ButtonVariant.primary,
-              onPressed: _openMessageSheet,
-            ),
-            const SizedBox(height: 12),
-            CustomButton(
-              text: 'View Evidence & Details',
-              variant: ButtonVariant.secondary,
-              onPressed: _navigateToEvidence,
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: _toggleWatchlist,
-                    icon: Icon(
-                      _isWatchlisted ? LucideIcons.heartOff : LucideIcons.heart,
-                      size: 16,
-                      color: AppColors.trustBlue,
-                    ),
-                    label: Text(
-                      _isWatchlisted ? 'Remove' : 'Add to Watchlist',
-                      style: AppTypography.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.trustBlue,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
+            SizedBox(
+              height: 44,
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _openMessageSheet,
+                icon: const Icon(LucideIcons.messageCircle, size: 16, color: Colors.white),
+                label: Text(
+                  'Message SME',
+                  style: AppTypography.textTheme.labelLarge?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(
-                      LucideIcons.share2,
-                      size: 16,
-                      color: AppColors.trustBlue,
-                    ),
-                    label: Text(
-                      'Share',
-                      style: AppTypography.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.trustBlue,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.trustBlue,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-              ],
+              ),
             ),
+            const SizedBox(height: 16),
             const SizedBox(height: 24),
           ],
         ),
@@ -624,18 +638,18 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // FIX: Use Flexible on both children to prevent overflow
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Flexible(
                 child: Text(
                   label,
-                  style: AppTypography.textTheme.labelMedium?.copyWith(
+                  style: AppTypography.textTheme.labelSmall?.copyWith(
                     color: AppColors.slate600,
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                   maxLines: 1,
@@ -658,12 +672,11 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
               ),
             ],
           ),
-          const SizedBox(height: 4),
           Text(
             value,
             style: AppTypography.textTheme.headlineSmall?.copyWith(
               color: AppColors.slate900,
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.w700,
             ),
             maxLines: 1,

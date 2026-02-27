@@ -29,7 +29,7 @@ class DeepDiveEvidencePage extends StatelessWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(LucideIcons.download, color: AppColors.trustBlue),
+            icon: const Icon(LucideIcons.download, size: 20, color: AppColors.slate900),
             onPressed: () {},
           ),
         ],
@@ -49,15 +49,35 @@ class DeepDiveEvidencePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Overall Assessment',
-                    style: AppTypography.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.slate900,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Overall Assessment',
+                        style: AppTypography.textTheme.bodyMedium?.copyWith(
+                          color: AppColors.slate900,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: AppColors.successGreen),
+                        ),
+                        child: Text(
+                          'Low Risk',
+                          style: AppTypography.textTheme.labelSmall?.copyWith(
+                            color: AppColors.successGreen,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
                   Text(
                     'Acme Manufacturing demonstrates strong financial health, consistent revenue growth, and reliable payment behavior. Low risk profile suitable for investment.',
                     style: AppTypography.textTheme.bodyMedium?.copyWith(
@@ -74,31 +94,31 @@ class DeepDiveEvidencePage extends StatelessWidget {
             // Evidence Sections (Expandable)
             _buildEvidenceSection(
               title: 'Revenue Consistency',
-              contribution: '+18 points',
-              evidenceExplanation: 'Your revenue has remained stable over the past 3 years.',
+              contribution: '+15% impact on score',
+              evidenceExplanation: 'Strong revenue consistency with low volatility across 3 years.',
               chartPlaceholderText: '[Line Chart: Year 1: ₦500K, Year 2: ₦600K, Year 3: ₦750K]',
               metrics: [
-                {'Average YoY Growth': '22.5%'},
-                {'Revenue Volatility': 'Low (std dev: 8%)'},
-                {'Trend': 'Strongly positive'},
+                {'YoY Growth': '+22%'},
+                {'Monthly Avg': '₦1.2M'},
               ],
             ),
             const SizedBox(height: 12),
             _buildEvidenceSection(
               title: 'Expense Ratio',
-              contribution: '+12 points',
-              evidenceExplanation: 'Your expense-to-revenue ratio of 60% is within healthy range.',
+              contribution: '-5% impact',
+              contributionColor: AppColors.dangerRed,
+              evidenceExplanation: 'Operating expenses have grown slightly faster than revenue.',
               chartPlaceholderText: '[Pie Chart: COGS 40%, OpEx 35%, Admin 15%, Other 10%]',
               metrics: [
-                {'Monthly Revenue': '₦50,000'},
-                {'Monthly Expenses': '₦30,000'},
-                {'Profit Margin': '40%'},
+                {'Monthly Revenue': '₦1.2M'},
+                {'Monthly Expenses': '₦800K'},
+                {'Profit Margin': '33%'},
               ],
             ),
             const SizedBox(height: 12),
             _buildEvidenceSection(
               title: 'Repayment Behavior',
-              contribution: '+10 points',
+              contribution: '+10% impact',
               evidenceExplanation: 'Perfect payment history; 24 of 24 payments on time.',
               chartPlaceholderText: '[Bar Chart: Timeline Jan-Dec 100% on time]',
               metrics: [
@@ -111,6 +131,14 @@ class DeepDiveEvidencePage extends StatelessWidget {
             const SizedBox(height: 32),
 
             // Financial Statements
+            Text(
+              'Financial Statements',
+              style: AppTypography.textTheme.headlineSmall?.copyWith(
+                color: AppColors.slate900,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 12),
             _buildFinancialTableGroup(
               'Income Statement (Last 3 Years)',
               ['Metric', 'Year 1', 'Year 2', 'Year 3'],
@@ -155,16 +183,14 @@ class DeepDiveEvidencePage extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             _buildDocumentCard(
-              title: 'Bank Statements',
+              title: 'Bank Statement (Oct - Dec)',
               metadata: '2.3 MB • Feb 20, 2026',
+              iconData: LucideIcons.fileText,
             ),
             _buildDocumentCard(
-              title: 'Tax Returns',
+              title: 'CAC Certificate',
               metadata: '1.8 MB • Feb 18, 2026',
-            ),
-            _buildDocumentCard(
-              title: 'Financial Audit',
-              metadata: '3.2 MB • Feb 15, 2026',
+              iconData: LucideIcons.image,
             ),
 
             const SizedBox(height: 32),
@@ -183,6 +209,7 @@ class DeepDiveEvidencePage extends StatelessWidget {
   Widget _buildEvidenceSection({
     required String title,
     required String contribution,
+    Color contributionColor = AppColors.trustBlue,
     required String evidenceExplanation,
     required String chartPlaceholderText,
     required List<Map<String, String>> metrics,
@@ -214,7 +241,7 @@ class DeepDiveEvidencePage extends StatelessWidget {
                 style: AppTypography.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
-                  color: AppColors.trustBlue,
+                  color: contributionColor,
                 ),
               ),
             ],
@@ -340,7 +367,7 @@ class DeepDiveEvidencePage extends StatelessWidget {
     );
   }
 
-  Widget _buildDocumentCard({required String title, required String metadata}) {
+  Widget _buildDocumentCard({required String title, required String metadata, IconData iconData = LucideIcons.fileText}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -351,7 +378,7 @@ class DeepDiveEvidencePage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(LucideIcons.fileText, size: 24, color: AppColors.slate400),
+          Icon(iconData, size: 24, color: AppColors.slate400),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

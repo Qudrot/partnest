@@ -49,6 +49,7 @@ class ApiAuthRepository implements AuthRepository {
 
       if (token != null && (token as String).isNotEmpty) {
         await _secureStorage.write(key: 'jwt_token', value: token);
+        await _secureStorage.write(key: 'user_role', value: parsedRole.name);
         // CRITICAL: Also inject into the live Dio client immediately so
         // subsequent calls in the same session don't miss the header.
         apiClient.setToken(token);
@@ -109,6 +110,7 @@ class ApiAuthRepository implements AuthRepository {
 
       if (token != null && (token as String).isNotEmpty) {
         await _secureStorage.write(key: 'jwt_token', value: token);
+        await _secureStorage.write(key: 'user_role', value: UserRole.sme.name);
         // CRITICAL: Also inject into the live Dio client immediately.
         apiClient.setToken(token);
         if (kDebugMode) print('TOKEN STORED + INJECTED: ${token.substring(0, 20)}...');
@@ -264,6 +266,9 @@ class ApiAuthRepository implements AuthRepository {
       return [];
     } catch (e) {
       if (e is DioException) {
+        if (e.response?.statusCode == 403 || e.response?.statusCode == 401) {
+          throw Exception('Forbidden: insufficient permissions');
+        }
         throw Exception(e.response?.data['message'] ?? e.response?.data['error'] ?? 'Failed to fetch SMEs.');
       }
       throw Exception(e.toString());

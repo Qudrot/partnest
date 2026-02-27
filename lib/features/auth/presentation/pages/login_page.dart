@@ -10,6 +10,8 @@ import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
 import 'package:partnex/features/auth/presentation/pages/signup_page.dart';
 import 'package:partnex/features/auth/presentation/pages/dashboard/credibility_dashboard_page.dart';
+import 'package:partnex/features/auth/presentation/pages/investor/sme_discovery_feed_page.dart';
+import 'package:partnex/features/auth/data/models/user_model.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -47,10 +49,17 @@ class _LoginPageState extends State<LoginPage> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const CredibilityDashboardPage()),
-          );
+          if (state.user.role == UserRole.investor) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const SmeDiscoveryFeedPage()),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const CredibilityDashboardPage()),
+            );
+          }
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -71,22 +80,11 @@ class _LoginPageState extends State<LoginPage> {
             // Header
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
-                    onPressed: () => Navigator.pop(context), // Though usually root
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        'Sign In',
-                        style: AppTypography.textTheme.headlineMedium,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 48), // Balance for back button
-                ],
+              child: Center(
+                child: Text(
+                  'Sign In',
+                  style: AppTypography.textTheme.headlineMedium,
+                ),
               ),
             ),
             

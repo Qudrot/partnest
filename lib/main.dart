@@ -7,6 +7,7 @@ import 'package:partnex/features/auth/data/repositories/api_auth_repository.dart
 import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_cubit.dart';
+import 'package:partnex/features/auth/presentation/blocs/discovery_cubit/discovery_cubit.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,6 +30,11 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<ScoreCubit>(
           create: (_) => ScoreCubit(),
+        ),
+        BlocProvider<DiscoveryCubit>(
+          create: (context) => DiscoveryCubit(
+            authRepository: context.read<AuthBloc>().authRepository,
+          ),
         ),
       ],
       child: MaterialApp(

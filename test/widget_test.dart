@@ -14,7 +14,6 @@ import 'package:partnex/main.dart';
 
 void main() {
   testWidgets('App initialization smoke test', (WidgetTester tester) async {
-  testWidgets('App initialization smoke test', (WidgetTester tester) async {
     // Scaffold SharedPreferences for the test environment
     SharedPreferences.setMockInitialValues({});
 
