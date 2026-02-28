@@ -12,6 +12,7 @@ import 'package:partnex/features/auth/presentation/pages/signup_page.dart';
 import 'package:partnex/features/auth/presentation/pages/dashboard/credibility_dashboard_page.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/sme_discovery_feed_page.dart';
 import 'package:partnex/features/auth/data/models/user_model.dart';
+import 'package:partnex/core/services/ui_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -50,24 +51,18 @@ class _LoginPageState extends State<LoginPage> {
       listener: (context, state) {
         if (state is AuthAuthenticated) {
           if (state.user.role == UserRole.investor) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const SmeDiscoveryFeedPage()),
-            );
+            uiService.replaceWith(const SmeDiscoveryFeedPage());
           } else {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const CredibilityDashboardPage()),
-            );
+            uiService.replaceWith(const CredibilityDashboardPage());
           }
         } else if (state is AuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: AppColors.dangerRed,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          if (state.message.contains('REGISTRATION_REDIRECT')) {
+             final displayMsg = state.message.split('|')[0];
+             uiService.showSnackBar(displayMsg);
+             uiService.replaceWith(SignupPage(emailPrefill: _emailController.text));
+          } else {
+             uiService.showSnackBar(state.message, isError: true);
+          }
         }
       },
       builder: (context, state) {
@@ -82,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: const EdgeInsets.all(16.0),
               child: Center(
                 child: Text(
-                  'Sign In',
+                  'Welcome back!',
                   style: AppTypography.textTheme.headlineMedium,
                 ),
               ),
@@ -101,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                       // const PartnexLogo(size: 48, variant: PartnexLogoVariant.brandCombo),
                       // const SizedBox(height: 16),
                       Text(
-                        'Welcome back',
+                        'Sign in to your Partnexaccount',
                         textAlign: TextAlign.center,
                         style: AppTypography.textTheme.bodyMedium?.copyWith(
                           color: AppColors.slate600,
@@ -179,10 +174,7 @@ class _LoginPageState extends State<LoginPage> {
                         text: "Don't have an account? Sign up",
                         variant: ButtonVariant.tertiary,
                         onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (_) => const SignupPage()),
-                          );
+                          uiService.replaceWith(const SignupPage());
                         },
                       ),
                       

@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:partnex/core/theme/app_colors.dart';
 import 'package:partnex/core/theme/app_typography.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
+import 'package:partnex/core/theme/widgets/partnex_logo.dart';
+import 'package:partnex/core/services/ui_service.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/sme_discovery_feed_page.dart';
 
 class InvestorOnboardingPage extends StatefulWidget {
@@ -62,16 +68,31 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
   ];
 
   void _navigateToFeed() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const SmeDiscoveryFeedPage()),
-    );
+    uiService.replaceWith(const SmeDiscoveryFeedPage());
+  }
+
+  void _submitProfile() {
+    context.read<AuthBloc>().add(SubmitInvestorProfileEvent({
+      'role': _selectedRole,
+      'sectors': _selectedSectors.toList(),
+      'ticketSize': _selectedTicketSize ?? 'Not Specified',
+    }));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is InvestorProfileSubmittedSuccess) {
+          uiService.replaceWith(const SmeDiscoveryFeedPage());
+        } else if (state is InvestorProfileSubmissionError) {
+          uiService.showSnackBar(state.message, isError: true);
+        }
+      },
+      builder: (context, state) {
+        final isLoading = state is InvestorProfileSubmitting;
+        return Scaffold(
+          backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
@@ -85,20 +106,8 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
                     const SizedBox(height: 32),
                     
                     // Header Logo
-                    Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(LucideIcons.hexagon, color: AppColors.trustBlue, size: 32),
-                          const SizedBox(width: 8),
-                          Text(
-                            'PARTNEX',
-                            style: AppTypography.textTheme.displayMedium?.copyWith(
-                              color: AppColors.trustBlue,
-                            ),
-                          ),
-                        ],
-                      ),
+                    const Center(
+                      child: PartnexLogo(size: 32, variant: PartnexLogoVariant.brandCombo),
                     ),
                     const SizedBox(height: 32),
 
@@ -287,7 +296,8 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
                     child: CustomButton(
                       text: 'Continue',
                       variant: ButtonVariant.primary,
-                      onPressed: _navigateToFeed,
+                      isLoading: isLoading,
+                      onPressed: _submitProfile,
                     ),
                   ),
                 ],
@@ -296,6 +306,8 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
           ],
         ),
       ),
+    );
+      },
     );
   }
 }

@@ -53,3 +53,17 @@ class SmeProfileSubmissionError extends AuthState {
   @override
   List<Object?> get props => [message];
 }
+
+// Special states for Investor Onboarding submission
+class InvestorProfileSubmitting extends AuthState {}
+
+class InvestorProfileSubmittedSuccess extends AuthState {}
+
+class InvestorProfileSubmissionError extends AuthState {
+  final String message;
+
+  const InvestorProfileSubmissionError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

@@ -12,6 +12,8 @@ import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
 import 'package:partnex/features/auth/presentation/pages/login_page.dart';
+import 'package:partnex/features/auth/presentation/pages/investor/investor_profile_page.dart';
+import 'package:partnex/core/services/ui_service.dart';
 
 class SmeDiscoveryFeedPage extends StatefulWidget {
   const SmeDiscoveryFeedPage({super.key});
@@ -21,7 +23,7 @@ class SmeDiscoveryFeedPage extends StatefulWidget {
 }
 
 class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
-  final List<String> _activeFilters = ['Score: 80+', 'Revenue: ₦500K+'];
+  final List<String> _activeFilters = [];
 
   @override
   void initState() {
@@ -32,17 +34,11 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
   }
 
   void _navigateToProfile(SmeCardData sme) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => SmeProfileExpandedPage(sme: sme)),
-    );
+    uiService.navigateTo(SmeProfileExpandedPage(sme: sme));
   }
 
   void _navigateToEvidence() {
-     Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const DeepDiveEvidencePage()),
-    );
+     uiService.navigateTo(const DeepDiveEvidencePage());
   }
 
   @override
@@ -52,10 +48,7 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthUnauthenticated) {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const LoginPage()),
-              (route) => false,
-            );
+            uiService.clearAndNavigateTo(const LoginPage());
           }
         },
         child: SafeArea(
@@ -163,6 +156,8 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
               onSelected: (value) {
                 if (value == 'logout') {
                   _showLogoutConfirmation();
+                } else if (value == 'profile') {
+                  uiService.navigateTo(const InvestorProfilePage());
                 }
               },
               icon: const Icon(LucideIcons.menu, size: 24, color: AppColors.slate900),
@@ -177,10 +172,6 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
                 PopupMenuItem<String>(
                   value: 'profile',
                   child: Text('My Profile', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate900)),
-                ),
-                PopupMenuItem<String>(
-                  value: 'settings',
-                  child: Text('Settings', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate900)),
                 ),
                 const PopupMenuDivider(height: 1),
                 PopupMenuItem<String>(
@@ -199,9 +190,9 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
   }
 
   void _showLogoutConfirmation() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+    uiService.showCustomDialog(
+      
+      AlertDialog(
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
@@ -214,7 +205,7 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => uiService.goBack(),
             child: Text(
               'Cancel',
               style: AppTypography.textTheme.labelLarge?.copyWith(color: AppColors.slate600, fontWeight: FontWeight.w600),
@@ -222,7 +213,7 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context); // close dialog
+              uiService.goBack(); // close dialog
               context.read<AuthBloc>().add(LogoutEvent()); // Trigger logout
             },
             style: ElevatedButton.styleFrom(

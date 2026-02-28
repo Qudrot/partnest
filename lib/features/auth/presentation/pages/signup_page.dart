@@ -10,9 +10,12 @@ import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
 import 'package:partnex/features/auth/presentation/pages/login_page.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/welcome_role_selection_page.dart';
+import 'package:partnex/core/services/ui_service.dart';
 
 class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
+  final String? emailPrefill;
+
+  const SignupPage({super.key, this.emailPrefill});
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -32,6 +35,14 @@ class _SignupPageState extends State<SignupPage> {
   double _passwordStrength = 0;
   String _passwordStrengthText = 'Weak';
   Color _passwordStrengthColor = AppColors.dangerRed;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.emailPrefill != null) {
+      _emailController.text = widget.emailPrefill!;
+    }
+  }
 
   @override
   void dispose() {
@@ -93,18 +104,9 @@ class _SignupPageState extends State<SignupPage> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const WelcomeRoleSelectionPage()),
-          );
+          uiService.replaceWith(const WelcomeRoleSelectionPage());
         } else if (state is AuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: AppColors.dangerRed,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          uiService.showSnackBar(state.message, isError: true);
         }
       },
       builder: (context, state) {
@@ -268,10 +270,7 @@ class _SignupPageState extends State<SignupPage> {
                         text: 'Already have an account? Sign in',
                         variant: ButtonVariant.tertiary,
                         onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (_) => const LoginPage()),
-                          );
+                          uiService.replaceWith(const LoginPage());
                         },
                       ),
                       

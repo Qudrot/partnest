@@ -27,6 +27,9 @@ abstract class AuthRepository {
   // Submits the SME onboarding data and returns the resulting CredibilityScore
   Future<CredibilityScore> submitSmeProfile(Map<String, dynamic> data);
 
+  // Submits the Investor onboarding data 
+  Future<void> submitInvestorProfile(Map<String, dynamic> data);
+
   // Uploads strictly formatted files (e.g. Statement of Accounts) via multipart-form
   Future<void> uploadStatementOfAccount(File file);
 

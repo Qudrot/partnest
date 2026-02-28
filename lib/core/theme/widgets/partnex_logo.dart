@@ -54,7 +54,7 @@ class PartnexLogo extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _buildSymbol(size),
-        SizedBox(width: size * 0.3), // Spacing between symbol and wordmark
+        SizedBox(width: size * 0.003), // Spacing between symbol and wordmark
         _buildWordmark(size),
       ],
     );
@@ -81,7 +81,7 @@ class PartnexLogo extends StatelessWidget {
       TextSpan(
         children: [
           TextSpan(
-            text: 'Part',
+            text: 'Partnex',
             style: AppTypography.textTheme.displayLarge?.copyWith(
               fontSize: renderSize * 0.85,
               fontWeight: FontWeight.w700,
@@ -90,16 +90,16 @@ class PartnexLogo extends StatelessWidget {
               letterSpacing: -renderSize * 0.02,
             ),
           ),
-          TextSpan(
-            text: 'nex',
-            style: AppTypography.textTheme.displayLarge?.copyWith(
-              fontSize: renderSize * 0.85,
-              fontWeight: FontWeight.w500,
-              color: tSecondary,
-              height: 1.0,
-              letterSpacing: -renderSize * 0.02,
-            ),
-          ),
+          // TextSpan(
+          //   text: 'nex',
+          //   style: AppTypography.textTheme.displayLarge?.copyWith(
+          //     fontSize: renderSize * 0.85,
+          //     fontWeight: FontWeight.w500,
+          //     color: tSecondary,
+          //     height: 1.0,
+          //     letterSpacing: -renderSize * 0.02,
+          //   ),
+          // ),
         ],
       ),
     );

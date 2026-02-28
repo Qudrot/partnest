@@ -10,6 +10,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoginEvent>(_onLogin);
     on<SignupEvent>(_onSignup);
     on<SubmitSmeProfileEvent>(_onSubmitSmeProfile);
+    on<SubmitInvestorProfileEvent>(_onSubmitInvestorProfile);
     on<LogoutEvent>(_onLogout);
   }
 
@@ -48,6 +49,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(SmeProfileSubmittedSuccess(score));
     } catch (e) {
       emit(SmeProfileSubmissionError(e.toString()));
+    }
+  }
+
+  Future<void> _onSubmitInvestorProfile(SubmitInvestorProfileEvent event, Emitter<AuthState> emit) async {
+    emit(InvestorProfileSubmitting());
+    try {
+      await authRepository.submitInvestorProfile(event.profileData);
+      emit(InvestorProfileSubmittedSuccess());
+    } catch (e) {
+      emit(InvestorProfileSubmissionError(e.toString()));
     }
   }
 

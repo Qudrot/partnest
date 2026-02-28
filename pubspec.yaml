@@ -108,5 +108,5 @@ flutter:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/partnex_icon.png"
+  image_path: "assets/images/partnex_logo_icon_only.png"
   min_sdk_android: 21

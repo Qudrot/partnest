@@ -8,7 +8,13 @@ import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/welcome_role_selection_page.dart';
-
+import 'package:partnex/features/auth/presentation/pages/login_page.dart';
+import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
+import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_cubit.dart';
+import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_state.dart';
+import 'package:partnex/features/auth/data/models/credibility_score.dart';
+import 'package:intl/intl.dart';
+import 'package:partnex/core/services/ui_service.dart';
 class ProfileManagementPage extends StatefulWidget {
   const ProfileManagementPage({super.key});
 
@@ -26,13 +32,7 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
       listener: (context, state) {
         if (state is AuthUnauthenticated) {
           // Navigate to welcome page and clear navigation stack
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const WelcomeRoleSelectionPage(),
-            ),
-            (route) => false,
-          );
+          uiService.clearAndNavigateTo(const LoginPage());
         }
       },
       child: Scaffold(
@@ -43,7 +43,7 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
         shadowColor: AppColors.slate200,
         leading: IconButton(
           icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => uiService.goBack(),
         ),
         title: Text(
           'Profile Management',
@@ -52,99 +52,123 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-          children: [
-            // Profile Summary Card
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.slate200),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.slate200.withValues(alpha: 0.5),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 64,
-                        height: 64,
-                        decoration: BoxDecoration(
-                          color: AppColors.successGreen,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '85',
-                            style: AppTypography.textTheme.headlineMedium?.copyWith(
-                              color: Colors.white,
-                              fontSize: 24,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Acme Manufacturing',
-                              style: AppTypography.textTheme.headlineMedium?.copyWith(
-                                color: AppColors.slate900,
-                                fontSize: 20,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Industry: Manufacturing',
-                              style: AppTypography.textTheme.bodyMedium?.copyWith(
-                                color: AppColors.slate600,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.successGreen.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: AppColors.successGreen.withValues(alpha: 0.3)),
-                                  ),
-                                  child: Text(
-                                    'Low Risk',
-                                    style: AppTypography.textTheme.labelSmall?.copyWith(
-                                      color: AppColors.successGreen,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                                const Spacer(),
-                                Text(
-                                  'Updated Feb 24',
-                                  style: AppTypography.textTheme.bodySmall?.copyWith(
-                                    color: AppColors.slate500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+        child: Builder(
+          builder: (context) {
+            final profileState = context.watch<SmeProfileCubit>().state;
+            final scoreState = context.watch<ScoreCubit>().state;
+
+            int scoreValue = 0;
+            String riskLevelString = 'High Risk';
+            Color riskColor = AppColors.dangerRed;
+            String updatedDate = 'Recently';
+
+            if (scoreState is ScoreLoadedSuccess) {
+              final scoreData = scoreState.score;
+              scoreValue = scoreData.totalScore.toInt();
+              updatedDate = 'Updated ${DateFormat('MMM d').format(scoreData.calculatedAt)}';
+
+              if (scoreData.riskLevel == RiskLevel.low) {
+                riskLevelString = 'Low Risk';
+                riskColor = AppColors.successGreen;
+              } else if (scoreData.riskLevel == RiskLevel.medium) {
+                riskLevelString = 'Medium Risk';
+                riskColor = AppColors.warningAmber;
+              }
+            }
+
+            return ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+              children: [
+                // Profile Summary Card
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.slate200),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.slate200.withValues(alpha: 0.5),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color: riskColor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Text(
+                                '$scoreValue',
+                                style: AppTypography.textTheme.headlineMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  profileState.businessName.isNotEmpty ? profileState.businessName : 'Your Business',
+                                  style: AppTypography.textTheme.headlineMedium?.copyWith(
+                                    color: AppColors.slate900,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Industry: ${profileState.industry.isNotEmpty ? profileState.industry : 'N/A'}',
+                                  style: AppTypography.textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.slate600,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: riskColor.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(color: riskColor.withValues(alpha: 0.3)),
+                                      ),
+                                      child: Text(
+                                        riskLevelString,
+                                        style: AppTypography.textTheme.labelSmall?.copyWith(
+                                          color: riskColor,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      updatedDate,
+                                      style: AppTypography.textTheme.bodySmall?.copyWith(
+                                        color: AppColors.slate500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
             
             const SizedBox(height: 32),
             
@@ -256,8 +280,9 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
               ),
             ),
             const SizedBox(height: 32),
-          ],
-        ),
+            ],
+          );
+        }),
       ),
     ),
     );

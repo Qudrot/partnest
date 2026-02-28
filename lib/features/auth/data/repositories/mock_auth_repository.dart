@@ -73,6 +73,12 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> submitInvestorProfile(Map<String, dynamic> data) async {
+    // Mock investor profile submission delay
+    await Future.delayed(const Duration(seconds: 2));
+  }
+
+  @override
   Future<void> uploadStatementOfAccount(File file) async {
     // Mock upload delay
     await Future.delayed(const Duration(seconds: 2));

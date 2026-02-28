@@ -38,8 +38,9 @@ class ApiAuthRepository implements AuthRepository {
       
       // We map the string role from the backend into our Flutter Enum
       UserRole parsedRole = UserRole.sme; // Default fallback
-      if (userData['role'] == 'sme') parsedRole = UserRole.sme;
-      if (userData['role'] == 'investor') parsedRole = UserRole.investor;
+      final lowerRole = userData['role']?.toString().toLowerCase();
+      if (lowerRole == 'sme') parsedRole = UserRole.sme;
+      if (lowerRole == 'investor') parsedRole = UserRole.investor;
 
       // Resilient token extraction: check multiple possible field names
       final token = response.data['token'] ??
@@ -70,7 +71,15 @@ class ApiAuthRepository implements AuthRepository {
         // Backend may return a Map {"message":"..."} or a raw String
         final d = e.response?.data;
         final msg = (d is Map) ? d['message']?.toString() : d?.toString();
-        throw Exception(msg ?? 'Failed to login');
+        
+        final lowerMsg = msg?.toLowerCase() ?? '';
+        if (lowerMsg.contains('invalid credential') || lowerMsg.contains('incorrect password') || e.response?.statusCode == 401) {
+           throw Exception('The email or password you entered is incorrect. Double-check and try again.');
+        } else if (lowerMsg.contains('not found') || lowerMsg.contains('no user') || lowerMsg.contains('unregistered') || e.response?.statusCode == 404) {
+           throw Exception('Account not found. It looks like you are new here!|REGISTRATION_REDIRECT');
+        }
+        
+        throw Exception(msg ?? 'Failed to sign in. Please try again.');
       }
       throw Exception(e.toString());
     }
@@ -219,6 +228,40 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> submitInvestorProfile(Map<String, dynamic> data) async {
+    try {
+      String? token = apiClient.getCachedToken();
+      if (token == null || token.isEmpty) {
+        token = await _secureStorage.read(key: 'jwt_token');
+      }
+
+      if (token == null || token.isEmpty) {
+        throw Exception('Session expired. Please log in again.');
+      }
+
+      final authOptions = Options(headers: {'Authorization': 'Bearer $token'});
+
+      await apiClient.dio.post(
+        '/api/investor/profile',
+        data: {
+          "investor_type": data['role'],
+          "preferred_sectors": data['sectors'],
+          "typical_ticket_size": data['ticketSize'],
+        },
+        options: authOptions,
+      );
+      
+      // Update local role to investor
+      await _secureStorage.write(key: 'user_role', value: 'investor');
+    } catch (e) {
+      if (e is DioException) {
+        throw Exception(e.response?.data['message'] ?? e.response?.data['error'] ?? 'Failed to save investor profile.');
+      }
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
   Future<UserModel?> getCurrentUser() async {
     // TODO: Implement reading token and GET /auth/me for session persistence
     return null;
@@ -227,6 +270,8 @@ class ApiAuthRepository implements AuthRepository {
   @override
   Future<void> logout() async {
     await _secureStorage.delete(key: 'jwt_token');
+    await _secureStorage.delete(key: 'user_role');
+    apiClient.setToken('');
   }
 
   @override
@@ -253,7 +298,13 @@ class ApiAuthRepository implements AuthRepository {
   @override
   Future<List<Map<String, dynamic>>> getInvestorSmes() async {
     try {
-      final response = await apiClient.dio.get('/api/investor/smes');
+      String? token = apiClient.getCachedToken();
+      if (token == null || token.isEmpty) {
+        token = await _secureStorage.read(key: 'jwt_token');
+      }
+      final authOptions = Options(headers: {'Authorization': 'Bearer $token'});
+
+      final response = await apiClient.dio.get('/api/investor/smes', options: authOptions);
       final data = response.data;
       
       // Ensure we extract a List 

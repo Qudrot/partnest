@@ -39,3 +39,12 @@ class SubmitSmeProfileEvent extends AuthEvent {
   @override
   List<Object?> get props => [profileData];
 }
+
+class SubmitInvestorProfileEvent extends AuthEvent {
+  final Map<String, dynamic> profileData;
+
+  const SubmitInvestorProfileEvent(this.profileData);
+
+  @override
+  List<Object?> get props => [profileData];
+}

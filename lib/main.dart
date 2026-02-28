@@ -8,6 +8,7 @@ import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/discovery_cubit/discovery_cubit.dart';
+import 'package:partnex/core/services/ui_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,6 +41,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Partnex MVP',
         theme: AppTheme.lightTheme,
+        navigatorKey: uiService.navigatorKey,
+        scaffoldMessengerKey: uiService.scaffoldMessengerKey,
         debugShowCheckedModeBanner: false,
         home: const SplashPage(),
       ),
