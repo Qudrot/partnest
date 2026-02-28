@@ -42,6 +42,14 @@ class ApiAuthRepository implements AuthRepository {
       if (lowerRole == 'sme') parsedRole = UserRole.sme;
       if (lowerRole == 'investor') parsedRole = UserRole.investor;
 
+      // Parse profile completion
+      bool isProfileCompleted = false;
+      if (userData.containsKey('has_score')) {
+          isProfileCompleted = userData['has_score'] == true || userData['has_score'] == 1;
+      } else if (userData.containsKey('profile_completed')) {
+          isProfileCompleted = userData['profile_completed'] == true || userData['profile_completed'] == 1;
+      }
+
       // Resilient token extraction: check multiple possible field names
       final token = response.data['token'] ??
           response.data['accessToken'] ??
@@ -51,6 +59,7 @@ class ApiAuthRepository implements AuthRepository {
       if (token != null && (token as String).isNotEmpty) {
         await _secureStorage.write(key: 'jwt_token', value: token);
         await _secureStorage.write(key: 'user_role', value: parsedRole.name);
+        await _secureStorage.write(key: 'profile_completed', value: isProfileCompleted.toString());
         // CRITICAL: Also inject into the live Dio client immediately so
         // subsequent calls in the same session don't miss the header.
         apiClient.setToken(token);
@@ -65,6 +74,7 @@ class ApiAuthRepository implements AuthRepository {
         name: 'SME user', // Your backend 'users' table doesn't have 'name', you may want to add it!
         role: parsedRole,
         profilePicture: '', 
+        profileCompleted: isProfileCompleted,
       );
     } catch (e) {
       if (e is DioException) {
@@ -120,6 +130,7 @@ class ApiAuthRepository implements AuthRepository {
       if (token != null && (token as String).isNotEmpty) {
         await _secureStorage.write(key: 'jwt_token', value: token);
         await _secureStorage.write(key: 'user_role', value: UserRole.sme.name);
+        await _secureStorage.write(key: 'profile_completed', value: 'false');
         // CRITICAL: Also inject into the live Dio client immediately.
         apiClient.setToken(token);
         if (kDebugMode) print('TOKEN STORED + INJECTED: ${token.substring(0, 20)}...');
@@ -133,6 +144,7 @@ class ApiAuthRepository implements AuthRepository {
         name: name, 
         role: UserRole.sme,
         profilePicture: '',
+        profileCompleted: false,
       );
     } catch (e) {
       if (e is DioException) {
@@ -173,26 +185,41 @@ class ApiAuthRepository implements AuthRepository {
       final annualRevenue = monthlyRev * 12;
       final liabilities = double.tryParse(data['totalLiabilities'].toString()) ?? 0.0;
 
-      await apiClient.dio.post(
-        '/api/sme/profile',
-        data: {
-          "business_name": data['businessName'],
-          "industry_sector": data['industry'],
-          "location": data['location'],
-          "years_of_operation": data['yearsOfOperation'],
-          "number_of_employees": data['numberOfEmployees'],
-          "annual_revenue_year_1": currentYear - 1,
-          "annual_revenue_amount_1": annualRevenue,
-          "annual_revenue_year_2": currentYear,
-          "annual_revenue_amount_2": annualRevenue, // Same estimate for current year
-          "monthly_expenses": monthlyExp,
-          "existing_liabilities": liabilities,
-          "prior_funding_history": data['hasPriorFunding'] == true
-              ? "Received ${data['priorFundingAmount'] ?? 0} from ${data['priorFundingSource'] ?? 'unknown'} in ${data['fundingYear'] ?? 'N/A'}"
-              : "No prior funding",
-        },
-        options: authOptions,
-      );
+      try {
+        await apiClient.dio.post(
+          '/api/sme/profile',
+          data: {
+            "business_name": data['businessName'],
+            "industry_sector": data['industry'],
+            "location": data['location'],
+            "years_of_operation": data['yearsOfOperation'],
+            "number_of_employees": data['numberOfEmployees'],
+            "annual_revenue_year_1": currentYear - 1,
+            "annual_revenue_amount_1": annualRevenue,
+            "annual_revenue_year_2": currentYear,
+            "annual_revenue_amount_2": annualRevenue, // Same estimate for current year
+            "monthly_expenses": monthlyExp,
+            "existing_liabilities": liabilities,
+            "prior_funding_history": data['hasPriorFunding'] == true
+                ? "Received ${data['priorFundingAmount'] ?? 0} from ${data['priorFundingSource'] ?? 'unknown'} in ${data['fundingYear'] ?? 'N/A'}"
+                : "No prior funding",
+          },
+          options: authOptions,
+        );
+      } catch (e) {
+        if (e is DioException) {
+          final msg = (e.response?.data['message'] ?? e.response?.data['error'] ?? '').toString().toLowerCase();
+          if (msg.contains('already exists')) {
+            if (kDebugMode) print('Profile already exists, proceeding to score generation...');
+            // In a complete implementation, you might want to call PUT here to update the profile instead.
+            // For now, we catch the exception and proceed so the user can get their score.
+          } else {
+            rethrow;
+          }
+        } else {
+          rethrow;
+        }
+      }
 
       // 3. Run Credibility Score
       if (kDebugMode) print('RUNNING SCORE GENERATION');
@@ -208,6 +235,9 @@ class ApiAuthRepository implements AuthRepository {
       RiskLevel rLevel = RiskLevel.low;
       if (scoreData['risk_level'] == 'MEDIUM' || scoreData['risk_level'] == 'Medium Risk') rLevel = RiskLevel.medium;
       if (scoreData['risk_level'] == 'HIGH' || scoreData['risk_level'] == 'High Risk') rLevel = RiskLevel.high;
+
+      // Mark profile as completed locally
+      await _secureStorage.write(key: 'profile_completed', value: 'true');
 
       return CredibilityScore(
         id: DateTime.now().millisecondsSinceEpoch.toString(), 
@@ -253,6 +283,7 @@ class ApiAuthRepository implements AuthRepository {
       
       // Update local role to investor
       await _secureStorage.write(key: 'user_role', value: 'investor');
+      await _secureStorage.write(key: 'profile_completed', value: 'true');
     } catch (e) {
       if (e is DioException) {
         throw Exception(e.response?.data['message'] ?? e.response?.data['error'] ?? 'Failed to save investor profile.');

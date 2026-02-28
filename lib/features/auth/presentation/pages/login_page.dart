@@ -11,6 +11,7 @@ import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
 import 'package:partnex/features/auth/presentation/pages/signup_page.dart';
 import 'package:partnex/features/auth/presentation/pages/dashboard/credibility_dashboard_page.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/sme_discovery_feed_page.dart';
+import 'package:partnex/features/auth/presentation/pages/onboarding/input_method_selection_page.dart';
 import 'package:partnex/features/auth/data/models/user_model.dart';
 import 'package:partnex/core/services/ui_service.dart';
 
@@ -53,7 +54,11 @@ class _LoginPageState extends State<LoginPage> {
           if (state.user.role == UserRole.investor) {
             uiService.replaceWith(const SmeDiscoveryFeedPage());
           } else {
-            uiService.replaceWith(const CredibilityDashboardPage());
+            if (state.user.profileCompleted) {
+              uiService.replaceWith(const CredibilityDashboardPage());
+            } else {
+              uiService.replaceWith(const InputMethodSelectionPage());
+            }
           }
         } else if (state is AuthError) {
           if (state.message.contains('REGISTRATION_REDIRECT')) {

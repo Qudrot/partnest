@@ -11,8 +11,15 @@ import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/sme_discovery_feed_page.dart';
 
+import 'package:partnex/features/auth/presentation/pages/investor/investor_profile_page.dart';
+
 class InvestorOnboardingPage extends StatefulWidget {
-  const InvestorOnboardingPage({super.key});
+  final bool isEditing;
+
+  const InvestorOnboardingPage({
+    super.key,
+    this.isEditing = false,
+  });
 
   @override
   State<InvestorOnboardingPage> createState() => _InvestorOnboardingPageState();
@@ -84,7 +91,11 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is InvestorProfileSubmittedSuccess) {
-          uiService.replaceWith(const SmeDiscoveryFeedPage());
+          if (widget.isEditing) {
+            uiService.replaceWith(const InvestorProfilePage());
+          } else {
+            uiService.replaceWith(const SmeDiscoveryFeedPage());
+          }
         } else if (state is InvestorProfileSubmissionError) {
           uiService.showSnackBar(state.message, isError: true);
         }
@@ -285,16 +296,16 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
                 children: [
                   Expanded(
                     child: CustomButton(
-                      text: 'Skip',
+                      text: widget.isEditing ? 'Cancel' : 'Skip',
                       variant: ButtonVariant.secondary,
-                      onPressed: _navigateToFeed,
+                      onPressed: widget.isEditing ? () => uiService.goBack() : _navigateToFeed,
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     flex: 2,
                     child: CustomButton(
-                      text: 'Continue',
+                      text: widget.isEditing ? 'Save Profile' : 'Continue',
                       variant: ButtonVariant.primary,
                       isLoading: isLoading,
                       onPressed: _submitProfile,

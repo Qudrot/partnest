@@ -10,7 +10,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 
 class RevenueExpensesPage extends StatefulWidget {
-  const RevenueExpensesPage({super.key});
+  final bool isEditing;
+
+  const RevenueExpensesPage({
+    super.key,
+    this.isEditing = false,
+  });
 
   @override
   State<RevenueExpensesPage> createState() => _RevenueExpensesPageState();
@@ -81,6 +86,22 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
     }
 
     setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final profileState = context.read<SmeProfileCubit>().state;
+    if (profileState.annualRevenue > 0) {
+      _annualRevController.text = profileState.annualRevenue.toStringAsFixed(0);
+      _annualExpController.text = profileState.annualExpenses.toStringAsFixed(0);
+      _monthlyRevController.text = profileState.monthlyAvgRevenue.toStringAsFixed(0);
+      _monthlyExpController.text = profileState.monthlyAvgExpenses.toStringAsFixed(0);
+      // Trigger initial calculation
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _onFieldChanged('');
+      });
+    }
   }
 
   @override
@@ -304,7 +325,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomButton(
-                      text: 'Next',
+                      text: widget.isEditing ? 'Save Changes' : 'Next',
                       variant: ButtonVariant.primary,
                       isDisabled: !_isFormValid,
                       onPressed: () {
@@ -316,12 +337,16 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                             monthlyAvgExpenses: double.parse(_monthlyExpController.text.replaceAll(',', '')),
                           );
 
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const LiabilitiesHistoryPage(),
-                            ),
-                          );
+                          if (widget.isEditing) {
+                            Navigator.pop(context);
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const LiabilitiesHistoryPage(),
+                              ),
+                            );
+                          }
                         }
                       },
                     ),

@@ -13,10 +13,12 @@ import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_p
 
 class BusinessProfilePage extends StatefulWidget {
   final bool isDocumentUpload;
+  final bool isEditing;
 
   const BusinessProfilePage({
     super.key,
     this.isDocumentUpload = false,
+    this.isEditing = false,
   });
 
   @override
@@ -58,6 +60,23 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
   void _onFieldChanged(String value) {
     // Only rebuild to update button state
     setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final profileState = context.read<SmeProfileCubit>().state;
+    if (profileState.businessName.isNotEmpty) {
+      _nameController.text = profileState.businessName;
+      _locationController.text = profileState.location;
+      if (profileState.yearsOfOperation > 0) {
+        _yearsController.text = profileState.yearsOfOperation.toString();
+      }
+      if (profileState.numberOfEmployees > 0) {
+        _employeesController.text = profileState.numberOfEmployees.toString();
+      }
+      _selectedIndustry = profileState.industry.isNotEmpty ? profileState.industry : null;
+    }
   }
 
   @override
@@ -202,7 +221,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomButton(
-                      text: 'Next',
+                      text: widget.isEditing ? 'Save Changes' : 'Next',
                       variant: ButtonVariant.primary,
                       isDisabled: !_isFormValid,
                       onPressed: () {
@@ -215,7 +234,9 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                             yearsOfOperation: int.parse(_yearsController.text),
                             numberOfEmployees: int.parse(_employeesController.text),
                           );
-                          if (widget.isDocumentUpload) {
+                          if (widget.isEditing) {
+                            Navigator.pop(context);
+                          } else if (widget.isDocumentUpload) {
                             Navigator.push(
                               context,
                               MaterialPageRoute(

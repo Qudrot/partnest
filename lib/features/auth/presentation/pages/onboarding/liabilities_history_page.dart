@@ -12,7 +12,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 
 class LiabilitiesHistoryPage extends StatefulWidget {
-  const LiabilitiesHistoryPage({super.key});
+  final bool isEditing;
+
+  const LiabilitiesHistoryPage({
+    super.key,
+    this.isEditing = false,
+  });
 
   @override
   State<LiabilitiesHistoryPage> createState() => _LiabilitiesHistoryPageState();
@@ -60,6 +65,29 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
 
   void _onFieldChanged(String value) {
     setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final profileState = context.read<SmeProfileCubit>().state;
+    if (profileState.totalLiabilities > 0 || profileState.outstandingLoans > 0) {
+      _totalLiabilitiesController.text = profileState.totalLiabilities.toStringAsFixed(0);
+      _outstandingLoansController.text = profileState.outstandingLoans.toStringAsFixed(0);
+      _hasPriorFunding = profileState.hasPriorFunding;
+      if (profileState.priorFundingAmount != null) {
+        _fundingAmountController.text = profileState.priorFundingAmount!.toStringAsFixed(0);
+      }
+      if (profileState.priorFundingSource != null) {
+        _fundingSourceController.text = profileState.priorFundingSource!;
+      }
+      if (profileState.fundingYear != null) {
+        _fundingYearController.text = profileState.fundingYear.toString();
+      }
+      if (profileState.onTimePaymentRate != null) {
+        _onTimePaymentRateController.text = profileState.onTimePaymentRate.toString();
+      }
+    }
   }
 
   @override
@@ -314,7 +342,7 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomButton(
-                      text: 'Next',
+                      text: widget.isEditing ? 'Save Changes' : 'Next',
                       variant: ButtonVariant.primary,
                       isDisabled: !_isFormValid,
                       onPressed: () {
@@ -329,12 +357,16 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
                             onTimePaymentRate: _onTimePaymentRateController.text.isEmpty ? null : int.parse(_onTimePaymentRateController.text),
                           );
 
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const ReviewConfirmPage(),
-                            ),
-                          );
+                          if (widget.isEditing) {
+                            Navigator.pop(context);
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const ReviewConfirmPage(),
+                              ),
+                            );
+                          }
                         }
                       },
                     ),

@@ -11,8 +11,9 @@ import 'package:partnex/features/auth/presentation/blocs/discovery_cubit/discove
 import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
-import 'package:partnex/features/auth/presentation/pages/login_page.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/investor_profile_page.dart';
+import 'package:partnex/features/auth/presentation/pages/login_page.dart';
+import 'package:partnex/features/auth/presentation/pages/investor/investor_onboarding_page.dart';
 import 'package:partnex/core/services/ui_service.dart';
 
 class SmeDiscoveryFeedPage extends StatefulWidget {
@@ -157,7 +158,12 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
                 if (value == 'logout') {
                   _showLogoutConfirmation();
                 } else if (value == 'profile') {
-                  uiService.navigateTo(const InvestorProfilePage());
+                  final authState = context.read<AuthBloc>().state;
+                  if (authState is AuthAuthenticated && !authState.user.profileCompleted) {
+                    uiService.navigateTo(const InvestorOnboardingPage(isEditing: true)); // Assuming InvestorOnboardingPage can act as add details. Wait, it might not have isEditing.
+                  } else {
+                    uiService.navigateTo(const InvestorProfilePage());
+                  }
                 }
               },
               icon: const Icon(LucideIcons.menu, size: 24, color: AppColors.slate900),

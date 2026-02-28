@@ -8,6 +8,7 @@ import 'package:partnex/core/theme/widgets/partnex_logo.dart';
 import 'package:partnex/features/auth/presentation/pages/login_page.dart';
 import 'package:partnex/features/auth/presentation/pages/dashboard/credibility_dashboard_page.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/sme_discovery_feed_page.dart';
+import 'package:partnex/features/auth/presentation/pages/onboarding/input_method_selection_page.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -48,15 +49,23 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     // Check for stored JWT token — if found, user is already logged in
     final storedToken = await _secureStorage.read(key: 'jwt_token');
     final storedRole = await _secureStorage.read(key: 'user_role');
+    final storedProfileCompleted = await _secureStorage.read(key: 'profile_completed');
+    final isProfileCompleted = storedProfileCompleted == 'true';
 
     if (storedToken != null && storedToken.isNotEmpty) {
       // Re-inject token into ApiClient for this session
       ApiClient.restoreToken(storedToken);
       if (kDebugMode) print('SPLASH: Token restored → navigating to Dashboard');
 
-      Widget nextRoute = const CredibilityDashboardPage();
+      Widget nextRoute;
       if (storedRole == 'investor') {
         nextRoute = const SmeDiscoveryFeedPage();
+      } else {
+        if (isProfileCompleted) {
+          nextRoute = const CredibilityDashboardPage();
+        } else {
+          nextRoute = const InputMethodSelectionPage();
+        }
       }
 
       if (mounted) {

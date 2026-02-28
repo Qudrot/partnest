@@ -492,10 +492,7 @@ class CredibilityDashboardPage extends StatelessWidget {
           value: 'profile',
           child: Text('My Profile', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate900)),
         ),
-        PopupMenuItem<String>(
-          value: 'settings',
-          child: Text('Settings', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate900)),
-        ),
+
         const PopupMenuDivider(height: 1),
         PopupMenuItem<String>(
           value: 'logout',

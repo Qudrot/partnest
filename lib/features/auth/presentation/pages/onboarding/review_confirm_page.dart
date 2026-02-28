@@ -18,7 +18,7 @@ import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_p
 import 'package:partnex/features/auth/presentation/pages/onboarding/business_profile_page.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/liabilities_history_page.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/revenue_expenses_page.dart';
-import 'package:partnex/features/auth/presentation/pages/onboarding/success_next_steps_page.dart';
+import 'package:partnex/features/auth/presentation/pages/dashboard/analysis_state_page.dart';
 
 class ReviewConfirmPage extends StatefulWidget {
   final bool isDocumentUpload;
@@ -177,7 +177,7 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
           context.read<ScoreCubit>().loadScore(state.score);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const SuccessNextStepsPage()),
+            MaterialPageRoute(builder: (_) => const AnalysisStatePage()),
           );
         } else if (state is SmeProfileSubmissionError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -264,6 +264,7 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                               MaterialPageRoute(
                                 builder: (_) => BusinessProfilePage(
                                   isDocumentUpload: widget.isDocumentUpload,
+                                  isEditing: true,
                                 ),
                               ),
                             );
@@ -288,7 +289,7 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const RevenueExpensesPage(),
+                                  builder: (_) => const RevenueExpensesPage(isEditing: true),
                                 ),
                               );
                             },
@@ -323,7 +324,7 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) =>
-                                      const LiabilitiesHistoryPage(),
+                                      const LiabilitiesHistoryPage(isEditing: true),
                                 ),
                               );
                             },

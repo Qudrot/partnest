@@ -81,6 +81,14 @@ class _AnalysisStatePageState extends State<AnalysisStatePage> with SingleTicker
   }
 
   void _navigateToDashboard() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Credibility Score Generated Successfully!'),
+        backgroundColor: AppColors.successGreen,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
