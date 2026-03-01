@@ -5,9 +5,11 @@ import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/business_profile_page.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/csv_upload_page.dart';
+import 'package:partnex/features/auth/presentation/pages/onboarding/revenue_expenses_page.dart';
 
 class InputMethodSelectionPage extends StatelessWidget {
-  const InputMethodSelectionPage({super.key});
+  final bool isUpdatingRecord;
+  const InputMethodSelectionPage({super.key, this.isUpdatingRecord = false});
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +73,7 @@ class InputMethodSelectionPage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const BusinessProfilePage(),
+                              builder: (_) => isUpdatingRecord ? const RevenueExpensesPage(isUpdatingRecord: true) : const BusinessProfilePage(),
                             ),
                           );
                         },

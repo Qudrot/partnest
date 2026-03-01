@@ -14,6 +14,7 @@ import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
 import 'package:partnex/features/auth/presentation/pages/login_page.dart';
 import 'package:partnex/features/auth/data/models/credibility_score.dart';
+import 'package:partnex/features/auth/presentation/pages/onboarding/input_method_selection_page.dart';
 import 'package:intl/intl.dart';
 
 class CredibilityDashboardPage extends StatefulWidget {
@@ -24,6 +25,28 @@ class CredibilityDashboardPage extends StatefulWidget {
 }
 
 class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
+
+  // Helper function to dynamically derive monthly revenue since it is now optional
+  double getCalculatedMonthlyRev(Map<String, dynamic> profile) {
+    double mRev = double.tryParse(profile['monthly_revenue']?.toString() ?? '0') ?? 0.0;
+    if (mRev <= 0) {
+      // Fallback to average of submitted annual revenues / 12
+      double a1 = double.tryParse(profile['annual_revenue_amount_1']?.toString() ?? '0') ?? 0.0;
+      double a2 = double.tryParse(profile['annual_revenue_amount_2']?.toString() ?? '0') ?? 0.0;
+      double a3 = double.tryParse(profile['annual_revenue_amount_3']?.toString() ?? '0') ?? 0.0;
+      int validYears = 0;
+      double tRev = 0;
+      if (a1 > 0) { tRev += a1; validYears++; }
+      if (a2 > 0) { tRev += a2; validYears++; }
+      if (a3 > 0) { tRev += a3; validYears++; }
+      
+      if (validYears > 0) {
+        mRev = (tRev / validYears) / 12;
+      }
+    }
+    return mRev;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -54,6 +77,16 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
             appBar: AppBar(
               backgroundColor: Colors.white,
               elevation: 0,
+              automaticallyImplyLeading: false,
+              leading: IconButton(
+                icon: const Icon(LucideIcons.menu, size: 24, color: AppColors.slate900),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ProfileManagementPage()),
+                  );
+                },
+              ),
               title: Text(
                 'Dashboard',
                 style: AppTypography.textTheme.headlineMedium?.copyWith(
@@ -64,7 +97,13 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
               ),
               centerTitle: true,
               actions: [
-                _buildLogoutMenu(context),
+                TextButton.icon(
+                  icon: const Icon(LucideIcons.plus, size: 16, color: AppColors.trustBlue),
+                  label: Text('Add new', style: AppTypography.textTheme.labelMedium?.copyWith(color: AppColors.trustBlue)),
+                  onPressed: () {
+                    // Navigate to the InputMethodSelectionPage with isUpdatingRecord = true
+                  },
+                ),
                 const SizedBox(width: 8),
               ],
             ),
@@ -149,24 +188,60 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
           riskColor = AppColors.warningAmber;
         }
 
-        final formattedDate = DateFormat('MMM d, yyyy \\a\\t h:mm a').format(scoreData.calculatedAt);
+        final formattedDate = DateFormat('MMM d, yyyy h:mm a').format(scoreData.calculatedAt);
 
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
             backgroundColor: Colors.white,
             elevation: 0,
-            title: Text(
-              'Your Credibility Score',
-              style: AppTypography.textTheme.headlineMedium?.copyWith(
-                color: AppColors.slate900,
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-              ),
+            automaticallyImplyLeading: false,
+            titleSpacing: 16,
+            centerTitle: false,
+            title: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ProfileManagementPage()),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  child: const Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: Icon(LucideIcons.menu, size: 24, color: AppColors.slate900),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Credibility Score',
+                    style: AppTypography.textTheme.headlineMedium?.copyWith(
+                      color: AppColors.slate900,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
-            centerTitle: true,
             actions: [
-              _buildLogoutMenu(context),
+              TextButton.icon(
+                icon: const Icon(LucideIcons.plus, size: 16, color: AppColors.trustBlue),
+                label: Text('Add new', style: AppTypography.textTheme.labelMedium?.copyWith(color: AppColors.trustBlue)),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const InputMethodSelectionPage(isUpdatingRecord: true),
+                    ),
+                  );
+                },
+              ),
               const SizedBox(width: 8),
             ],
           ),
@@ -254,33 +329,6 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppColors.slate100,
-                            border: Border.all(color: AppColors.slate200),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                scoreData.modelVersion.contains('ai') ? LucideIcons.bot : LucideIcons.cpu,
-                                size: 12,
-                                color: AppColors.trustBlue,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Model: ${scoreData.modelVersion}',
-                                style: AppTypography.textTheme.labelSmall?.copyWith(
-                                  color: AppColors.trustBlue,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -293,25 +341,29 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 1.8,
+                    childAspectRatio: 1.25,
                     children: [
                       _buildMetricMiniCard(
-                        label: 'Monthly Revenue',
-                        value: '₦${(double.tryParse((state as ScoreLoadedSuccess).smeProfile['monthly_revenue']?.toString() ?? '0') ?? 0.0) >= 1000 ? '${((double.tryParse((state).smeProfile['monthly_revenue']?.toString() ?? '0') ?? 0.0)/1000).toStringAsFixed(1)}K' : (state).smeProfile['monthly_revenue']?.toString() ?? '0'}',
+                        label: 'Mnthly Revenue',
+                        value: (() {
+                          final rev = getCalculatedMonthlyRev((state as ScoreLoadedSuccess).smeProfile);
+                          if (rev >= 1000) return '₦${(rev/1000).toStringAsFixed(1)}K';
+                          return '₦${rev.toStringAsFixed(0)}';
+                        })(),
                         icon: LucideIcons.trendingUp,
                         statusColor: AppColors.successGreen,
                       ),
                       _buildMetricMiniCard(
                         label: 'Opex/Revenue',
                         value: (() {
-                          final rev = double.tryParse((state).smeProfile['monthly_revenue']?.toString() ?? '0') ?? 0.0;
+                          final rev = getCalculatedMonthlyRev((state as ScoreLoadedSuccess).smeProfile);
                           final exp = double.tryParse((state).smeProfile['monthly_expenses']?.toString() ?? '0') ?? 0.0;
                           if (rev <= 0) return 'N/A';
                           return '${((exp / rev) * 100).toStringAsFixed(0)}%';
                         })(),
                         icon: LucideIcons.pieChart,
                         statusColor: (() {
-                          final rev = double.tryParse((state).smeProfile['monthly_revenue']?.toString() ?? '0') ?? 0.0;
+                          final rev = getCalculatedMonthlyRev((state).smeProfile);
                           final exp = double.tryParse((state).smeProfile['monthly_expenses']?.toString() ?? '0') ?? 0.0;
                           if (rev <= 0 || (exp/rev) > 0.8) return AppColors.dangerRed;
                           if ((exp/rev) > 0.5) return AppColors.warningAmber;
@@ -354,7 +406,7 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                   const SizedBox(height: 16),
 
                   (() {
-                    final rev = double.tryParse((state as ScoreLoadedSuccess).smeProfile['monthly_revenue']?.toString() ?? '0') ?? 0.0;
+                    final rev = getCalculatedMonthlyRev((state as ScoreLoadedSuccess).smeProfile);
                     final exp = double.tryParse((state).smeProfile['monthly_expenses']?.toString() ?? '0') ?? 0.0;
                     final liab = double.tryParse((state).smeProfile['existing_liabilities']?.toString() ?? '0') ?? 0.0;
                     final sc = state.score.totalScore;
@@ -366,7 +418,7 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                           driverName: 'Opex Ratio Health',
                           points: (sc * 0.4).toInt().toString(),
                           percentage: 0.40,
-                          statusColor: (rev <= 0 || exp/rev > 0.8) ? AppColors.dangerRed : ((exp/rev > 0.5) ? AppColors.warningAmber : AppColors.successGreen),
+                          statusColor: (rev <= 0 || (exp/rev) > 0.8) ? AppColors.dangerRed : (((exp/rev) > 0.5) ? AppColors.warningAmber : AppColors.successGreen),
                         ),
                         const SizedBox(height: 12),
                         _buildDriverBar(
@@ -439,15 +491,17 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-               Text(
-                 label,
-                 style: AppTypography.textTheme.labelMedium?.copyWith(
-                   color: AppColors.slate600,
-                   fontWeight: FontWeight.w600,
-                   fontSize: 12,
+               Expanded(
+                 child: Text(
+                   label,
+                   style: AppTypography.textTheme.labelMedium?.copyWith(
+                     color: AppColors.slate600,
+                     fontWeight: FontWeight.w600,
+                     fontSize: 12,
+                   ),
                  ),
-                 overflow: TextOverflow.ellipsis,
                ),
+               const SizedBox(width: 4),
               Icon(icon, size: 20, color: statusColor),
             ],
           ),
@@ -489,7 +543,6 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
               ),
-              overflow: TextOverflow.ellipsis,
             ),
           ),
           const SizedBox(width: 8),
@@ -533,83 +586,5 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
     );
   }
 
-  Widget _buildLogoutMenu(BuildContext context) {
-    return PopupMenuButton<String>(
-      onSelected: (value) {
-        if (value == 'logout') {
-          _showLogoutConfirmation(context);
-        } else if (value == 'profile') {
-           Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const ProfileManagementPage()),
-          );
-        }
-      },
-      icon: const Icon(LucideIcons.menu, size: 24, color: AppColors.slate900),
-      position: PopupMenuPosition.under,
-      color: Colors.white,
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: const BorderSide(color: AppColors.slate200),
-      ),
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-        PopupMenuItem<String>(
-          value: 'profile',
-          child: Text('My Profile', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate900)),
-        ),
 
-        const PopupMenuDivider(height: 1),
-        PopupMenuItem<String>(
-          value: 'logout',
-          child: Text(
-            'Log Out', 
-            style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.dangerRed, fontWeight: FontWeight.w600),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _showLogoutConfirmation(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Text(
-          'Log Out',
-          style: AppTypography.textTheme.headlineSmall?.copyWith(color: AppColors.slate900, fontWeight: FontWeight.w700),
-        ),
-        content: Text(
-          'Are you sure you want to end your session?',
-          style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate600),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(
-              'Cancel',
-              style: AppTypography.textTheme.labelLarge?.copyWith(color: AppColors.slate600, fontWeight: FontWeight.w600),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(dialogContext); // close dialog
-              context.read<AuthBloc>().add(LogoutEvent()); // Trigger logout
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.dangerRed,
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-            ),
-            child: Text(
-              'Log Out',
-              style: AppTypography.textTheme.labelLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

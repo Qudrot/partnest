@@ -12,6 +12,8 @@ class CustomCurrencyField extends StatelessWidget {
   final String prefixText;
   final void Function(String)? onChanged;
   final String? Function(String?)? validator;
+  final Color? fillColor;
+  final EdgeInsetsGeometry? contentPadding;
 
   const CustomCurrencyField({
     super.key,
@@ -23,6 +25,8 @@ class CustomCurrencyField extends StatelessWidget {
     this.prefixText = '₦',
     this.onChanged,
     this.validator,
+    this.fillColor,
+    this.contentPadding,
   });
 
   @override
@@ -30,8 +34,10 @@ class CustomCurrencyField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTypography.textTheme.labelLarge),
-        const SizedBox(height: 8),
+        if (label.isNotEmpty) ...[
+          Text(label, style: AppTypography.textTheme.labelLarge),
+          const SizedBox(height: 8),
+        ],
         TextFormField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -59,40 +65,40 @@ class CustomCurrencyField extends StatelessWidget {
               color: AppColors.dangerRed,
             ),
             filled: true,
-            fillColor: MaterialStateColor.resolveWith((Set<MaterialState> states) {
+            fillColor: fillColor ?? MaterialStateColor.resolveWith((Set<MaterialState> states) {
               if (states.contains(MaterialState.error) || states.contains(MaterialState.focused)) {
                 return AppColors.slate50;
               }
               return AppColors.slate100;
             }),
-            contentPadding: const EdgeInsets.symmetric(
+            contentPadding: contentPadding ?? const EdgeInsets.symmetric(
               vertical: 12,
               horizontal: 16,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: AppColors.slate200),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: AppColors.slate200),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(
                 color: AppColors.trustBlue,
                 width: 2,
               ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(
                 color: AppColors.dangerRed,
                 width: 2,
               ),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(
                 color: AppColors.dangerRed,
                 width: 2,

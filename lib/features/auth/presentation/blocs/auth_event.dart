@@ -23,11 +23,17 @@ class SignupEvent extends AuthEvent {
   final String name;
   final String email;
   final String password;
+  final String role;
 
-  const SignupEvent({required this.name, required this.email, required this.password});
+  const SignupEvent({
+    required this.name,
+    required this.email,
+    required this.password,
+    required this.role,
+  });
 
   @override
-  List<Object?> get props => [name, email, password];
+  List<Object?> get props => [name, email, password, role];
 }
 
 class SubmitSmeProfileEvent extends AuthEvent {
@@ -42,9 +48,10 @@ class SubmitSmeProfileEvent extends AuthEvent {
 
 class SubmitInvestorProfileEvent extends AuthEvent {
   final Map<String, dynamic> profileData;
+  final bool isEditing;
 
-  const SubmitInvestorProfileEvent(this.profileData);
+  const SubmitInvestorProfileEvent(this.profileData, {this.isEditing = false});
 
   @override
-  List<Object?> get props => [profileData];
+  List<Object?> get props => [profileData, isEditing];
 }

@@ -41,8 +41,8 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   }
 
   Future<void> _navigateToNext() async {
-    // Show splash for at least 2 seconds
-    await Future.delayed(const Duration(milliseconds: 2000));
+    // Show splash for at least 5 seconds
+    await Future.delayed(const Duration(milliseconds: 5000));
 
     if (!mounted) return;
 
@@ -119,9 +119,9 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const PartnexLogo(size: 64, variant: PartnexLogoVariant.brandCombo),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 Text(
-                  'Join Africa\'s leading SME credibility platform',
+                  'Your SME credibility platform',
                   style: AppTypography.textTheme.bodyMedium?.copyWith(
                     color: AppColors.slate600,
                     fontSize: 16,

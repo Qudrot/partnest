@@ -21,14 +21,22 @@ class SmeProfileCubit extends Cubit<SmeProfileState> {
   }
 
   void updateRevenueExpenses({
-    required double annualRevenue,
-    required double annualExpenses,
-    required double monthlyAvgRevenue,
+    required int annualRevenueYear1,
+    required double annualRevenueAmount1,
+    required int annualRevenueYear2,
+    required double annualRevenueAmount2,
+    int? annualRevenueYear3,
+    double? annualRevenueAmount3,
+    double? monthlyAvgRevenue,
     required double monthlyAvgExpenses,
   }) {
     emit(state.copyWith(
-      annualRevenue: annualRevenue,
-      annualExpenses: annualExpenses,
+      annualRevenueYear1: annualRevenueYear1,
+      annualRevenueAmount1: annualRevenueAmount1,
+      annualRevenueYear2: annualRevenueYear2,
+      annualRevenueAmount2: annualRevenueAmount2,
+      annualRevenueYear3: annualRevenueYear3,
+      annualRevenueAmount3: annualRevenueAmount3,
       monthlyAvgRevenue: monthlyAvgRevenue,
       monthlyAvgExpenses: monthlyAvgExpenses,
     ));
@@ -41,7 +49,7 @@ class SmeProfileCubit extends Cubit<SmeProfileState> {
     double? priorFundingAmount,
     String? priorFundingSource,
     int? fundingYear,
-    int? onTimePaymentRate,
+    String? repaymentHistory,
   }) {
     emit(state.copyWith(
       totalLiabilities: totalLiabilities,
@@ -50,7 +58,7 @@ class SmeProfileCubit extends Cubit<SmeProfileState> {
       priorFundingAmount: priorFundingAmount,
       priorFundingSource: priorFundingSource,
       fundingYear: fundingYear,
-      onTimePaymentRate: onTimePaymentRate,
+      repaymentHistory: repaymentHistory,
     ));
   }
 }

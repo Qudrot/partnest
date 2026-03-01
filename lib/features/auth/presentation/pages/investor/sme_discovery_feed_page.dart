@@ -35,11 +35,11 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
   }
 
   void _navigateToProfile(SmeCardData sme) {
-    uiService.navigateTo(SmeProfileExpandedPage(sme: sme));
+    context.read<DiscoveryCubit>().viewSmeProfile(sme);
   }
 
   void _navigateToEvidence() {
-     uiService.navigateTo(const DeepDiveEvidencePage());
+     context.read<DiscoveryCubit>().viewDeepDiveEvidence();
   }
 
   @override
@@ -151,91 +151,23 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
           ),
           // The sliders icon was removed from here
           const SizedBox(width: 8),
-          Material(
-            color: Colors.transparent,
-            child: PopupMenuButton<String>(
-              onSelected: (value) {
-                if (value == 'logout') {
-                  _showLogoutConfirmation();
-                } else if (value == 'profile') {
-                  final authState = context.read<AuthBloc>().state;
-                  if (authState is AuthAuthenticated && !authState.user.profileCompleted) {
-                    uiService.navigateTo(const InvestorOnboardingPage(isEditing: true)); // Assuming InvestorOnboardingPage can act as add details. Wait, it might not have isEditing.
-                  } else {
-                    uiService.navigateTo(const InvestorProfilePage());
-                  }
-                }
-              },
-              icon: const Icon(LucideIcons.menu, size: 24, color: AppColors.slate900),
-              position: PopupMenuPosition.under,
-              color: Colors.white,
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-                side: const BorderSide(color: AppColors.slate200),
-              ),
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                PopupMenuItem<String>(
-                  value: 'profile',
-                  child: Text('My Profile', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate900)),
-                ),
-                const PopupMenuDivider(height: 1),
-                PopupMenuItem<String>(
-                  value: 'logout',
-                  child: Text(
-                    'Log Out', 
-                    style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.dangerRed, fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ],
-            ),
+          IconButton(
+            icon: const Icon(LucideIcons.menu, size: 24, color: AppColors.slate900),
+            onPressed: () {
+              final authState = context.read<AuthBloc>().state;
+              if (authState is AuthAuthenticated && !authState.user.profileCompleted) {
+                uiService.navigateTo(const InvestorOnboardingPage(isEditing: true)); 
+              } else {
+                uiService.navigateTo(const InvestorProfilePage());
+              }
+            },
           ),
         ],
       ),
     );
   }
 
-  void _showLogoutConfirmation() {
-    uiService.showCustomDialog(
-      
-      AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Text(
-          'Log Out',
-          style: AppTypography.textTheme.headlineSmall?.copyWith(color: AppColors.slate900, fontWeight: FontWeight.w700),
-        ),
-        content: Text(
-          'Are you sure you want to end your session?',
-          style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate600),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => uiService.goBack(),
-            child: Text(
-              'Cancel',
-              style: AppTypography.textTheme.labelLarge?.copyWith(color: AppColors.slate600, fontWeight: FontWeight.w600),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              uiService.goBack(); // close dialog
-              context.read<AuthBloc>().add(LogoutEvent()); // Trigger logout
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.dangerRed,
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-            ),
-            child: Text(
-              'Log Out',
-              style: AppTypography.textTheme.labelLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildFilterBar() {
     return Container(
@@ -384,8 +316,6 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
                                   color: AppColors.slate600,
                                   fontSize: 12,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                          ],

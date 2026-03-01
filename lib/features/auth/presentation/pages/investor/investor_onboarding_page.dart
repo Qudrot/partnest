@@ -83,23 +83,12 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
       'role': _selectedRole,
       'sectors': _selectedSectors.toList(),
       'ticketSize': _selectedTicketSize ?? 'Not Specified',
-    }));
+    }, isEditing: widget.isEditing));
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is InvestorProfileSubmittedSuccess) {
-          if (widget.isEditing) {
-            uiService.replaceWith(const InvestorProfilePage());
-          } else {
-            uiService.replaceWith(const SmeDiscoveryFeedPage());
-          }
-        } else if (state is InvestorProfileSubmissionError) {
-          uiService.showSnackBar(state.message, isError: true);
-        }
-      },
+    return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         final isLoading = state is InvestorProfileSubmitting;
         return Scaffold(

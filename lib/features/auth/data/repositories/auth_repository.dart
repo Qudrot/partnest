@@ -11,11 +11,11 @@ abstract class AuthRepository {
     required String password,
   });
 
-  //Registration function that 
   Future<UserModel> signup({
     required String email,
     required String password,
     required String name,
+    required String role,
   });
 
   //Session management function, it check if user exist on app start

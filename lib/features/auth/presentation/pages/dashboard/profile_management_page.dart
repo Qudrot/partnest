@@ -47,7 +47,7 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
         ),
         title: Text(
           'Profile Management',
-          style: AppTypography.textTheme.headlineMedium,
+          style: AppTypography.textTheme.headlineMedium?.copyWith(fontSize: 18),
         ),
         centerTitle: true,
       ),
@@ -60,12 +60,12 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
             int scoreValue = 0;
             String riskLevelString = 'High Risk';
             Color riskColor = AppColors.dangerRed;
-            String updatedDate = 'Recently';
+            //String updatedDate = 'Recently';
 
             if (scoreState is ScoreLoadedSuccess) {
               final scoreData = scoreState.score;
               scoreValue = scoreData.totalScore.toInt();
-              updatedDate = 'Updated ${DateFormat('MMM d').format(scoreData.calculatedAt)}';
+              //updatedDate = 'Updated ${DateFormat('MMM d').format(scoreData.calculatedAt)}';
 
               if (scoreData.riskLevel == RiskLevel.low) {
                 riskLevelString = 'Low Risk';
@@ -152,14 +152,20 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                                         ),
                                       ),
                                     ),
-                                    const Spacer(),
-                                    Text(
-                                      updatedDate,
-                                      style: AppTypography.textTheme.bodySmall?.copyWith(
-                                        color: AppColors.slate500,
-                                      ),
-                                    ),
-                                  ],
+                                      // Expanded(
+                                      //   child: Align(
+                                      //     alignment: Alignment.centerRight,
+                                      //     child: Text(
+                                      //       updatedDate,
+                                      //       style: AppTypography.textTheme.bodySmall?.copyWith(
+                                      //         color: AppColors.slate500,
+                                      //       ),
+                                      //       maxLines: 1,
+                                      //       overflow: TextOverflow.ellipsis,
+                                      //     ),
+                                      //   ),
+                                      // ),
+                                    ],
                                 ),
                               ],
                             ),

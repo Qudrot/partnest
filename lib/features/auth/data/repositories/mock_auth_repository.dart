@@ -29,14 +29,16 @@ class MockAuthRepository implements AuthRepository {
     required String email,
     required String password,
     required String name,
+    required String role,
   }) async {
     // TODO(API): Replace with Dio.post to /auth/signup
     await Future.delayed(const Duration(seconds: 2));
+    UserRole parsedRole = role.toLowerCase() == 'investor' ? UserRole.investor : UserRole.sme;
     return UserModel(
       id: "U-124",
       email: email,
       name: name,
-      role: UserRole.sme,
+      role: parsedRole,
       profilePicture: "",
     );
   }

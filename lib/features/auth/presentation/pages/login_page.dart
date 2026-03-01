@@ -48,28 +48,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is AuthAuthenticated) {
-          if (state.user.role == UserRole.investor) {
-            uiService.replaceWith(const SmeDiscoveryFeedPage());
-          } else {
-            if (state.user.profileCompleted) {
-              uiService.replaceWith(const CredibilityDashboardPage());
-            } else {
-              uiService.replaceWith(const InputMethodSelectionPage());
-            }
-          }
-        } else if (state is AuthError) {
-          if (state.message.contains('REGISTRATION_REDIRECT')) {
-             final displayMsg = state.message.split('|')[0];
-             uiService.showSnackBar(displayMsg);
-             uiService.replaceWith(SignupPage(emailPrefill: _emailController.text));
-          } else {
-             uiService.showSnackBar(state.message, isError: true);
-          }
-        }
-      },
+    return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         final isLoading = state is AuthLoading;
         return Scaffold(
@@ -101,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                       // const PartnexLogo(size: 48, variant: PartnexLogoVariant.brandCombo),
                       // const SizedBox(height: 16),
                       Text(
-                        'Sign in to your Partnexaccount',
+                        'Sign in to your Partnex account',
                         textAlign: TextAlign.center,
                         style: AppTypography.textTheme.bodyMedium?.copyWith(
                           color: AppColors.slate600,

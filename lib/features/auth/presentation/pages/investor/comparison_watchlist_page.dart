@@ -373,8 +373,6 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage> with 
                                       fontSize: 16,
                                       color: AppColors.slate900,
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                                 IconButton(

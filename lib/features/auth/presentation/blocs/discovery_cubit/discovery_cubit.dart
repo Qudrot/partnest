@@ -2,11 +2,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:partnex/features/auth/data/repositories/auth_repository.dart';
 import 'discovery_state.dart';
 import 'package:flutter/foundation.dart';
+import 'package:partnex/core/services/ui_service.dart';
+import 'package:partnex/features/auth/presentation/pages/investor/sme_profile_expanded_page.dart';
+import 'package:partnex/features/auth/presentation/pages/investor/deep_dive_evidence_page.dart';
 
 class DiscoveryCubit extends Cubit<DiscoveryState> {
   final AuthRepository authRepository;
 
   DiscoveryCubit({required this.authRepository}) : super(DiscoveryInitial());
+
+  void viewSmeProfile(SmeCardData sme) {
+    uiService.navigateTo(SmeProfileExpandedPage(sme: sme));
+  }
+
+  void viewDeepDiveEvidence() {
+    uiService.navigateTo(const DeepDiveEvidencePage());
+  }
 
   Future<void> loadSmes() async {
     emit(DiscoveryLoading());

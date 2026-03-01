@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -89,6 +90,10 @@ class ApiAuthRepository implements AuthRepository {
            throw Exception('Account not found. It looks like you are new here!|REGISTRATION_REDIRECT');
         }
         
+        if (msg == null && e.type != DioExceptionType.badResponse) {
+           throw Exception('Network error: ${e.message}. Please check your internet connection.');
+        }
+        
         throw Exception(msg ?? 'Failed to sign in. Please try again.');
       }
       throw Exception(e.toString());
@@ -100,16 +105,16 @@ class ApiAuthRepository implements AuthRepository {
     required String email,
     required String password,
     required String name,
+    required String role,
   }) async {
     try {
       // Calls POST /auth/register on your local backend
-      // We are hardcoding the role to 'sme' for this MVP onboarding path.
       final response = await apiClient.dio.post(
         '/api/auth/register',
         data: {
           'email': email,
           'password': password,
-          'role': 'sme', 
+          'role': role, 
         },
       );
 
@@ -121,6 +126,12 @@ class ApiAuthRepository implements AuthRepository {
       // Same payload extraction as login
       final userData = response.data['user'];
       
+      // Parse role from backend (or fallback to what was requested)
+      UserRole parsedRole = role.toLowerCase() == 'investor' ? UserRole.investor : UserRole.sme;
+      final lowerBackendRole = userData['role']?.toString().toLowerCase();
+      if (lowerBackendRole == 'sme') parsedRole = UserRole.sme;
+      if (lowerBackendRole == 'investor') parsedRole = UserRole.investor;
+
       // Resilient token extraction: check multiple possible field names
       final token = response.data['token'] ??
           response.data['accessToken'] ??
@@ -129,7 +140,7 @@ class ApiAuthRepository implements AuthRepository {
 
       if (token != null && (token as String).isNotEmpty) {
         await _secureStorage.write(key: 'jwt_token', value: token);
-        await _secureStorage.write(key: 'user_role', value: UserRole.sme.name);
+        await _secureStorage.write(key: 'user_role', value: parsedRole.name);
         await _secureStorage.write(key: 'profile_completed', value: 'false');
         // CRITICAL: Also inject into the live Dio client immediately.
         apiClient.setToken(token);
@@ -142,15 +153,25 @@ class ApiAuthRepository implements AuthRepository {
         id: userData['id'].toString(),
         email: userData['email'],
         name: name, 
-        role: UserRole.sme,
-        profilePicture: '',
+        role: parsedRole,
+        profilePicture: '', 
         profileCompleted: false,
       );
     } catch (e) {
       if (e is DioException) {
         final d = e.response?.data;
         final msg = (d is Map) ? d['message']?.toString() : d?.toString();
-        throw Exception(msg ?? 'Failed to register');
+        
+        final lowerMsg = msg?.toLowerCase() ?? '';
+        if (lowerMsg.contains('already exist') || lowerMsg.contains('duplicate') || e.response?.statusCode == 409) {
+           throw Exception('An account with this email already exists. Try logging in instead.');
+        }
+        
+        if (msg == null && e.type != DioExceptionType.badResponse) {
+           throw Exception('Network error: ${e.message}. Please check your internet connection.');
+        }
+
+        throw Exception(msg ?? 'Failed to register. Please try again.');
       }
       throw Exception(e.toString());
     }
@@ -178,32 +199,37 @@ class ApiAuthRepository implements AuthRepository {
       // This is the most reliable approach — no interceptor dependency.
       final authOptions = Options(headers: {'Authorization': 'Bearer $token'});
 
-      // 1. Create SME Profile — send ALL required fields in one request
-      final currentYear = DateTime.now().year;
-      final monthlyRev = double.tryParse(data['monthlyAvgRevenue'].toString()) ?? 0.0;
-      final monthlyExp = double.tryParse(data['monthlyAvgExpenses'].toString()) ?? 0.0;
-      final annualRevenue = monthlyRev * 12;
-      final liabilities = double.tryParse(data['totalLiabilities'].toString()) ?? 0.0;
+      final Map<String, dynamic> payload = {
+        "business_name": data['businessName'],
+        "industry_sector": data['industry'],
+        "location": data['location'],
+        "years_of_operation": data['yearsOfOperation'],
+        "number_of_employees": data['numberOfEmployees'],
+        "annual_revenue_year_1": data['annualRevenueYear1'],
+        "annual_revenue_amount_1": data['annualRevenueAmount1'],
+        "annual_revenue_year_2": data['annualRevenueYear2'],
+        "annual_revenue_amount_2": data['annualRevenueAmount2'],
+        "monthly_expenses": data['monthlyAvgExpenses'],
+        "existing_liabilities": data['totalLiabilities'],
+        "prior_funding_history": data['hasPriorFunding'] == true
+            ? "Received ${data['priorFundingAmount'] ?? 0} from ${data['priorFundingSource'] ?? 'unknown'} in ${data['fundingYear'] ?? 'N/A'}"
+            : "No prior funding",
+        "repayment_history": data['repaymentHistory'] ?? 'N/A',
+      };
+
+      if (data['annualRevenueYear3'] != null) {
+        payload["annual_revenue_year_3"] = data['annualRevenueYear3'];
+        payload["annual_revenue_amount_3"] = data['annualRevenueAmount3'] ?? 0;
+      }
+
+      if (data['monthlyAvgRevenue'] != null) {
+        payload["monthly_revenue"] = data['monthlyAvgRevenue'];
+      }
 
       try {
         await apiClient.dio.post(
           '/api/sme/profile',
-          data: {
-            "business_name": data['businessName'],
-            "industry_sector": data['industry'],
-            "location": data['location'],
-            "years_of_operation": data['yearsOfOperation'],
-            "number_of_employees": data['numberOfEmployees'],
-            "annual_revenue_year_1": currentYear - 1,
-            "annual_revenue_amount_1": annualRevenue,
-            "annual_revenue_year_2": currentYear,
-            "annual_revenue_amount_2": annualRevenue, // Same estimate for current year
-            "monthly_expenses": monthlyExp,
-            "existing_liabilities": liabilities,
-            "prior_funding_history": data['hasPriorFunding'] == true
-                ? "Received ${data['priorFundingAmount'] ?? 0} from ${data['priorFundingSource'] ?? 'unknown'} in ${data['fundingYear'] ?? 'N/A'}"
-                : "No prior funding",
-          },
+          data: payload,
           options: authOptions,
         );
       } catch (e) {
@@ -230,6 +256,9 @@ class ApiAuthRepository implements AuthRepository {
       );
       
       final scoreData = scoreResponse.data;
+      if (kDebugMode) {
+        print('Model Version generated: ${scoreData['model_version']}');
+      }
 
       // Extract risk level string and map to enum
       RiskLevel rLevel = RiskLevel.low;
@@ -272,15 +301,16 @@ class ApiAuthRepository implements AuthRepository {
 
       final authOptions = Options(headers: {'Authorization': 'Bearer $token'});
 
-      await apiClient.dio.post(
-        '/api/investor/profile',
-        data: {
-          "investor_type": data['role'],
-          "preferred_sectors": data['sectors'],
-          "typical_ticket_size": data['ticketSize'],
-        },
-        options: authOptions,
-      );
+      // Mocking the Backend Profile Save to unblock the UI
+      // In the future, this should be an apiClient.dio.post('/api/investor/profile')
+      if (kDebugMode) {
+        print('Mocking investor profile submission via secure storage: $data');
+      }
+
+      // Save locally to simulate persistence
+      await _secureStorage.write(key: 'investor_type', value: data['role']);
+      await _secureStorage.write(key: 'preferred_sectors', value: jsonEncode(data['sectors']));
+      await _secureStorage.write(key: 'typical_ticket_size', value: data['ticketSize']);
       
       // Update local role to investor
       await _secureStorage.write(key: 'user_role', value: 'investor');
@@ -347,17 +377,21 @@ class ApiAuthRepository implements AuthRepository {
       }
 
       final authOptions = Options(headers: {'Authorization': 'Bearer $token'});
-      final response = await apiClient.dio.get('/api/sme/me', options: authOptions);
+      final response = await apiClient.dio.get('/api/sme/profile', options: authOptions);
       
       final data = response.data;
       if (data is Map<String, dynamic>) {
-        // Backend could wrap in { "profile": {...} } or return direct
         if (data.containsKey('profile')) {
           return data['profile'] as Map<String, dynamic>;
         }
         return data; 
       }
       return {};
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404 || e.response?.statusCode == 403) {
+        return {}; // Return empty if profile endpoint doesn't exist yet or is forbidden
+      }
+      throw Exception('Failed to fetch SME profile: $e');
     } catch (e) {
       throw Exception('Failed to fetch SME profile: $e');
     }
@@ -375,6 +409,9 @@ class ApiAuthRepository implements AuthRepository {
       // We use /score/run to compute/fetch the latest score per API docs
       final scoreResponse = await apiClient.dio.post('/api/score/run', options: authOptions);
       final scoreData = scoreResponse.data;
+      if (kDebugMode) {
+        print('Model Version retrieved: ${scoreData['model_version']}');
+      }
 
       RiskLevel rLevel = RiskLevel.low;
       if (scoreData['risk_level'] == 'MEDIUM' || scoreData['risk_level'] == 'Medium Risk') rLevel = RiskLevel.medium;

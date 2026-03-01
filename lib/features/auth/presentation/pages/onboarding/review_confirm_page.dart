@@ -22,10 +22,12 @@ import 'package:partnex/features/auth/presentation/pages/dashboard/analysis_stat
 
 class ReviewConfirmPage extends StatefulWidget {
   final bool isDocumentUpload;
+  final bool isUpdatingRecord;
 
   const ReviewConfirmPage({
     super.key,
     this.isDocumentUpload = false,
+    this.isUpdatingRecord = false,
   });
 
   @override
@@ -247,41 +249,45 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                     child: Column(
                       children: [
                         // --- Business Profile Section ---
-                        _buildSummarySection(
-                          title: 'Business Profile',
-                          data: {
-                            'Business Name': profileState.businessName,
-                            'Industry': profileState.industry,
-                            'Location': profileState.location,
-                            'Years of Operation':
-                                profileState.yearsOfOperation.toString(),
-                            'Employees':
-                                profileState.numberOfEmployees.toString(),
-                          },
-                          onEdit: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => BusinessProfilePage(
-                                  isDocumentUpload: widget.isDocumentUpload,
-                                  isEditing: true,
+                        if (!widget.isUpdatingRecord)
+                          _buildSummarySection(
+                            title: 'Business Profile',
+                            data: {
+                              'Business Name': profileState.businessName,
+                              'Industry': profileState.industry,
+                              'Location': profileState.location,
+                              'Years of Operation':
+                                  profileState.yearsOfOperation.toString(),
+                              'Employees':
+                                  profileState.numberOfEmployees.toString(),
+                            },
+                            onEdit: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => BusinessProfilePage(
+                                    isDocumentUpload: widget.isDocumentUpload,
+                                    isEditing: true,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
+                              );
+                            },
+                          ),
 
                         // --- Manual Entry: Revenue & Expenses + Liabilities ---
                         if (!widget.isDocumentUpload) ...[
                           _buildSummarySection(
                             title: 'Revenue & Expenses',
                             data: {
-                              'Annual Revenue':
-                                  '₦${profileState.annualRevenue.toStringAsFixed(0)}',
-                              'Annual Expenses':
-                                  '₦${profileState.annualExpenses.toStringAsFixed(0)}',
-                              'Monthly Revenue':
-                                  '₦${profileState.monthlyAvgRevenue.toStringAsFixed(0)}',
+                              'Year ${profileState.annualRevenueYear1} Revenue':
+                                  '₦${profileState.annualRevenueAmount1.toStringAsFixed(0)}',
+                              'Year ${profileState.annualRevenueYear2} Revenue':
+                                  '₦${profileState.annualRevenueAmount2.toStringAsFixed(0)}',
+                              if (profileState.annualRevenueYear3 != null)
+                                'Year ${profileState.annualRevenueYear3} Revenue':
+                                    '₦${profileState.annualRevenueAmount3?.toStringAsFixed(0) ?? 0}',
+                              'Monthly Revenue (Approx)':
+                                  profileState.monthlyAvgRevenue != null ? '₦${profileState.monthlyAvgRevenue?.toStringAsFixed(0)}' : 'N/A',
                               'Monthly Expenses':
                                   '₦${profileState.monthlyAvgExpenses.toStringAsFixed(0)}',
                             },
@@ -314,10 +320,8 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                                   profileState.priorFundingSource ?? 'N/A',
                               'Funding Year':
                                   profileState.fundingYear?.toString() ?? 'N/A',
-                              'On-Time Payment Rate':
-                                  profileState.onTimePaymentRate != null
-                                      ? '${profileState.onTimePaymentRate}%'
-                                      : 'N/A',
+                              'Repayment History':
+                                  profileState.repaymentHistory ?? 'N/A',
                             },
                             onEdit: () {
                               Navigator.push(
@@ -400,12 +404,13 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                         ),
                       ),
                       const SizedBox(width: 12),
+                      // Submit Button
                       Expanded(
                         child: CustomButton(
-                          text: 'Generate Score',
+                          text: widget.isUpdatingRecord ? 'Generate New Score' : 'Confirm & Submit Profile',
                           variant: ButtonVariant.primary,
-                          isDisabled: !_isConfirmed || isSubmitting,
                           isLoading: isSubmitting,
+                          isDisabled: !_isConfirmed || isSubmitting,
                           onPressed: _submitData,
                         ),
                       ),

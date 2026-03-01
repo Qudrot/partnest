@@ -13,10 +13,12 @@ import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_p
 
 class LiabilitiesHistoryPage extends StatefulWidget {
   final bool isEditing;
+  final bool isUpdatingRecord;
 
   const LiabilitiesHistoryPage({
     super.key,
     this.isEditing = false,
+    this.isUpdatingRecord = false,
   });
 
   @override
@@ -34,7 +36,7 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
   final _fundingSourceController = TextEditingController();
   final _fundingYearController = TextEditingController();
 
-  final _onTimePaymentRateController = TextEditingController();
+  final _repaymentHistoryController = TextEditingController();
 
   bool get _validateLiabilities {
     final t = double.tryParse(_totalLiabilitiesController.text.replaceAll(',', ''));
@@ -54,8 +56,7 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
   }
 
   bool get _validateHistory {
-    final r = double.tryParse(_onTimePaymentRateController.text);
-    if (r == null || r < 0 || r > 100) return false;
+    if (_repaymentHistoryController.text.isEmpty) return false;
     return true;
   }
 
@@ -84,8 +85,8 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
       if (profileState.fundingYear != null) {
         _fundingYearController.text = profileState.fundingYear.toString();
       }
-      if (profileState.onTimePaymentRate != null) {
-        _onTimePaymentRateController.text = profileState.onTimePaymentRate.toString();
+      if (profileState.repaymentHistory != null) {
+        _repaymentHistoryController.text = profileState.repaymentHistory!;
       }
     }
   }
@@ -97,7 +98,7 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
     _fundingAmountController.dispose();
     _fundingSourceController.dispose();
     _fundingYearController.dispose();
-    _onTimePaymentRateController.dispose();
+    _repaymentHistoryController.dispose();
     super.dispose();
   }
 
@@ -304,20 +305,19 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
                       const SizedBox(height: 16),
 
                       CustomInputField(
-                        label: 'On-Time Payment Rate (%)',
-                        placeholder: 'e.g., 95',
-                        controller: _onTimePaymentRateController,
+                        label: 'Repayment History',
+                        placeholder: 'e.g., No missed repayments, defaulted in 2021',
+                        controller: _repaymentHistoryController,
                         onChanged: _onFieldChanged,
+                        maxLines: 2,
                         validator: (val) {
                           if (val == null || val.isEmpty) return 'Required';
-                          final num = double.tryParse(val);
-                          if (num == null || num < 0 || num > 100) return 'Please enter a valid percentage between 0 and 100';
                           return null;
                         },
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Percentage of payments made on time',
+                        'Summarize your loan/credit repayment history',
                         style: AppTypography.textTheme.bodySmall?.copyWith(color: AppColors.slate600),
                       ),
                       const SizedBox(height: 32),
@@ -354,7 +354,7 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
                             priorFundingAmount: _fundingAmountController.text.isEmpty ? null : double.parse(_fundingAmountController.text.replaceAll(',', '')),
                             priorFundingSource: _fundingSourceController.text.isEmpty ? null : _fundingSourceController.text,
                             fundingYear: _fundingYearController.text.isEmpty ? null : int.parse(_fundingYearController.text),
-                            onTimePaymentRate: _onTimePaymentRateController.text.isEmpty ? null : int.parse(_onTimePaymentRateController.text),
+                            repaymentHistory: _repaymentHistoryController.text.isEmpty ? null : _repaymentHistoryController.text,
                           );
 
                           if (widget.isEditing) {
@@ -363,7 +363,7 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const ReviewConfirmPage(),
+                                builder: (_) => ReviewConfirmPage(isUpdatingRecord: widget.isUpdatingRecord),
                               ),
                             );
                           }
