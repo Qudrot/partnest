@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:partnex/core/theme/app_colors.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
+import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_cubit.dart';
+import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_state.dart';
 
 class ScoreDriversDetailPage extends StatelessWidget {
   const ScoreDriversDetailPage({super.key});
@@ -46,91 +49,89 @@ class ScoreDriversDetailPage extends StatelessWidget {
           ),
         ],
       ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-          children: [
-            // Score Summary
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+      body: BlocBuilder<ScoreCubit, ScoreState>(
+        builder: (context, state) {
+          if (state is! ScoreLoadedSuccess) {
+            return const Center(child: CircularProgressIndicator(color: AppColors.trustBlue));
+          }
+
+          final sc = state.score.totalScore;
+          final rLevel = state.score.riskLevel.name.toUpperCase();
+          final rev = double.tryParse(state.smeProfile['monthly_revenue']?.toString() ?? '0') ?? 0.0;
+          final exp = double.tryParse(state.smeProfile['monthly_expenses']?.toString() ?? '0') ?? 0.0;
+          final liab = double.tryParse(state.smeProfile['existing_liabilities']?.toString() ?? '0') ?? 0.0;
+          final yrs = int.tryParse(state.smeProfile['years_of_operation']?.toString() ?? '0') ?? 0;
+
+          final opexRatio = rev > 0 ? (exp/rev) : 1.0;
+          final debtRatio = rev > 0 ? (liab/(rev*12)) : 1.0;
+
+          return SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
               children: [
-                Text(
-                  'Your Score: 85',
-                  style: AppTypography.textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.slate900,
-                    fontSize: 28,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.successGreen,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    'Low Risk',
-                    style: AppTypography.textTheme.bodyMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
+                // Score Summary
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Your Score: ${sc.toInt()}',
+                      style: AppTypography.textTheme.headlineLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.slate900,
+                        fontSize: 28,
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: (rLevel == 'LOW') ? AppColors.successGreen : (rLevel == 'MEDIUM' ? AppColors.warningAmber : AppColors.dangerRed),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '$rLevel RISK',
+                        style: AppTypography.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 32),
+                const SizedBox(height: 32),
 
-            // Score Composition
-            _buildDriverExpansionTile(
-              driverName: 'Payment History',
-              points: '90',
-              percentageStr: '30%',
-              percentage: 0.30,
-              statusText: 'Positive',
-              statusColor: AppColors.successGreen,
-              explanation: 'Your payment history is excellent. You have made 24 of 24 payments on time.',
-              initiallyExpanded: true,
-            ),
-            _buildDriverExpansionTile(
-              driverName: 'Revenue Trend',
-              points: '75',
-              percentageStr: '25%',
-              percentage: 0.25,
-              statusText: 'Positive',
-              statusColor: AppColors.successGreen,
-              explanation: 'Your revenue shows consistent growth. Average YoY growth: 22.5%',
-            ),
-            _buildDriverExpansionTile(
-              driverName: 'Expense Ratio',
-              points: '60',
-              percentageStr: '20%',
-              percentage: 0.20,
-              statusText: 'Healthy',
-              statusColor: AppColors.warningAmber,
-              explanation: 'Your expense-to-revenue ratio is within healthy range (60%).',
-            ),
-            _buildDriverExpansionTile(
-              driverName: 'Liabilities',
-              points: '40',
-              percentageStr: '13%',
-              percentage: 0.13,
-              statusText: 'Moderate',
-              statusColor: AppColors.warningAmber,
-              explanation: 'Your liabilities are moderate relative to revenue. Consider reducing outstanding loans.',
-            ),
-            _buildDriverExpansionTile(
-              driverName: 'Business Stability',
-              points: '35',
-              percentageStr: '12%',
-              percentage: 0.12,
-              statusText: 'Fair',
-              statusColor: AppColors.dangerRed,
-              explanation: 'Your business has been operating for 5 years. Longer operation history would improve this factor.',
-            ),
+                // Score Composition
+                _buildDriverExpansionTile(
+                  driverName: 'Opex Ratio Health',
+                  points: (sc * 0.4).toInt().toString(),
+                  percentageStr: '40%',
+                  percentage: 0.40,
+                  statusText: opexRatio > 0.8 ? 'Needs Work' : (opexRatio > 0.5 ? 'Moderate' : 'Healthy'),
+                  statusColor: opexRatio > 0.8 ? AppColors.dangerRed : (opexRatio > 0.5 ? AppColors.warningAmber : AppColors.successGreen),
+                  explanation: 'Operating expenses ratio is ${(opexRatio*100).toStringAsFixed(1)}%. Keeping expenses below 50% of revenue ensures strong profit margins.',
+                  initiallyExpanded: true,
+                ),
+                _buildDriverExpansionTile(
+                  driverName: 'Liabilities Burden',
+                  points: (sc * 0.35).toInt().toString(),
+                  percentageStr: '35%',
+                  percentage: 0.35,
+                  statusText: debtRatio > 0.5 ? 'High Debt' : (debtRatio > 0.2 ? 'Moderate' : 'Low Debt'),
+                  statusColor: debtRatio > 0.5 ? AppColors.dangerRed : (debtRatio > 0.2 ? AppColors.warningAmber : AppColors.successGreen),
+                  explanation: 'Your liabilities are roughly ${(debtRatio*100).toStringAsFixed(1)}% of annualized projected revenue. Maintaining low debt allows for growth stability.',
+                ),
+                _buildDriverExpansionTile(
+                  driverName: 'Business Stability',
+                  points: (sc * 0.25).toInt().toString(),
+                  percentageStr: '25%',
+                  percentage: 0.25,
+                  statusText: yrs > 5 ? 'Excellent' : (yrs > 2 ? 'Fair' : 'New Business'),
+                  statusColor: yrs > 5 ? AppColors.successGreen : (yrs > 2 ? AppColors.trustBlue : AppColors.warningAmber),
+                  explanation: 'Your business has been operating for $yrs years. Longer history and continuity directly boost stability confidence.',
+                ),
 
-            const SizedBox(height: 32),
+                const SizedBox(height: 32),
 
             // Recommendations
             Text(
@@ -214,7 +215,8 @@ class ScoreDriversDetailPage extends StatelessWidget {
             const SizedBox(height: 24),
           ],
         ),
-      ),
+      );
+      }),
     );
   }
 

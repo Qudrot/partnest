@@ -14,11 +14,12 @@ class ScoreLoading extends ScoreState {}
 
 class ScoreLoadedSuccess extends ScoreState {
   final CredibilityScore score;
+  final Map<String, dynamic> smeProfile;
 
-  const ScoreLoadedSuccess({required this.score});
+  const ScoreLoadedSuccess({required this.score, required this.smeProfile});
 
   @override
-  List<Object?> get props => [score];
+  List<Object?> get props => [score, smeProfile];
 }
 
 class ScoreError extends ScoreState {

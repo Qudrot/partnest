@@ -30,7 +30,9 @@ class MyApp extends StatelessWidget {
           create: (_) => SmeProfileCubit(),
         ),
         BlocProvider<ScoreCubit>(
-          create: (_) => ScoreCubit(),
+          create: (context) => ScoreCubit(
+            authRepository: context.read<AuthBloc>().authRepository,
+          ),
         ),
         BlocProvider<DiscoveryCubit>(
           create: (context) => DiscoveryCubit(

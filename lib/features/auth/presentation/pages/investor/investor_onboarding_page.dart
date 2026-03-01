@@ -117,10 +117,10 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
                     const SizedBox(height: 32),
                     
                     // Header Logo
-                    const Center(
-                      child: PartnexLogo(size: 32, variant: PartnexLogoVariant.brandCombo),
-                    ),
-                    const SizedBox(height: 32),
+                    // const Center(
+                    //   child: PartnexLogo(size: 32, variant: PartnexLogoVariant.brandCombo),
+                    // ),
+                    // const SizedBox(height: 32),
 
                     // Hero Section
                     Text(

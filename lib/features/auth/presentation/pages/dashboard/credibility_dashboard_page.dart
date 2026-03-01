@@ -16,8 +16,24 @@ import 'package:partnex/features/auth/presentation/pages/login_page.dart';
 import 'package:partnex/features/auth/data/models/credibility_score.dart';
 import 'package:intl/intl.dart';
 
-class CredibilityDashboardPage extends StatelessWidget {
+class CredibilityDashboardPage extends StatefulWidget {
   const CredibilityDashboardPage({super.key});
+
+  @override
+  State<CredibilityDashboardPage> createState() => _CredibilityDashboardPageState();
+}
+
+class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cubit = context.read<ScoreCubit>();
+      if (cubit.state is ScoreInitial) {
+        cubit.fetchDashboardData();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -238,6 +254,33 @@ class CredibilityDashboardPage extends StatelessWidget {
                             ),
                           ],
                         ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.slate100,
+                            border: Border.all(color: AppColors.slate200),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                scoreData.modelVersion.contains('ai') ? LucideIcons.bot : LucideIcons.cpu,
+                                size: 12,
+                                color: AppColors.trustBlue,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Model: ${scoreData.modelVersion}',
+                                style: AppTypography.textTheme.labelSmall?.copyWith(
+                                  color: AppColors.trustBlue,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -253,27 +296,38 @@ class CredibilityDashboardPage extends StatelessWidget {
                     childAspectRatio: 1.8,
                     children: [
                       _buildMetricMiniCard(
-                        label: 'Revenue Trend',
-                        value: '↑ 115%',
+                        label: 'Monthly Revenue',
+                        value: '₦${(double.tryParse((state as ScoreLoadedSuccess).smeProfile['monthly_revenue']?.toString() ?? '0') ?? 0.0) >= 1000 ? '${((double.tryParse((state).smeProfile['monthly_revenue']?.toString() ?? '0') ?? 0.0)/1000).toStringAsFixed(1)}K' : (state).smeProfile['monthly_revenue']?.toString() ?? '0'}',
                         icon: LucideIcons.trendingUp,
                         statusColor: AppColors.successGreen,
                       ),
                       _buildMetricMiniCard(
-                        label: 'Expenses',
-                        value: '60%',
+                        label: 'Opex/Revenue',
+                        value: (() {
+                          final rev = double.tryParse((state).smeProfile['monthly_revenue']?.toString() ?? '0') ?? 0.0;
+                          final exp = double.tryParse((state).smeProfile['monthly_expenses']?.toString() ?? '0') ?? 0.0;
+                          if (rev <= 0) return 'N/A';
+                          return '${((exp / rev) * 100).toStringAsFixed(0)}%';
+                        })(),
                         icon: LucideIcons.pieChart,
-                        statusColor: AppColors.successGreen, // "Healthy" matching success green on screen 9 spec
+                        statusColor: (() {
+                          final rev = double.tryParse((state).smeProfile['monthly_revenue']?.toString() ?? '0') ?? 0.0;
+                          final exp = double.tryParse((state).smeProfile['monthly_expenses']?.toString() ?? '0') ?? 0.0;
+                          if (rev <= 0 || (exp/rev) > 0.8) return AppColors.dangerRed;
+                          if ((exp/rev) > 0.5) return AppColors.warningAmber;
+                          return AppColors.successGreen;
+                        })(),
                       ),
                       _buildMetricMiniCard(
                         label: 'Liabilities',
-                        value: '₦200K',
+                        value: '₦${(double.tryParse((state).smeProfile['existing_liabilities']?.toString() ?? '0') ?? 0.0) >= 1000 ? '${((double.tryParse((state).smeProfile['existing_liabilities']?.toString() ?? '0') ?? 0.0)/1000).toStringAsFixed(1)}K' : (state).smeProfile['existing_liabilities']?.toString() ?? '0'}',
                         icon: LucideIcons.alertCircle,
                         statusColor: AppColors.warningAmber,
                       ),
                       _buildMetricMiniCard(
-                        label: 'Payment History',
-                        value: 'On Time ✓',
-                        icon: LucideIcons.checkCircle,
+                        label: 'Age',
+                        value: '${(state).smeProfile['years_of_operation']?.toString() ?? '0'} Yrs',
+                        icon: LucideIcons.briefcase,
                         statusColor: AppColors.successGreen,
                       ),
                     ],
@@ -299,26 +353,38 @@ class CredibilityDashboardPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  _buildDriverBar(
-                     driverName: 'Payment History',
-                     points: '90',
-                     percentage: 0.30,
-                     statusColor: AppColors.successGreen,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildDriverBar(
-                     driverName: 'Revenue Trend',
-                     points: '75',
-                     percentage: 0.25,
-                     statusColor: AppColors.successGreen,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildDriverBar(
-                     driverName: 'Expense Ratio',
-                     points: '60',
-                     percentage: 0.20,
-                     statusColor: AppColors.warningAmber,
-                  ),
+                  (() {
+                    final rev = double.tryParse((state as ScoreLoadedSuccess).smeProfile['monthly_revenue']?.toString() ?? '0') ?? 0.0;
+                    final exp = double.tryParse((state).smeProfile['monthly_expenses']?.toString() ?? '0') ?? 0.0;
+                    final liab = double.tryParse((state).smeProfile['existing_liabilities']?.toString() ?? '0') ?? 0.0;
+                    final sc = state.score.totalScore;
+                    
+                    // Simple logic to distribute the score for display
+                    return Column(
+                      children: [
+                        _buildDriverBar(
+                          driverName: 'Opex Ratio Health',
+                          points: (sc * 0.4).toInt().toString(),
+                          percentage: 0.40,
+                          statusColor: (rev <= 0 || exp/rev > 0.8) ? AppColors.dangerRed : ((exp/rev > 0.5) ? AppColors.warningAmber : AppColors.successGreen),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildDriverBar(
+                          driverName: 'Liabilities Burden',
+                          points: (sc * 0.35).toInt().toString(),
+                          percentage: 0.35,
+                          statusColor: (rev <= 0 || liab/(rev*12) > 0.5) ? AppColors.warningAmber : AppColors.successGreen,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildDriverBar(
+                          driverName: 'Business Stability',
+                          points: (sc * 0.25).toInt().toString(),
+                          percentage: 0.25,
+                          statusColor: AppColors.trustBlue,
+                        ),
+                      ],
+                    );
+                  })(),
 
                   const SizedBox(height: 32),
 

@@ -1,24 +1,26 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_state.dart';
 import 'package:partnex/features/auth/data/models/credibility_score.dart';
+import 'package:partnex/features/auth/data/repositories/auth_repository.dart';
 
 class ScoreCubit extends Cubit<ScoreState> {
-  ScoreCubit() : super(ScoreInitial());
+  final AuthRepository authRepository;
 
-  /// Currently, the score is retrieved when the SME profile is submitted
-  /// via the AuthBloc -> AuthRepository. 
-  /// So when that flow succeeds, we can inject that new score straight into here!
-  void loadScore(CredibilityScore credibilityScore) {
+  ScoreCubit({required this.authRepository}) : super(ScoreInitial());
+
+  Future<void> fetchDashboardData() async {
     emit(ScoreLoading());
-    // In a real flow where you fetch this directly without submitting first:
-    // try {
-    //   final score = await authRepository.getMyScore();
-    //   emit(ScoreLoadedSuccess(score: score));
-    // } catch (e) {
-    //   emit(ScoreError(message: e.toString()));
-    // }
-    
-    // For now we just inject the one we successfully created:
-    emit(ScoreLoadedSuccess(score: credibilityScore));
+    try {
+      final smeProfile = await authRepository.getMySmeProfile();
+      final score = await authRepository.getMyScore();
+      emit(ScoreLoadedSuccess(score: score, smeProfile: smeProfile));
+    } catch (e) {
+      emit(ScoreError(message: e.toString()));
+    }
+  }
+
+  void loadScore(CredibilityScore credibilityScore) {
+    // For now we just inject the one we successfully created with an empty profile fallback:
+    emit(ScoreLoadedSuccess(score: credibilityScore, smeProfile: {}));
   }
 }

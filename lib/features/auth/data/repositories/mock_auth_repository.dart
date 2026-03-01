@@ -67,6 +67,7 @@ class MockAuthRepository implements AuthRepository {
       organisationId: "ORG-111",
       totalScore: 85.0,
       riskLevel: RiskLevel.low,
+      modelVersion: 'fallback-v1',
       calculatedAt: DateTime.now(),
       topContributingFactors: ["Consistent Revenue Tracking", "Low Liabilities"],
     );
@@ -96,5 +97,31 @@ class MockAuthRepository implements AuthRepository {
          "risk_level": "LOW",
       }
     ];
+  }
+
+  @override
+  Future<Map<String, dynamic>> getMySmeProfile() async {
+    await Future.delayed(const Duration(seconds: 1));
+    return {
+      "business_name": "Mock SME",
+      "monthly_revenue": 500000,
+      "monthly_expenses": 200000,
+      "existing_liabilities": 100000,
+      "years_of_operation": 3,
+    };
+  }
+
+  @override
+  Future<CredibilityScore> getMyScore() async {
+    await Future.delayed(const Duration(seconds: 1));
+    return CredibilityScore(
+      id: "SCORE-999",
+      organisationId: "ORG-111",
+      totalScore: 85.0,
+      riskLevel: RiskLevel.low,
+      modelVersion: 'fallback-v1',
+      calculatedAt: DateTime.now(),
+      topContributingFactors: ["Consistent Revenue Tracking", "Low Liabilities"],
+    );
   }
 }

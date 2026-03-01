@@ -21,7 +21,14 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       emit(DiscoveryLoaded(smes: dataList));
     } catch (e) {
       if (kDebugMode) print('DiscoveryCubit Error: $e');
-      emit(DiscoveryError('Failed to load SMEs. Please try again.'));
+      
+      // Clean up Exception prefix if it's there
+      String errorMessage = e.toString();
+      if (errorMessage.startsWith('Exception: ')) {
+        errorMessage = errorMessage.substring(11); // remove 'Exception: '
+      }
+      
+      emit(DiscoveryError('Failed to load SMEs:\n$errorMessage'));
     }
   }
 }

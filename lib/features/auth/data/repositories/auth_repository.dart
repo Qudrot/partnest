@@ -24,6 +24,12 @@ abstract class AuthRepository {
   //Clears token from secure storage
   Future<void> logout();
 
+  // Retrieves the SME profile for the current user
+  Future<Map<String, dynamic>> getMySmeProfile();
+
+  // Retrieves the current credibility score for the SME
+  Future<CredibilityScore> getMyScore();
+
   // Submits the SME onboarding data and returns the resulting CredibilityScore
   Future<CredibilityScore> submitSmeProfile(Map<String, dynamic> data);
 
