@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+enum CsvProcessingStatus { initial, processing, success, error }
+
 class SmeProfileState extends Equatable {
   // Step 1: Business Profile
   final String businessName;
@@ -30,6 +32,20 @@ class SmeProfileState extends Equatable {
   final int? fundingYear;
   final String? repaymentHistory;
 
+  // Step 4: Payment History & Documents
+  final int onTimePayments;
+  final int latePayments;
+  final int latePaymentsOver30Days;
+  final int latePaymentsOver60Days;
+  final int numDocumentsSubmitted;
+  final bool areDocumentsRecent;
+  final bool areDocumentsComplete;
+  final bool areDocumentsConsistent;
+
+  // CSV Processing Status
+  final CsvProcessingStatus csvProcessingStatus;
+  final String? csvErrorMessage;
+
   const SmeProfileState({
     this.businessName = '',
     this.industry = '',
@@ -52,6 +68,16 @@ class SmeProfileState extends Equatable {
     this.priorFundingSource,
     this.fundingYear,
     this.repaymentHistory,
+    this.onTimePayments = 0,
+    this.latePayments = 0,
+    this.latePaymentsOver30Days = 0,
+    this.latePaymentsOver60Days = 0,
+    this.numDocumentsSubmitted = 0,
+    this.areDocumentsRecent = false,
+    this.areDocumentsComplete = false,
+    this.areDocumentsConsistent = false,
+    this.csvProcessingStatus = CsvProcessingStatus.initial,
+    this.csvErrorMessage,
   });
 
   SmeProfileState copyWith({
@@ -76,6 +102,16 @@ class SmeProfileState extends Equatable {
     String? priorFundingSource,
     int? fundingYear,
     String? repaymentHistory,
+    int? onTimePayments,
+    int? latePayments,
+    int? latePaymentsOver30Days,
+    int? latePaymentsOver60Days,
+    int? numDocumentsSubmitted,
+    bool? areDocumentsRecent,
+    bool? areDocumentsComplete,
+    bool? areDocumentsConsistent,
+    CsvProcessingStatus? csvProcessingStatus,
+    String? csvErrorMessage,
   }) {
     return SmeProfileState(
       businessName: businessName ?? this.businessName,
@@ -99,6 +135,16 @@ class SmeProfileState extends Equatable {
       priorFundingSource: priorFundingSource ?? this.priorFundingSource,
       fundingYear: fundingYear ?? this.fundingYear,
       repaymentHistory: repaymentHistory ?? this.repaymentHistory,
+      onTimePayments: onTimePayments ?? this.onTimePayments,
+      latePayments: latePayments ?? this.latePayments,
+      latePaymentsOver30Days: latePaymentsOver30Days ?? this.latePaymentsOver30Days,
+      latePaymentsOver60Days: latePaymentsOver60Days ?? this.latePaymentsOver60Days,
+      numDocumentsSubmitted: numDocumentsSubmitted ?? this.numDocumentsSubmitted,
+      areDocumentsRecent: areDocumentsRecent ?? this.areDocumentsRecent,
+      areDocumentsComplete: areDocumentsComplete ?? this.areDocumentsComplete,
+      areDocumentsConsistent: areDocumentsConsistent ?? this.areDocumentsConsistent,
+      csvProcessingStatus: csvProcessingStatus ?? this.csvProcessingStatus,
+      csvErrorMessage: csvErrorMessage ?? this.csvErrorMessage,
     );
   }
 
@@ -125,7 +171,48 @@ class SmeProfileState extends Equatable {
       'priorFundingSource': priorFundingSource,
       'fundingYear': fundingYear,
       'repaymentHistory': repaymentHistory,
+      'onTimePayments': onTimePayments,
+      'latePayments': latePayments,
+      'latePaymentsOver30Days': latePaymentsOver30Days,
+      'latePaymentsOver60Days': latePaymentsOver60Days,
+      'numDocumentsSubmitted': numDocumentsSubmitted,
+      'areDocumentsRecent': areDocumentsRecent,
+      'areDocumentsComplete': areDocumentsComplete,
+      'areDocumentsConsistent': areDocumentsConsistent,
     };
+  }
+
+  factory SmeProfileState.fromMap(Map<String, dynamic> map) {
+    return SmeProfileState(
+      businessName: map['businessName'] ?? '',
+      industry: map['industry'] ?? '',
+      location: map['location'] ?? '',
+      yearsOfOperation: map['yearsOfOperation'] ?? 0,
+      numberOfEmployees: map['numberOfEmployees'] ?? 0,
+      annualRevenueYear1: map['annualRevenueYear1'] ?? 0,
+      annualRevenueAmount1: (map['annualRevenueAmount1'] ?? 0).toDouble(),
+      annualRevenueYear2: map['annualRevenueYear2'] ?? 0,
+      annualRevenueAmount2: (map['annualRevenueAmount2'] ?? 0).toDouble(),
+      annualRevenueYear3: map['annualRevenueYear3'],
+      annualRevenueAmount3: map['annualRevenueAmount3']?.toDouble(),
+      monthlyAvgRevenue: map['monthlyAvgRevenue']?.toDouble(),
+      monthlyAvgExpenses: (map['monthlyAvgExpenses'] ?? 0).toDouble(),
+      totalLiabilities: (map['totalLiabilities'] ?? 0).toDouble(),
+      outstandingLoans: (map['outstandingLoans'] ?? 0).toDouble(),
+      hasPriorFunding: map['hasPriorFunding'],
+      priorFundingAmount: map['priorFundingAmount']?.toDouble(),
+      priorFundingSource: map['priorFundingSource'],
+      fundingYear: map['fundingYear'],
+      repaymentHistory: map['repaymentHistory'],
+      onTimePayments: map['onTimePayments'] ?? 0,
+      latePayments: map['latePayments'] ?? 0,
+      latePaymentsOver30Days: map['latePaymentsOver30Days'] ?? 0,
+      latePaymentsOver60Days: map['latePaymentsOver60Days'] ?? 0,
+      numDocumentsSubmitted: map['numDocumentsSubmitted'] ?? 0,
+      areDocumentsRecent: map['areDocumentsRecent'] ?? false,
+      areDocumentsComplete: map['areDocumentsComplete'] ?? false,
+      areDocumentsConsistent: map['areDocumentsConsistent'] ?? false,
+    );
   }
 
   @override
@@ -150,5 +237,15 @@ class SmeProfileState extends Equatable {
         priorFundingSource,
         fundingYear,
         repaymentHistory,
+        onTimePayments,
+        latePayments,
+        latePaymentsOver30Days,
+        latePaymentsOver60Days,
+        numDocumentsSubmitted,
+        areDocumentsRecent,
+        areDocumentsComplete,
+        areDocumentsConsistent,
+        csvProcessingStatus,
+        csvErrorMessage,
       ];
 }

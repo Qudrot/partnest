@@ -76,65 +76,71 @@ class _LoginPageState extends State<LoginPage> {
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(height: 8),
-                      // const PartnexLogo(size: 48, variant: PartnexLogoVariant.brandCombo),
-                      // const SizedBox(height: 16),
-                      Text(
-                        'Sign in to your Partnex account',
-                        textAlign: TextAlign.center,
-                        style: AppTypography.textTheme.bodyMedium?.copyWith(
-                          color: AppColors.slate600,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      
-                      CustomInputField(
-                        label: 'Email Address',
-                        placeholder: 'you@example.com',
-                        controller: _emailController,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a valid email address';
-                          }
-                          final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                          if (!emailRegExp.hasMatch(value)) {
-                            return 'Please enter a valid email address';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      
-                      CustomInputField(
-                        label: 'Password',
-                        placeholder: '········',
-                        controller: _passwordController,
-                        obscureText: _obscurePassword,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword ? LucideIcons.eyeOff : LucideIcons.eye,
-                            color: AppColors.slate400,
-                            size: 20,
+                child: AutofillGroup(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 8),
+                        // const PartnexLogo(size: 48, variant: PartnexLogoVariant.brandCombo),
+                        // const SizedBox(height: 16),
+                        Text(
+                          'Sign in to your Partnex account',
+                          textAlign: TextAlign.center,
+                          style: AppTypography.textTheme.bodyMedium?.copyWith(
+                            color: AppColors.slate600,
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
+                        ),
+                        const SizedBox(height: 24),
+                        
+                        CustomInputField(
+                          label: 'Email Address',
+                          placeholder: 'you@example.com',
+                          controller: _emailController,
+                          autofillHints: const [AutofillHints.email],
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter a valid email address';
+                            }
+                            final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                            if (!emailRegExp.hasMatch(value)) {
+                              return 'Please enter a valid email address';
+                            }
+                            return null;
                           },
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Incorrect email or password';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
+                        
+                        CustomInputField(
+                          label: 'Password',
+                          placeholder: '········',
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
+                          autofillHints: const [AutofillHints.password],
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword ? LucideIcons.eyeOff : LucideIcons.eye,
+                              color: AppColors.slate400,
+                              size: 20,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Incorrect email or password';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
 
                       const SizedBox(height: 24),
                       

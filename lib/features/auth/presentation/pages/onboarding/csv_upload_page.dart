@@ -12,10 +12,18 @@ import 'package:partnex/core/theme/widgets/custom_button.dart';
 import 'package:partnex/core/theme/widgets/custom_progress_indicator.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/business_profile_page.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
+import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_state.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
+import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_cubit.dart';
+import 'package:partnex/features/auth/presentation/pages/dashboard/analysis_state_page.dart';
+import 'package:partnex/core/services/ui_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CsvUploadPage extends StatefulWidget {
-  const CsvUploadPage({super.key});
+  final bool isUpdatingRecord;
+  const CsvUploadPage({super.key, this.isUpdatingRecord = false});
 
   @override
   State<CsvUploadPage> createState() => _CsvUploadPageState();
@@ -29,72 +37,6 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
   String _fileName = '';
   List<List<dynamic>> _parsedData = [];
 
-  void _processBankStatementLocally(List<List<dynamic>> rows, String fileName) {
-    if (rows.isEmpty) return;
-
-    // Use headers to dynamically find column indexes
-    final headers = rows.first.map((e) => e.toString().toLowerCase()).toList();
-    
-    int creditIdx = -1;
-    int debitIdx = -1;
-    int descIdx = -1;
-
-    for (int i = 0; i < headers.length; i++) {
-      if (headers[i].contains("credit") || headers[i].contains("deposit")) {
-        creditIdx = i;
-      } else if (headers[i].contains("debit") || headers[i].contains("withdrawal")) {
-        debitIdx = i;
-      } else if (headers[i].contains("narration") || headers[i].contains("description") || headers[i].contains("details")) {
-        descIdx = i;
-      }
-    }
-
-    double totalRevenue = 0.0;
-    double totalExpenses = 0.0;
-    double totalDebt = 0.0;
-
-    // Iterate through data rows (skipping header)
-    for (int i = 1; i < rows.length; i++) {
-      final row = rows[i];
-      
-      // Calculate Revenue
-      if (creditIdx != -1 && creditIdx < row.length) {
-        final val = double.tryParse(row[creditIdx].toString().replaceAll(RegExp(r'[^0-9.]'), ''));
-        if (val != null) totalRevenue += val;
-      }
-
-      // Calculate Expenses
-      if (debitIdx != -1 && debitIdx < row.length) {
-        final val = double.tryParse(row[debitIdx].toString().replaceAll(RegExp(r'[^0-9.]'), ''));
-        if (val != null) totalExpenses += val;
-      }
-
-      // Calculate Debt (Look for loan keywords in narration)
-      if (descIdx != -1 && descIdx < row.length && debitIdx != -1 && debitIdx < row.length) {
-        final desc = row[descIdx].toString().toLowerCase();
-        if (desc.contains("loan") || desc.contains("fairmoney") || desc.contains("branch") || desc.contains("carbon")) {
-          final debtVal = double.tryParse(row[debitIdx].toString().replaceAll(RegExp(r'[^0-9.]'), ''));
-          if (debtVal != null) totalDebt += debtVal;
-        }
-      }
-    }
-
-    // Save metrics into Cubit state
-    context.read<SmeProfileCubit>().updateRevenueExpenses(
-      annualRevenueYear1: DateTime.now().year - 1,
-      annualRevenueAmount1: totalRevenue,
-      annualRevenueYear2: DateTime.now().year - 2,
-      annualRevenueAmount2: totalRevenue * 0.8, // Fallback historical extrapolation
-      monthlyAvgExpenses: totalExpenses / 12,
-      documentFileName: fileName,
-    );
-
-    context.read<SmeProfileCubit>().updateLiabilitiesHistory(
-      totalLiabilities: totalDebt,
-      outstandingLoans: totalDebt,
-      priorFundingSource: "Extracted from CSV",
-    );
-  }
 
   void _pickAndParseFile() async {
     try {
@@ -105,13 +47,6 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
       );
 
       if (result != null) {
-        setState(() {
-          _isUploading = true;
-          _isSuccess = false;
-          _isError = false;
-          _errorMessage = '';
-        });
-
         final file = result.files.single;
         setState(() => _fileName = file.name);
 
@@ -124,49 +59,44 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
           throw Exception("Could not read file data.");
         }
 
-        // Parse CSV
-        List<List<dynamic>> rowsAsListOfValues = CsvCodec().decoder.convert(csvString);
-
-        if (rowsAsListOfValues.isEmpty) {
-          throw Exception("The CSV file is empty.");
-        }
-
-        // Silent Local Computations
-        _processBankStatementLocally(rowsAsListOfValues, file.name);
-
-        // Simulate slight parsing delay for UX
-        await Future.delayed(const Duration(milliseconds: 600));
-
         if (mounted) {
-           setState(() {
-             _parsedData = rowsAsListOfValues;
-             _isUploading = false;
-             _isSuccess = true;
-           });
+          context.read<SmeProfileCubit>().processCsv(csvString, file.name);
+          
+          // We still want to parse locally ONLY for the preview table, 
+          // but we do NOT wait for it to block navigation.
+          final rows = CsvCodec().decoder.convert(csvString);
+          setState(() {
+            _parsedData = rows;
+            _isSuccess = rows.isNotEmpty;
+          });
         }
       }
     } catch (e) {
       if (mounted) {
-         setState(() {
-           _isUploading = false;
-           _isError = true;
-           _errorMessage = 'Error parsing file. Please check the format. Details: ${e.toString()}';
-           _isSuccess = false;
-         });
+        uiService.showSnackBar('Error reading file: $e', isError: true);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.neutralWhite,
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is SmeProfileSubmittedSuccess) {
+          context.read<ScoreCubit>().loadScore(state.score);
+          uiService.navigateTo(const AnalysisStatePage());
+        } else if (state is SmeProfileSubmissionError) {
+          uiService.showSnackBar(state.message, isError: true);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.neutralWhite,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => uiService.goBack(),
         ),
         title: Text(
           'Upload Financial Data',
@@ -183,7 +113,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
           IconButton(
             icon: const Icon(LucideIcons.x, color: AppColors.slate900),
             onPressed: () {
-              Navigator.pop(context);
+              uiService.goBack();
             },
           ),
         ],
@@ -202,7 +132,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                     ProgressIndicatorWidget(progress: 0.33),
                     const SizedBox(height: 6),
                     Text(
-                      'Step 1 of 3',
+                      widget.isUpdatingRecord ? 'Step 1 of 1' : 'Step 1 of 3',
                       style: AppTypography.textTheme.bodySmall?.copyWith(
                         color: AppColors.slate600,
                         fontWeight: FontWeight.w500,
@@ -240,22 +170,22 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                   child: Container(
                     height: 200,
                     width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: AppColors.slate50,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: _isUploading
-                        ? const Center(
-                            child: Column(
-                               mainAxisAlignment: MainAxisAlignment.center,
-                               children: [
+                    child: BlocBuilder<SmeProfileCubit, SmeProfileState>(
+                        builder: (context, state) {
+                          if (state.csvProcessingStatus == CsvProcessingStatus.processing) {
+                            return const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
                                   CircularProgressIndicator(color: AppColors.trustBlue),
                                   SizedBox(height: 16),
-                                  Text('Parsing data...', style: TextStyle(color: AppColors.slate600)),
-                               ],
-                            ),
-                          )
-                        : Column(
+                                  Text('Processing in background...',
+                                      style: TextStyle(color: AppColors.slate600)),
+                                ],
+                              ),
+                            );
+                          }
+                          return Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Icon(
@@ -266,11 +196,10 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                               const SizedBox(height: 16),
                               Text(
                                 'Tap to upload from your device',
-                                style: AppTypography.textTheme.bodyLarge
-                                    ?.copyWith(
-                                      color: AppColors.slate900,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                style: AppTypography.textTheme.bodyLarge?.copyWith(
+                                  color: AppColors.slate900,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -279,7 +208,9 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                                     ?.copyWith(color: AppColors.slate400),
                               ),
                             ],
-                          ),
+                          );
+                        },
+                      ),
                   ),
                 ),
               ),
@@ -424,21 +355,26 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                       child: CustomButton(
                         text: 'Cancel',
                         variant: ButtonVariant.secondary,
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => uiService.goBack(),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: CustomButton(
-                        text: 'Continue',
-                        variant: ButtonVariant.primary,
-                        isDisabled: !_isSuccess,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const BusinessProfilePage(isDocumentUpload: true),
-                            ),
+                      child: BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, authState) {
+                          return CustomButton(
+                            text: widget.isUpdatingRecord ? 'Generate Score' : 'Continue',
+                            variant: ButtonVariant.primary,
+                            isLoading: authState is SmeProfileSubmitting,
+                            isDisabled: !_isSuccess,
+                            onPressed: () {
+                              if (widget.isUpdatingRecord) {
+                                // Instant navigation as per Step 2/3 architecture
+                                uiService.navigateTo(const AnalysisStatePage());
+                              } else {
+                                uiService.navigateTo(const BusinessProfilePage(isDocumentUpload: true));
+                              }
+                            },
                           );
                         },
                       ),
@@ -450,8 +386,9 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildDynamicDataTable() {
      if (_parsedData.isEmpty) return const SizedBox();
@@ -473,7 +410,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
             List<dynamic> row = entry.value;
 
             return DataRow(
-                color: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+                color: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
                   return idx.isEven ? AppColors.slate50 : AppColors.neutralWhite;
                 }),
                 cells: List.generate(headers.length, (colIdx) {

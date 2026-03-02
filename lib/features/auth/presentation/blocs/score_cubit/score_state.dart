@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:partnex/features/auth/data/models/credibility_score.dart';
+import 'package:partnex/features/auth/data/models/financial_metrics.dart';
 
 abstract class ScoreState extends Equatable {
   const ScoreState();
@@ -15,11 +16,16 @@ class ScoreLoading extends ScoreState {}
 class ScoreLoadedSuccess extends ScoreState {
   final CredibilityScore score;
   final Map<String, dynamic> smeProfile;
+  final FinancialMetrics? financialMetrics;
 
-  const ScoreLoadedSuccess({required this.score, required this.smeProfile});
+  const ScoreLoadedSuccess({
+    required this.score,
+    required this.smeProfile,
+    this.financialMetrics,
+  });
 
   @override
-  List<Object?> get props => [score, smeProfile];
+  List<Object?> get props => [score, smeProfile, financialMetrics];
 }
 
 class ScoreError extends ScoreState {

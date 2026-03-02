@@ -379,8 +379,7 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<void> logout() async {
-    await _secureStorage.delete(key: 'jwt_token');
-    await _secureStorage.delete(key: 'user_role');
+    await _secureStorage.deleteAll(); // Clear everything: token, role, completion flags, etc.
     apiClient.setToken('');
   }
 
