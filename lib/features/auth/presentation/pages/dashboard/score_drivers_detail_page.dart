@@ -53,19 +53,14 @@ class ScoreDriversDetailPage extends StatelessWidget {
       ),
       body: BlocBuilder<ScoreCubit, ScoreState>(
         builder: (context, state) {
-          if (state is! ScoreLoadedSuccess) {
+          if (state is! ScoreLoadedSuccess || state.financialMetrics == null) {
             return const Center(child: CircularProgressIndicator(color: AppColors.trustBlue));
           }
 
-          final sc = state.score.totalScore;
+          final metrics = state.financialMetrics!;
+          final sc = metrics.totalCredibilityScore;
           final rLevel = state.score.riskLevel.name.toUpperCase();
-          final rev = double.tryParse(state.smeProfile['monthly_revenue']?.toString() ?? '0') ?? 0.0;
-          final exp = double.tryParse(state.smeProfile['monthly_expenses']?.toString() ?? '0') ?? 0.0;
-          final liab = double.tryParse(state.smeProfile['existing_liabilities']?.toString() ?? '0') ?? 0.0;
-          final yrs = int.tryParse(state.smeProfile['years_of_operation']?.toString() ?? '0') ?? 0;
-
-          final opexRatio = rev > 0 ? (exp/rev) : 1.0;
-          final debtRatio = rev > 0 ? (liab/(rev*12)) : 1.0;
+          final rankedDrivers = metrics.rankedDrivers;
 
           return SafeArea(
             child: ListView(
@@ -103,89 +98,69 @@ class ScoreDriversDetailPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
 
-                // Score Composition
-                _buildDriverExpansionTile(
-                  driverName: 'Opex Ratio Health',
-                  points: (sc * 0.4).toInt().toString(),
-                  percentageStr: '40%',
-                  percentage: 0.40,
-                  statusText: opexRatio > 0.8 ? 'Needs Work' : (opexRatio > 0.5 ? 'Moderate' : 'Healthy'),
-                  statusColor: opexRatio > 0.8 ? AppColors.dangerRed : (opexRatio > 0.5 ? AppColors.warningAmber : AppColors.successGreen),
-                  explanation: 'Operating expenses ratio is ${(opexRatio*100).toStringAsFixed(1)}%. Keeping expenses below 50% of revenue ensures strong profit margins.',
-                  initiallyExpanded: true,
+                // Primary Drivers
+                Text(
+                  'Primary Drivers (Top Impact)',
+                  style: AppTypography.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.slate900,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
                 ),
-                _buildDriverExpansionTile(
-                  driverName: 'Liabilities Burden',
-                  points: (sc * 0.35).toInt().toString(),
-                  percentageStr: '35%',
-                  percentage: 0.35,
-                  statusText: debtRatio > 0.5 ? 'High Debt' : (debtRatio > 0.2 ? 'Moderate' : 'Low Debt'),
-                  statusColor: debtRatio > 0.5 ? AppColors.dangerRed : (debtRatio > 0.2 ? AppColors.warningAmber : AppColors.successGreen),
-                  explanation: 'Your liabilities are roughly ${(debtRatio*100).toStringAsFixed(1)}% of annualized projected revenue. Maintaining low debt allows for growth stability.',
-                ),
-                _buildDriverExpansionTile(
-                  driverName: 'Business Stability',
-                  points: (sc * 0.25).toInt().toString(),
-                  percentageStr: '25%',
-                  percentage: 0.25,
-                  statusText: yrs > 5 ? 'Excellent' : (yrs > 2 ? 'Fair' : 'New Business'),
-                  statusColor: yrs > 5 ? AppColors.successGreen : (yrs > 2 ? AppColors.trustBlue : AppColors.warningAmber),
-                  explanation: 'Your business has been operating for $yrs years. Longer history and continuity directly boost stability confidence.',
+                const SizedBox(height: 12),
+                ...rankedDrivers.take(3).map((driver) => _buildDriverExpansionTile(
+                  driverName: driver.name,
+                  points: (driver.contribution).toStringAsFixed(1),
+                  percentageStr: '${(driver.weight * 100).toInt()}%',
+                  percentage: driver.score / 100,
+                  statusText: driver.score >= 80 ? 'Excellent' : (driver.score >= 50 ? 'Moderate' : 'Needs Work'),
+                  statusColor: driver.score >= 80 ? AppColors.successGreen : (driver.score >= 50 ? AppColors.warningAmber : AppColors.dangerRed),
+                  explanation: _getDriverExplanation(driver.name, metrics),
+                  initiallyExpanded: rankedDrivers.indexOf(driver) == 0,
+                )),
+
+                const SizedBox(height: 24),
+                // Secondary Drivers
+                Theme(
+                  data: ThemeData(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    title: Text(
+                      'Secondary Drivers',
+                      style: AppTypography.textTheme.bodyMedium?.copyWith(
+                        color: AppColors.slate600,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    tilePadding: EdgeInsets.zero,
+                    children: rankedDrivers.skip(3).map((driver) => _buildDriverExpansionTile(
+                      driverName: driver.name,
+                      points: (driver.contribution).toStringAsFixed(1),
+                      percentageStr: '${(driver.weight * 100).toInt()}%',
+                      percentage: driver.score / 100,
+                      statusText: driver.score >= 80 ? 'Excellent' : (driver.score >= 50 ? 'Moderate' : 'Needs Work'),
+                      statusColor: driver.score >= 80 ? AppColors.successGreen : (driver.score >= 50 ? AppColors.warningAmber : AppColors.dangerRed),
+                      explanation: _getDriverExplanation(driver.name, metrics),
+                    )).toList(),
+                  ),
                 ),
 
                 const SizedBox(height: 32),
 
-            // Recommendations
-            Text(
-              'Improvement Recommendations',
-              style: AppTypography.textTheme.headlineMedium?.copyWith(
-                color: AppColors.slate900,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 16),
+                // Recommendations
+                Text(
+                  'Improvement Recommendations',
+                  style: AppTypography.textTheme.headlineMedium?.copyWith(
+                    color: AppColors.slate900,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 16),
 
-            _buildRecommendationSection(
-              title: 'Payment History:',
-              items: [
-                '✓ Maintain your excellent payment record',
-                '✓ Continue paying all obligations on time',
-              ],
-              isPositive: true,
-            ),
-            _buildRecommendationSection(
-              title: 'Revenue Trend:',
-              items: [
-                '✓ Maintain consistent revenue growth',
-                '✓ Consider diversifying revenue streams',
-              ],
-              isPositive: true,
-            ),
-            _buildRecommendationSection(
-              title: 'Expense Ratio:',
-              items: [
-                '→ Reduce monthly expenses by 5-10% to improve profit margin',
-                '→ Optimize operational costs without sacrificing quality',
-              ],
-              isPositive: false,
-            ),
-            _buildRecommendationSection(
-              title: 'Liabilities:',
-              items: [
-                '→ Reduce outstanding liabilities by ₦50K to improve score',
-                '→ Consider refinancing high-interest loans',
-              ],
-              isPositive: false,
-            ),
-            _buildRecommendationSection(
-              title: 'Business Stability:',
-              items: [
-                '→ Continue building business track record',
-                '→ Document long-term growth plans',
-              ],
-              isPositive: false,
-            ),
+                ..._generateRecommendations(metrics),
+
+                const SizedBox(height: 32),
 
             const SizedBox(height: 32),
 
@@ -359,14 +334,10 @@ class ScoreDriversDetailPage extends StatelessWidget {
           const SizedBox(height: 8),
           ...items.map((item) {
             Color itemColor = isPositive ? AppColors.successGreen : AppColors.warningAmber;
-            if (!isPositive && item.startsWith('→ Focus') || item.contains('Build') || item.contains('history')) {
-              itemColor = AppColors.dangerRed;
-            }
-            // For simplicity, make arrow items info/warning color, and checkmark items green
             if (item.startsWith('✓')) {
               itemColor = AppColors.successGreen;
             } else if (item.startsWith('→')) {
-              itemColor = AppColors.trustBlue; // Actionable
+              itemColor = AppColors.trustBlue;
             }
 
             return Padding(
@@ -384,5 +355,73 @@ class ScoreDriversDetailPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _getDriverExplanation(String driverName, dynamic metrics) {
+    switch (driverName) {
+      case 'Revenue Trend':
+        return 'Your revenue trend score is based on CAGR of ${metrics.cagr.toStringAsFixed(1)}% and volatility of ${metrics.revenueVolatility.toStringAsFixed(2)}. Growth consistency is key to credibility.';
+      case 'Expense Ratio':
+        return 'Operating expenses ratio is ${metrics.expenseRatio.toStringAsFixed(1)}%. Keeping expenses below 70% of revenue ensures healthy profit margins.';
+      case 'Liabilities Burden':
+        return 'Debt-to-revenue ratio is ${metrics.debtToRevenueRatio.toStringAsFixed(1)}%. Lower debt relative to revenue indicates better repayment capacity.';
+      case 'Payment History':
+        return 'On-time payment rate is ${metrics.onTimePaymentRate.toStringAsFixed(0)}%. Consistent on-time payments are the strongest indicator of reliability.';
+      case 'Business Stability':
+        return 'Stability score is based on your years of operation. Older businesses generally have more predictable and stable performance.';
+      case 'Financial Documentation':
+        return 'Score reflects the completeness and quality of submitted records. Recent and consistent documents build high trust.';
+      default:
+        return 'This metric evaluates a key aspect of your business creditworthiness.';
+    }
+  }
+
+  List<Widget> _generateRecommendations(dynamic metrics) {
+    List<Widget> sections = [];
+
+    // Revenue
+    if (metrics.revenueTrendScore < 80) {
+      sections.add(_buildRecommendationSection(
+        title: 'Revenue Trend:',
+        items: [
+          metrics.cagr < 5 ? '→ Develop new revenue channels' : '→ Maintain consistent revenue growth',
+          metrics.revenueVolatility > 0.5 ? '→ Stabilize revenue fluctuations' : '→ Continue diversifying revenue streams',
+        ],
+        isPositive: false,
+      ));
+    }
+
+    // Expense
+    if (metrics.expenseRatioScore < 80) {
+      sections.add(_buildRecommendationSection(
+        title: 'Expense Ratio:',
+        items: [
+          metrics.expenseRatio > 75 ? '→ Implement cost reduction program' : '→ Optimize operational costs',
+          '→ Improve efficiency by limiting non-essential spending',
+        ],
+        isPositive: false,
+      ));
+    }
+
+    // Liabilities
+    if (metrics.liabilitiesBurdenScore < 80) {
+      sections.add(_buildRecommendationSection(
+        title: 'Liabilities:',
+        items: [
+          metrics.debtToRevenueRatio > 50 ? '→ Develop debt reduction strategy' : '→ Maintain low debt levels',
+          '→ Prioritize repayment of high-interest obligations',
+        ],
+        isPositive: false,
+      ));
+    }
+
+    if (sections.isEmpty) {
+      sections.add(const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text('Your metrics are strong! Maintain your current financial discipline.'),
+      ));
+    }
+
+    return sections;
   }
 }

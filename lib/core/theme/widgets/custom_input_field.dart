@@ -12,6 +12,7 @@ class CustomInputField extends StatelessWidget {
   final String? Function(String?)? validator;
   final int? maxLines;
   final void Function(String)? onChanged;
+  final Iterable<String>? autofillHints;
 
   const CustomInputField({
     super.key,
@@ -24,6 +25,7 @@ class CustomInputField extends StatelessWidget {
     this.validator,
     this.maxLines = 1,
     this.onChanged,
+    this.autofillHints,
   });
 
   @override
@@ -39,6 +41,7 @@ class CustomInputField extends StatelessWidget {
           validator: validator,
           maxLines: maxLines,
           onChanged: onChanged,
+          autofillHints: autofillHints,
           style: AppTypography.textTheme.bodyMedium?.copyWith(
             color: AppColors.slate900,
           ),

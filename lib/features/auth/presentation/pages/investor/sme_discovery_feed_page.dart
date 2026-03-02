@@ -300,11 +300,15 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
                        const SizedBox(height: 4),
                        Row(
                          children: [
-                            Text(
-                              '${sme.industry} · ',
-                              style: AppTypography.textTheme.bodySmall?.copyWith(
-                                color: AppColors.slate600,
-                                fontSize: 12,
+                            Flexible(
+                              child: Text(
+                                '${sme.industry} · ',
+                                style: AppTypography.textTheme.bodySmall?.copyWith(
+                                  color: AppColors.slate600,
+                                  fontSize: 12,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
                             ),
                             const Icon(LucideIcons.mapPin, size: 12, color: AppColors.slate400),
@@ -316,6 +320,8 @@ class _SmeDiscoveryFeedPageState extends State<SmeDiscoveryFeedPage> {
                                   color: AppColors.slate600,
                                   fontSize: 12,
                                 ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
                             ),
                          ],

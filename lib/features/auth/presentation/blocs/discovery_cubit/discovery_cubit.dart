@@ -41,5 +41,8 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       
       emit(DiscoveryError('Failed to load SMEs:\n$errorMessage'));
     }
+  
+  void reset() {
+    emit(DiscoveryInitial());
   }
 }

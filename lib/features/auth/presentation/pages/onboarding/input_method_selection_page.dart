@@ -98,7 +98,9 @@ class InputMethodSelectionPage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const CsvUploadPage(),
+                              builder: (_) => CsvUploadPage(
+                                isUpdatingRecord: isUpdatingRecord,
+                              ),
                             ),
                           );
                         },

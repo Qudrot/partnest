@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,6 +14,7 @@ import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
+import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_state.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/business_profile_page.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/liabilities_history_page.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/revenue_expenses_page.dart';
@@ -54,7 +54,7 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
       if (result != null) {
         final file = result.files.single;
 
-        // If CSV, auto-parse to update the profile cubit data
+        // If CSV, trigger background processing
         if (file.name.toLowerCase().endsWith('.csv')) {
           String csvString = '';
           if (file.bytes != null) {
@@ -63,13 +63,9 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
             csvString = await File(file.path!).readAsString();
           }
           if (csvString.isNotEmpty) {
-            // Parsed data is available if needed for future auto-fill
-            List<List<dynamic>> rowsAsListOfValues = CsvCodec().decoder.convert(
-              csvString,
-            );
-            if (rowsAsListOfValues.isNotEmpty) {
-              _processBankStatementLocally(rowsAsListOfValues, file.name);
-            }
+             if (mounted) {
+              context.read<SmeProfileCubit>().processCsv(csvString, file.name);
+             }
           }
         }
 
@@ -96,80 +92,6 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
     }
   }
 
-  void _processBankStatementLocally(List<List<dynamic>> rows, String fileName) {
-    if (rows.isEmpty) return;
-
-    final headers = rows.first.map((e) => e.toString().toLowerCase()).toList();
-
-    int creditIdx = -1;
-    int debitIdx = -1;
-    int descIdx = -1;
-
-    for (int i = 0; i < headers.length; i++) {
-      if (headers[i].contains("credit") || headers[i].contains("deposit")) {
-        creditIdx = i;
-      } else if (headers[i].contains("debit") ||
-          headers[i].contains("withdrawal")) {
-        debitIdx = i;
-      } else if (headers[i].contains("narration") ||
-          headers[i].contains("description") ||
-          headers[i].contains("details")) {
-        descIdx = i;
-      }
-    }
-
-    double totalRevenue = 0.0;
-    double totalExpenses = 0.0;
-    double totalDebt = 0.0;
-
-    for (int i = 1; i < rows.length; i++) {
-      final row = rows[i];
-      if (creditIdx != -1 && creditIdx < row.length) {
-        final val = double.tryParse(
-          row[creditIdx].toString().replaceAll(RegExp(r'[^0-9.]'), ''),
-        );
-        if (val != null) totalRevenue += val;
-      }
-      if (debitIdx != -1 && debitIdx < row.length) {
-        final val = double.tryParse(
-          row[debitIdx].toString().replaceAll(RegExp(r'[^0-9.]'), ''),
-        );
-        if (val != null) totalExpenses += val;
-      }
-      if (descIdx != -1 &&
-          descIdx < row.length &&
-          debitIdx != -1 &&
-          debitIdx < row.length) {
-        final desc = row[descIdx].toString().toLowerCase();
-        if (desc.contains("loan") ||
-            desc.contains("fairmoney") ||
-            desc.contains("branch") ||
-            desc.contains("carbon")) {
-          final debtVal = double.tryParse(
-            row[debitIdx].toString().replaceAll(RegExp(r'[^0-9.]'), ''),
-          );
-          if (debtVal != null) totalDebt += debtVal;
-        }
-      }
-    }
-
-    if (mounted) {
-      context.read<SmeProfileCubit>().updateRevenueExpenses(
-        annualRevenueYear1: DateTime.now().year - 1,
-        annualRevenueAmount1: totalRevenue,
-        annualRevenueYear2: DateTime.now().year - 2,
-        annualRevenueAmount2: totalRevenue * 0.8,
-        monthlyAvgExpenses: totalExpenses / 12,
-        documentFileName: fileName,
-      );
-
-      context.read<SmeProfileCubit>().updateLiabilitiesHistory(
-        totalLiabilities: totalDebt,
-        outstandingLoans: totalDebt,
-        priorFundingSource: "Extracted from CSV",
-      );
-    }
-  }
 
   Widget _buildSummarySection({
     required String title,
@@ -493,8 +415,10 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                               ? 'Generate New Score'
                               : 'Generate Score',
                           variant: ButtonVariant.primary,
-                          isLoading: isSubmitting,
-                          isDisabled: !_isConfirmed || isSubmitting,
+                          isLoading: isSubmitting || profileState.csvProcessingStatus == CsvProcessingStatus.processing,
+                          isDisabled: !_isConfirmed || 
+                                     isSubmitting || 
+                                     profileState.csvProcessingStatus == CsvProcessingStatus.processing,
                           onPressed: _submitData,
                         ),
                       ),

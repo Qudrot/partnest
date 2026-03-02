@@ -8,6 +8,7 @@ import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/discovery_cubit/discovery_cubit.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
 import 'package:partnex/core/services/ui_service.dart';
 
 void main() {
@@ -40,13 +41,22 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ],
-      child: MaterialApp(
-        title: 'Partnex MVP',
-        theme: AppTheme.lightTheme,
-        navigatorKey: uiService.navigatorKey,
-        scaffoldMessengerKey: uiService.scaffoldMessengerKey,
-        debugShowCheckedModeBanner: false,
-        home: const SplashPage(),
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthUnauthenticated) {
+            context.read<SmeProfileCubit>().reset();
+            context.read<DiscoveryCubit>().reset();
+            context.read<ScoreCubit>().reset();
+          }
+        },
+        child: MaterialApp(
+          title: 'Partnex MVP',
+          theme: AppTheme.lightTheme,
+          navigatorKey: uiService.navigatorKey,
+          scaffoldMessengerKey: uiService.scaffoldMessengerKey,
+          debugShowCheckedModeBanner: false,
+          home: const SplashPage(),
+        ),
       ),
     );
   }

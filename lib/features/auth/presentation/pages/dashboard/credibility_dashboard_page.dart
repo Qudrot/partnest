@@ -335,55 +335,57 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                   const SizedBox(height: 32),
 
                   // Key Metrics Area
-                  GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1.25,
-                    children: [
-                      _buildMetricMiniCard(
-                        label: 'Mnthly Revenue',
-                        value: (() {
-                          final rev = getCalculatedMonthlyRev((state as ScoreLoadedSuccess).smeProfile);
-                          if (rev >= 1000) return '₦${(rev/1000).toStringAsFixed(1)}K';
-                          return '₦${rev.toStringAsFixed(0)}';
-                        })(),
-                        icon: LucideIcons.trendingUp,
-                        statusColor: AppColors.successGreen,
-                      ),
-                      _buildMetricMiniCard(
-                        label: 'Opex/Revenue',
-                        value: (() {
-                          final rev = getCalculatedMonthlyRev((state as ScoreLoadedSuccess).smeProfile);
-                          final exp = double.tryParse((state).smeProfile['monthly_expenses']?.toString() ?? '0') ?? 0.0;
-                          if (rev <= 0) return 'N/A';
-                          return '${((exp / rev) * 100).toStringAsFixed(0)}%';
-                        })(),
-                        icon: LucideIcons.pieChart,
-                        statusColor: (() {
-                          final rev = getCalculatedMonthlyRev((state).smeProfile);
-                          final exp = double.tryParse((state).smeProfile['monthly_expenses']?.toString() ?? '0') ?? 0.0;
-                          if (rev <= 0 || (exp/rev) > 0.8) return AppColors.dangerRed;
-                          if ((exp/rev) > 0.5) return AppColors.warningAmber;
-                          return AppColors.successGreen;
-                        })(),
-                      ),
-                      _buildMetricMiniCard(
-                        label: 'Liabilities',
-                        value: '₦${(double.tryParse((state).smeProfile['existing_liabilities']?.toString() ?? '0') ?? 0.0) >= 1000 ? '${((double.tryParse((state).smeProfile['existing_liabilities']?.toString() ?? '0') ?? 0.0)/1000).toStringAsFixed(1)}K' : (state).smeProfile['existing_liabilities']?.toString() ?? '0'}',
-                        icon: LucideIcons.alertCircle,
-                        statusColor: AppColors.warningAmber,
-                      ),
-                      _buildMetricMiniCard(
-                        label: 'Age',
-                        value: '${(state).smeProfile['years_of_operation']?.toString() ?? '0'} Yrs',
-                        icon: LucideIcons.briefcase,
-                        statusColor: AppColors.successGreen,
-                      ),
-                    ],
-                  ),
+                  if (state.financialMetrics != null) ...[
+                    GridView.count(
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 1.15,
+                      children: [
+                        _buildMetricMiniCard(
+                          label: 'Revenue Trend',
+                          value: '${state.financialMetrics!.yoyGrowth > 0 ? '+' : ''}${state.financialMetrics!.yoyGrowth.toStringAsFixed(0)}% YoY',
+                          status: state.financialMetrics!.yoyGrowth >= 0 ? 'Positive' : 'Negative',
+                          statusColor: state.financialMetrics!.yoyGrowth >= 0 ? AppColors.successGreen : AppColors.dangerRed,
+                        ),
+                        _buildMetricMiniCard(
+                          label: 'Expense Ratio',
+                          value: '${state.financialMetrics!.expenseRatio.toStringAsFixed(0)}%',
+                          status: state.financialMetrics!.expenseRatio <= 60 ? 'Healthy' : (state.financialMetrics!.expenseRatio <= 85 ? 'Moderate' : 'Stressed'),
+                          statusColor: state.financialMetrics!.expenseRatio <= 60 ? AppColors.trustBlue : (state.financialMetrics!.expenseRatio <= 85 ? AppColors.warningAmber : AppColors.dangerRed),
+                        ),
+                        _buildMetricMiniCard(
+                          label: 'Liabilities',
+                          value: '₦${state.financialMetrics!.debtToRevenueRatio >= 1000 ? '${(state.financialMetrics!.debtToRevenueRatio/1000).toStringAsFixed(1)}K' : state.financialMetrics!.debtToRevenueRatio.toStringAsFixed(0)}',
+                          status: state.financialMetrics!.debtToRevenueRatio <= 30 ? 'Low' : (state.financialMetrics!.debtToRevenueRatio <= 70 ? 'Moderate' : 'High'),
+                          statusColor: state.financialMetrics!.debtToRevenueRatio <= 30 ? AppColors.successGreen : (state.financialMetrics!.debtToRevenueRatio <= 70 ? AppColors.warningAmber : AppColors.dangerRed),
+                        ),
+                        _buildMetricMiniCard(
+                          label: 'Payment History',
+                          value: state.financialMetrics!.onTimePaymentRate >= 95 ? 'On Time' : '${state.financialMetrics!.onTimePaymentRate.toStringAsFixed(0)}% On Time',
+                          status: state.financialMetrics!.onTimePaymentRate >= 90 ? 'Positive' : 'Attention',
+                          statusColor: state.financialMetrics!.onTimePaymentRate >= 90 ? AppColors.successGreen : AppColors.warningAmber,
+                        ),
+                      ],
+                    ),
+                  ] else ...[
+                    GridView.count(
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 1.15,
+                      children: [
+                        _buildMetricMiniCard(label: 'Revenue Trend', value: 'N/A', status: 'N/A', statusColor: AppColors.slate400),
+                        _buildMetricMiniCard(label: 'Expense Ratio', value: 'N/A', status: 'N/A', statusColor: AppColors.slate400),
+                        _buildMetricMiniCard(label: 'Liabilities', value: 'N/A', status: 'N/A', statusColor: AppColors.slate400),
+                        _buildMetricMiniCard(label: 'Payment History', value: 'N/A', status: 'N/A', statusColor: AppColors.slate400),
+                      ],
+                    ),
+                  ],
                   const SizedBox(height: 32),
 
                   // Score Drivers Area
@@ -405,38 +407,30 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                   ),
                   const SizedBox(height: 16),
 
-                  (() {
-                    final rev = getCalculatedMonthlyRev((state as ScoreLoadedSuccess).smeProfile);
-                    final exp = double.tryParse((state).smeProfile['monthly_expenses']?.toString() ?? '0') ?? 0.0;
-                    final liab = double.tryParse((state).smeProfile['existing_liabilities']?.toString() ?? '0') ?? 0.0;
-                    final sc = state.score.totalScore;
-                    
-                    // Simple logic to distribute the score for display
-                    return Column(
+                  if (state.financialMetrics != null) ...[
+                    Column(
+                      children: state.financialMetrics!.rankedDrivers.take(3).map((driver) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _buildDriverBar(
+                            driverName: driver.name,
+                            percentage: driver.score / 100,
+                            statusColor: driver.score >= 80 ? AppColors.successGreen : (driver.score >= 50 ? AppColors.warningAmber : AppColors.dangerRed),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ] else ...[
+                    Column(
                       children: [
-                        _buildDriverBar(
-                          driverName: 'Opex Ratio Health',
-                          points: (sc * 0.4).toInt().toString(),
-                          percentage: 0.40,
-                          statusColor: (rev <= 0 || (exp/rev) > 0.8) ? AppColors.dangerRed : (((exp/rev) > 0.5) ? AppColors.warningAmber : AppColors.successGreen),
-                        ),
+                        _buildDriverBar(driverName: 'Payment History', percentage: 0.5, statusColor: AppColors.slate300),
                         const SizedBox(height: 12),
-                        _buildDriverBar(
-                          driverName: 'Liabilities Burden',
-                          points: (sc * 0.35).toInt().toString(),
-                          percentage: 0.35,
-                          statusColor: (rev <= 0 || liab/(rev*12) > 0.5) ? AppColors.warningAmber : AppColors.successGreen,
-                        ),
+                        _buildDriverBar(driverName: 'Revenue Trend', percentage: 0.5, statusColor: AppColors.slate300),
                         const SizedBox(height: 12),
-                        _buildDriverBar(
-                          driverName: 'Business Stability',
-                          points: (sc * 0.25).toInt().toString(),
-                          percentage: 0.25,
-                          statusColor: AppColors.trustBlue,
-                        ),
+                        _buildDriverBar(driverName: 'Expense Ratio', percentage: 0.5, statusColor: AppColors.slate300),
                       ],
-                    );
-                  })(),
+                    ),
+                  ],
 
                   const SizedBox(height: 32),
 
@@ -473,45 +467,42 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
   Widget _buildMetricMiniCard({
     required String label,
     required String value,
-    required IconData icon,
+    required String status,
     required Color statusColor,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.slate50,
+        color: Colors.white,
         border: Border.all(color: AppColors.slate200),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-               Expanded(
-                 child: Text(
-                   label,
-                   style: AppTypography.textTheme.labelMedium?.copyWith(
-                     color: AppColors.slate600,
-                     fontWeight: FontWeight.w600,
-                     fontSize: 12,
-                   ),
-                 ),
-               ),
-               const SizedBox(width: 4),
-              Icon(icon, size: 20, color: statusColor),
-            ],
+          Text(
+            label,
+            style: AppTypography.textTheme.labelMedium?.copyWith(
+              color: AppColors.slate600,
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
           ),
-          const SizedBox(height: 6),
           Text(
             value,
             style: AppTypography.textTheme.headlineSmall?.copyWith(
               color: AppColors.slate900,
+              fontWeight: FontWeight.w700,
+              fontSize: 20,
+            ),
+          ),
+          Text(
+            status,
+            style: AppTypography.textTheme.labelSmall?.copyWith(
+              color: statusColor,
               fontWeight: FontWeight.w600,
-              fontSize: 16,
+              fontSize: 14,
             ),
           ),
         ],
@@ -521,60 +512,45 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
 
   Widget _buildDriverBar({
     required String driverName,
-    required String points,
     required double percentage,
     required Color statusColor,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: AppColors.slate200),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
           Expanded(
-            flex: 2,
+            flex: 3,
             child: Text(
               driverName,
               style: AppTypography.textTheme.bodyMedium?.copyWith(
                 color: AppColors.slate900,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 fontSize: 14,
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
           Expanded(
-            flex: 3,
-            child: Row(
-              children: [
-                 Expanded(
-                   child: Container(
-                     height: 4,
-                     decoration: BoxDecoration(
-                       color: AppColors.slate100,
-                       borderRadius: BorderRadius.circular(2),
-                     ),
-                     child: FractionallySizedBox(
-                       alignment: Alignment.centerLeft,
-                       widthFactor: 1.0, // Visual bar represents the max weight of the bar
-                       child: Container(
-                         decoration: BoxDecoration(
-                           color: statusColor,
-                           borderRadius: BorderRadius.circular(2),
-                         ),
-                       ),
-                     ),
-                   ),
-                 ),
-              ],
+            flex: 4,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(2),
+              child: LinearProgressIndicator(
+                value: percentage,
+                backgroundColor: AppColors.slate100,
+                valueColor: AlwaysStoppedAnimation<Color>(statusColor),
+                minHeight: 6,
+              ),
             ),
           ),
           const SizedBox(width: 16),
           Text(
-            points,
+            '${(percentage * 100).toInt()}%',
             style: AppTypography.textTheme.bodyMedium?.copyWith(
               color: AppColors.slate900,
               fontWeight: FontWeight.w600,
