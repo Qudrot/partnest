@@ -19,10 +19,10 @@
    info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:188:35 - deprecated_member_use
    info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:191:35 - deprecated_member_use
    info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:194:35 - deprecated_member_use
-   info - 'MaterialStateColor' is deprecated and shouldn't be used. Use WidgetStateColor instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_currency_field.dart:62:24 - deprecated_member_use
-   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_currency_field.dart:62:60 - deprecated_member_use
-   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_currency_field.dart:63:35 - deprecated_member_use
-   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_currency_field.dart:63:75 - deprecated_member_use
+   info - 'MaterialStateColor' is deprecated and shouldn't be used. Use WidgetStateColor instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_currency_field.dart:68:37 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_currency_field.dart:68:73 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_currency_field.dart:69:35 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_currency_field.dart:69:75 - deprecated_member_use
    info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\core\theme\widgets\custom_dropdown_field.dart:33:11 - deprecated_member_use
    info - 'MaterialStateColor' is deprecated and shouldn't be used. Use WidgetStateColor instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_dropdown_field.dart:45:24 - deprecated_member_use
    info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_dropdown_field.dart:45:60 - deprecated_member_use
@@ -42,25 +42,47 @@ warning - The value of the local variable 'y1' isn't used - lib\core\theme\widge
 warning - The value of the local variable 'y2' isn't used - lib\core\theme\widgets\partnex_logo.dart:164:18 - unused_local_variable
 warning - The value of the local variable 'y3' isn't used - lib\core\theme\widgets\partnex_logo.dart:165:18 - unused_local_variable
 warning - The value of the local variable 'y4' isn't used - lib\core\theme\widgets\partnex_logo.dart:166:18 - unused_local_variable
-  error - Missing concrete implementation of 'abstract class AuthRepository.submitInvestorProfile' - lib\features\auth\data\repositories\mock_auth_repository.dart:7:7 - non_abstract_class_inherits_abstract_member
-   info - Don't invoke 'print' in production code - lib\features\auth\presentation\blocs\discovery_cubit\discovery_cubit.dart:17:9 - avoid_print
-warning - Unused import: 'package:partnex/features/auth/presentation/pages/onboarding/welcome_role_selection_page.dart' - lib\features\auth\presentation\pages\dashboard\profile_management_page.dart:10:8 - unused_import
+warning - The value of the local variable 'score' isn't used - lib\features\auth\data\repositories\api_auth_repository.dart:70:19 - unused_local_variable
+   info - Don't invoke 'print' in production code - lib\features\auth\presentation\blocs\discovery_cubit\discovery_cubit.dart:28:9 - avoid_print
+  error - The constructor being called isn't a const constructor - lib\features\auth\presentation\blocs\sme_profile_cubit\sme_profile_cubit.dart:112:20 - const_with_non_const
+   info - Don't use 'BuildContext's across async gaps - lib\features\auth\presentation\pages\dashboard\analysis_state_page.dart:56:26 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\auth\presentation\pages\dashboard\analysis_state_page.dart:77:22 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\auth\presentation\pages\dashboard\analysis_state_page.dart:91:12 - use_build_context_synchronously
+warning - Unused import: 'package:partnex/features/auth/presentation/blocs/auth_event.dart' - lib\features\auth\presentation\pages\dashboard\credibility_dashboard_page.dart:14:8 - unused_import
+warning - Unnecessary cast - lib\features\auth\presentation\pages\dashboard\credibility_dashboard_page.dart:349:64 - unnecessary_cast
+warning - Unnecessary cast - lib\features\auth\presentation\pages\dashboard\credibility_dashboard_page.dart:359:64 - unnecessary_cast
+warning - Unnecessary cast - lib\features\auth\presentation\pages\dashboard\credibility_dashboard_page.dart:409:58 - unnecessary_cast
+warning - Unused import: 'package:partnex/core/theme/widgets/partnex_logo.dart' - lib\features\auth\presentation\pages\investor\investor_onboarding_page.dart:7:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/investor/investor_profile_page.dart' - lib\features\auth\presentation\pages\investor\investor_onboarding_page.dart:14:8 - unused_import
    info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\auth\presentation\pages\investor\investor_onboarding_page.dart:260:27 - deprecated_member_use
    info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\auth\presentation\pages\investor\investor_onboarding_page.dart:263:27 - deprecated_member_use
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/investor/deep_dive_evidence_page.dart' - lib\features\auth\presentation\pages\investor\sme_discovery_feed_page.dart:8:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/blocs/auth_event.dart' - lib\features\auth\presentation\pages\investor\sme_discovery_feed_page.dart:13:8 - unused_import
 warning - Unused import: 'package:partnex/core/theme/widgets/custom_button.dart' - lib\features\auth\presentation\pages\investor\sme_profile_expanded_page.dart:5:8 - unused_import
 warning - The declaration '_toggleWatchlist' isn't referenced - lib\features\auth\presentation\pages\investor\sme_profile_expanded_page.dart:324:8 - unused_element
-   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:127:29 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:151:29 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:165:29 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:179:29 - curly_braces_in_flow_control_structures
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\pages\onboarding\success_next_steps_page.dart:120:45 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\pages\onboarding\success_next_steps_page.dart:121:45 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\pages\onboarding\success_next_steps_page.dart:122:45 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\pages\onboarding\success_next_steps_page.dart:261:44 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\pages\onboarding\success_next_steps_page.dart:262:54 - deprecated_member_use
-warning - Unused import: 'package:google_fonts/google_fonts.dart' - test\export_logo_pngs_test.dart:6:8 - unused_import
-warning - Unused import: 'package:partnex/core/theme/app_colors.dart' - test\export_logo_pngs_test.dart:10:8 - unused_import
-   info - Don't invoke 'print' in production code - test\export_logo_pngs_test.dart:64:7 - avoid_print
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/dashboard/credibility_dashboard_page.dart' - lib\features\auth\presentation\pages\login_page.dart:12:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/investor/sme_discovery_feed_page.dart' - lib\features\auth\presentation\pages\login_page.dart:13:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/onboarding/input_method_selection_page.dart' - lib\features\auth\presentation\pages\login_page.dart:14:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/data/models/user_model.dart' - lib\features\auth\presentation\pages\login_page.dart:15:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/blocs/auth_event.dart' - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:15:8 - unused_import
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:173:29 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:197:29 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:211:29 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:225:29 - curly_braces_in_flow_control_structures
+   info - The private field _isUploading could be 'final' - lib\features\auth\presentation\pages\onboarding\csv_upload_page.dart:32:8 - prefer_final_fields
+   info - The private field _isError could be 'final' - lib\features\auth\presentation\pages\onboarding\csv_upload_page.dart:34:8 - prefer_final_fields
+   info - The private field _errorMessage could be 'final' - lib\features\auth\presentation\pages\onboarding\csv_upload_page.dart:35:10 - prefer_final_fields
+  error - The constructor being called isn't a const constructor - lib\features\auth\presentation\pages\onboarding\csv_upload_page.dart:66:24 - const_with_non_const
+   info - Use a 'SizedBox' to add whitespace to a layout - lib\features\auth\presentation\pages\onboarding\csv_upload_page.dart:169:26 - sized_box_for_whitespace
+  error - Undefined name 'CsvProcessingStatus' - lib\features\auth\presentation\pages\onboarding\csv_upload_page.dart:172:90 - undefined_identifier
+  error - Undefined name 'CsvProcessingStatus' - lib\features\auth\presentation\pages\onboarding\review_confirm_page.dart:418:90 - undefined_identifier
+  error - Undefined name 'CsvProcessingStatus' - lib\features\auth\presentation\pages\onboarding\review_confirm_page.dart:421:74 - undefined_identifier
+warning - Unused import: 'package:partnex/features/auth/data/models/user_model.dart' - lib\features\auth\presentation\pages\signup_page.dart:13:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/investor/investor_onboarding_page.dart' - lib\features\auth\presentation\pages\signup_page.dart:14:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/onboarding/input_method_selection_page.dart' - lib\features\auth\presentation\pages\signup_page.dart:15:8 - unused_import
+   info - Don't invoke 'print' in production code - print_json.dart:5:3 - avoid_print
+   info - Don't invoke 'print' in production code - test\export_direct_test.dart:67:5 - avoid_print
+   info - Don't invoke 'print' in production code - test\export_logo_pngs_test.dart:44:7 - avoid_print
    info - The variable name 'UThickness' isn't a lowerCamelCase identifier - test\generate_icon_test.dart:32:13 - non_constant_identifier_names
    info - Don't invoke 'print' in production code - test\generate_icon_test.dart:72:3 - avoid_print
 warning - The value of the local variable 'white' isn't used - test\generate_pngs_test.dart:8:19 - unused_local_variable
@@ -68,5 +90,26 @@ warning - The value of the local variable 'white' isn't used - test\generate_png
    info - Don't invoke 'print' in production code - test\generate_pngs_test.dart:101:3 - avoid_print
    info - Don't invoke 'print' in production code - test\generate_pngs_test.dart:102:3 - avoid_print
    info - Don't invoke 'print' in production code - test\generate_pngs_test.dart:103:3 - avoid_print
-warning - Duplicate import - test\widget_test.dart:10:8 - duplicate_import
+warning - Unused import: 'package:flutter/material.dart' - test\unit_test.dart:1:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_state.dart' - test\unit_test.dart:4:8 - unused_import
+   info - Don't invoke 'print' in production code - test_feed.dart:21:5 - avoid_print
+   info - Don't invoke 'print' in production code - test_feed.dart:24:5 - avoid_print
+   info - Don't invoke 'print' in production code - test_feed.dart:26:5 - avoid_print
 
+flutter : 95 issues 
+found. (ran in 14.9s)
+At line:1 char:1
++ flutter analyze > 
+analyze_output.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (95 issues fou   
+ nd. (ran in 14.9s)    
+:String) [], Remot    
+eException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
