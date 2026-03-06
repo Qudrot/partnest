@@ -12,7 +12,8 @@ class AppTheme {
         secondary: AppColors.slate900,
         error: AppColors.dangerRed,
         surface: AppColors.neutralWhite,
-        background: AppColors.slate50,
+        onSurface: AppColors.slate900,
+        surfaceContainer: AppColors.slate50,
       ),
       textTheme: AppTypography.textTheme,
     );

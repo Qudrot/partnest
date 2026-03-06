@@ -4,221 +4,182 @@ import 'package:partnex/features/auth/data/models/financial_metrics.dart';
 
 class FinancialMetricsCalculator {
   static FinancialMetrics calculate(SmeProfileState profile) {
-    // 1. Revenue Trend Analysis
-    final revenueTrend = _calculateRevenueTrend(profile);
+    // ---------------------------------------------------------
+    // BASE VARIABLES (Safeguarded against division by zero)
+    // ---------------------------------------------------------
+    final double revenueY1 = profile.annualRevenueAmount1 > 0 ? profile.annualRevenueAmount1 : 1; 
+    final double revenueY2 = profile.annualRevenueAmount2 > 0 ? profile.annualRevenueAmount2 : 1;
+    final double annualExpenses = profile.monthlyAvgExpenses * 12;
+    final double liabilities = profile.totalLiabilities;
+    final int employees = profile.numberOfEmployees > 0 ? profile.numberOfEmployees : 1;
+    final int years = profile.yearsOfOperation > 0 ? profile.yearsOfOperation : 1;
 
-    // 2. Expense Ratio Analysis
-    final expenseRatioResult = _calculateExpenseRatio(profile);
+    // ---------------------------------------------------------
+    // CATEGORY 1: REVENUE METRICS
+    // ---------------------------------------------------------
+    final double yoyGrowth = ((revenueY1 - revenueY2) / revenueY2) * 100;
+    
+    // CAGR (Matches YoY if only 2 years, otherwise smooths over 3)
+    double cagr = yoyGrowth; 
+    if (profile.annualRevenueAmount3 != null && profile.annualRevenueAmount3! > 0) {
+      cagr = (pow(revenueY1 / profile.annualRevenueAmount3!, 1 / 2) - 1) * 100;
+    }
+    
+    final double revenuePerEmployee = revenueY1 / employees;
 
-    // 3. Liabilities Burden Analysis
-    final liabilitiesResult = _calculateLiabilitiesBurden(profile, expenseRatioResult.profitMargin);
+    // ---------------------------------------------------------
+    // CATEGORY 2: PROFITABILITY METRICS
+    // ---------------------------------------------------------
+    final double expenseRatio = (annualExpenses / revenueY1) * 100;
+    final double profitMargin = ((revenueY1 - annualExpenses) / revenueY1) * 100;
+    final double monthlyProfit = (revenueY1 / 12) - profile.monthlyAvgExpenses;
+    final double annualProfit = revenueY1 - annualExpenses;
 
-    // 4. Payment History Analysis
-    final paymentHistoryResult = _calculatePaymentHistory(profile);
+    // ---------------------------------------------------------
+    // CATEGORY 3: DEBT & LIABILITIES
+    // ---------------------------------------------------------
+    final double liabilitiesToRevenueRatio = (liabilities / revenueY1) * 100;
+    
+    // Handle edge case where annual profit is negative (can't service debt)
+    final double debtServiceRatio = annualProfit > 0 ? (liabilities / annualProfit) * 100 : 999.9;
+    
+    final double liabilitiesPerEmployee = liabilities / employees;
+    final double liabilitiesCoverageRatio = liabilities > 0 ? (annualProfit / liabilities) : 999.9;
 
-    // 5. Business Stability Analysis
-    final businessStabilityResult = _calculateBusinessStability(profile);
+    // ---------------------------------------------------------
+    // CATEGORY 4 & 5: MATURITY & EFFICIENCY
+    // ---------------------------------------------------------
+    final double employeesPerYear = employees / years;
+    final double revenueGrowthAbs = revenueY1 - revenueY2;
+    final double revenueGrowthPerEmployee = revenueGrowthAbs / employees;
 
-    // 6. Financial Documentation Quality
-    final documentationResult = _calculateDocumentationQuality(profile);
+    // ---------------------------------------------------------
+    // SCORE DRIVERS & THRESHOLD MAPPING
+    // ---------------------------------------------------------
+    
+    // 1. Revenue Growth & Stability (Weight: 25%)
+    double revenueScore = (yoyGrowth + cagr) / 2;
+    MetricStatus revenueStatus = _getRevenueStatus(revenueScore);
 
-    // Driver Calculation & Ranking
+    // 2. Profitability & Expense Management (Weight: 20%)
+    double profitScore = 100 - expenseRatio; // 86.25% ratio = 13.75 score
+    MetricStatus profitStatus = _getProfitStatus(expenseRatio);
+
+    // 3. Debt Management & Financial Leverage (Weight: 20%)
+    double debtScore = (1 / (1 + (liabilitiesToRevenueRatio / 100))) * 100;
+    MetricStatus debtStatus = _getDebtStatus(liabilitiesToRevenueRatio);
+
+    // 4. Operational Efficiency & Scalability (Weight: 15%)
+    double efficiencyScore = min((revenuePerEmployee / 2000000) * 100, 100.0);
+    MetricStatus efficiencyStatus = _getEfficiencyStatus(revenuePerEmployee);
+
+    // 5. Business Maturity & Stability (Weight: 20%)
+    double maturityScore = min(years / 5, 1.0) * 100;
+    MetricStatus maturityStatus = _getMaturityStatus(years);
+
+    // Build the Ranked Drivers List
     final drivers = [
-      DriverResult(name: 'Payment History', score: paymentHistoryResult.score, weight: 0.35, contribution: paymentHistoryResult.score * 0.35),
-      DriverResult(name: 'Revenue Trend', score: revenueTrend.score, weight: 0.25, contribution: revenueTrend.score * 0.25),
-      DriverResult(name: 'Expense Ratio', score: expenseRatioResult.score, weight: 0.15, contribution: expenseRatioResult.score * 0.15),
-      DriverResult(name: 'Liabilities Burden', score: liabilitiesResult.score, weight: 0.15, contribution: liabilitiesResult.score * 0.15),
-      DriverResult(name: 'Business Stability', score: businessStabilityResult, weight: 0.05, contribution: businessStabilityResult * 0.05),
-      DriverResult(name: 'Financial Documentation', score: documentationResult.score, weight: 0.05, contribution: documentationResult.score * 0.05),
+      ScoreDriver(
+        name: "Revenue Growth & Stability",
+        scoreValue: revenueScore,
+        rawDisplayValue: "${yoyGrowth >= 0 ? '+' : ''}${yoyGrowth.toStringAsFixed(1)}% YoY",
+        status: revenueStatus,
+        weight: 0.25,
+      ),
+      ScoreDriver(
+        name: "Profitability & Expense Management",
+        scoreValue: profitScore,
+        rawDisplayValue: "${profitMargin.toStringAsFixed(1)}% margin",
+        status: profitStatus,
+        weight: 0.20,
+      ),
+      ScoreDriver(
+        name: "Debt Management & Leverage",
+        scoreValue: debtScore,
+        rawDisplayValue: "${liabilitiesToRevenueRatio.toStringAsFixed(1)}% of revenue",
+        status: debtStatus,
+        weight: 0.20,
+      ),
+      ScoreDriver(
+        name: "Operational Efficiency",
+        scoreValue: efficiencyScore,
+        rawDisplayValue: "₦${_formatCurrency(revenuePerEmployee)} / emp",
+        status: efficiencyStatus,
+        weight: 0.15,
+      ),
+      ScoreDriver(
+        name: "Business Maturity",
+        scoreValue: maturityScore,
+        rawDisplayValue: "$years year${years > 1 ? 's' : ''}",
+        status: maturityStatus,
+        weight: 0.20,
+      ),
     ];
 
-    // Rank drivers by contribution (highest to lowest)
-    final rankedDrivers = List<DriverResult>.from(drivers)..sort((a, b) => b.contribution.compareTo(a.contribution));
-
-    final totalScore = drivers.fold<double>(0, (sum, d) => sum + d.contribution);
+    // Sort drivers by status (Critical first, then Concerning, Moderate, Positive) to highlight action areas
+    drivers.sort((a, b) => b.status.index.compareTo(a.status.index));
 
     return FinancialMetrics(
-      yoyGrowth: revenueTrend.yoyGrowth,
-      cagr: revenueTrend.cagr,
-      revenueVolatility: revenueTrend.volatility,
-      revenueTrendScore: revenueTrend.score,
-      expenseRatio: expenseRatioResult.ratio,
-      profitMargin: expenseRatioResult.profitMargin,
-      efficiencyTrend: expenseRatioResult.efficiencyTrend,
-      expenseRatioScore: expenseRatioResult.score,
-      debtToRevenueRatio: liabilitiesResult.debtToRevenue,
-      debtServiceRatio: liabilitiesResult.debtServiceRatio,
-      liabilitiesBurdenScore: liabilitiesResult.score,
-      onTimePaymentRate: paymentHistoryResult.onTimeRate,
-      paymentReliabilityScore: paymentHistoryResult.score,
-      businessStabilityScore: businessStabilityResult,
-      documentationCompletenessScore: documentationResult.completeness,
-      documentationQualityScore: documentationResult.score,
-      totalCredibilityScore: totalScore,
-      rankedDrivers: rankedDrivers,
+      yoyGrowth: yoyGrowth,
+      cagr: cagr,
+      revenuePerEmployee: revenuePerEmployee,
+      expenseRatio: expenseRatio,
+      profitMargin: profitMargin,
+      monthlyProfit: monthlyProfit,
+      liabilitiesToRevenueRatio: liabilitiesToRevenueRatio,
+      debtServiceRatio: debtServiceRatio,
+      liabilitiesPerEmployee: liabilitiesPerEmployee,
+      liabilitiesCoverageRatio: liabilitiesCoverageRatio,
+      yearsOfOperation: years,
+      employeesPerYear: employeesPerYear,
+      revenueGrowthPerEmployee: revenueGrowthPerEmployee,
+      rankedDrivers: drivers,
     );
   }
 
-  static _RevenueTrendResult _calculateRevenueTrend(SmeProfileState profile) {
-    double r1 = profile.annualRevenueAmount1;
-    double r2 = profile.annualRevenueAmount2;
-    double? r3 = profile.annualRevenueAmount3;
+  // --- THRESHOLD HELPERS ---
 
-    if (r1 <= 0) return _RevenueTrendResult(0, 0, 0, 0);
+  static MetricStatus _getRevenueStatus(double growth) {
+    if (growth > 15) return MetricStatus.positive;
+    if (growth >= 0) return MetricStatus.moderate;
+    if (growth >= -5) return MetricStatus.concerning;
+    return MetricStatus.critical;
+  }
 
-    // YoY Growth
-    double yoy = ((r2 - r1) / r1) * 100;
+  static MetricStatus _getProfitStatus(double expenseRatio) {
+    if (expenseRatio < 70) return MetricStatus.positive;
+    if (expenseRatio <= 80) return MetricStatus.moderate;
+    if (expenseRatio <= 90) return MetricStatus.concerning;
+    return MetricStatus.critical;
+  }
 
-    // CAGR
-    double cagr;
-    int years;
-    if (r3 != null && r3 > 0) {
-      years = 2; // (ending/beginning)^(1/n) - 1 where n is years between
-      cagr = (pow(r3 / r1, 1 / 2) - 1) * 100;
-    } else {
-      years = 1;
-      cagr = ((r2 / r1) - 1) * 100;
+  static MetricStatus _getDebtStatus(double liabilitiesRatio) {
+    if (liabilitiesRatio < 20) return MetricStatus.positive;
+    if (liabilitiesRatio <= 35) return MetricStatus.moderate;
+    if (liabilitiesRatio <= 50) return MetricStatus.concerning;
+    return MetricStatus.critical;
+  }
+
+  static MetricStatus _getEfficiencyStatus(double revPerEmp) {
+    if (revPerEmp > 2000000) return MetricStatus.positive;
+    if (revPerEmp >= 1000000) return MetricStatus.moderate;
+    if (revPerEmp >= 500000) return MetricStatus.concerning;
+    return MetricStatus.critical;
+  }
+
+  static MetricStatus _getMaturityStatus(int years) {
+    if (years > 5) return MetricStatus.positive;
+    if (years >= 2) return MetricStatus.moderate;
+    if (years == 1) return MetricStatus.concerning;
+    return MetricStatus.critical;
+  }
+
+  static String _formatCurrency(double amount) {
+    if (amount >= 1000000) {
+      return "${(amount / 1000000).toStringAsFixed(2)}M";
+    } else if (amount >= 1000) {
+      return "${(amount / 1000).toStringAsFixed(1)}K";
     }
-
-    // Volatility
-    // For 2-3 years, we calculate standard deviation of YoY growths
-    List<double> growths = [yoy];
-    if (r3 != null && r3 > 0) {
-       growths.add(((r3 - r2) / r2) * 100);
-    }
-    
-    double mean = growths.reduce((a, b) => a + b) / growths.length;
-    double volatility = 0;
-    if (growths.length > 1) {
-      double variance = growths.map((x) => pow(x - mean, 2)).reduce((a, b) => a + b) / growths.length;
-      volatility = mean != 0 ? (sqrt(variance) / mean.abs()) : 0;
-    }
-
-    // Score
-    double score = 50 + (cagr * 2) - (volatility * 10);
-    if (cagr < 0) score -= 20;
-    else if (cagr == 0) score -= 10;
-
-    return _RevenueTrendResult(yoy, cagr, volatility, score.clamp(0, 100));
+    return amount.toStringAsFixed(0);
   }
-
-  static _ExpenseRatioResult _calculateExpenseRatio(SmeProfileState profile) {
-    double revenue = profile.annualRevenueAmount2; // Assume current year for ratio
-    double expenses = profile.monthlyAvgExpenses * 12; // Annualized
-
-    if (revenue <= 0) return _ExpenseRatioResult(0, 0, 0, 0);
-
-    double ratio = (expenses / revenue) * 100;
-    double profitMargin = ((revenue - expenses) / revenue) * 100;
-
-    // Efficiency Trend (Simplification: compare monthly vs annual if available, or just use 0 if not enough data)
-    double efficiencyTrend = 0; // +1, 0, -1
-    // Logic: if expenses growing slower than revenue...
-    // For now, default to 0 as we don't have expense history in state yet.
-
-    double score = 100 - (ratio * 1.5) + (efficiencyTrend * 5);
-    if (ratio > 100) score -= 30;
-    else if (ratio > 90) score -= 15;
-
-    return _ExpenseRatioResult(ratio, profitMargin, efficiencyTrend, score.clamp(0, 100));
-  }
-
-  static _LiabilitiesResult _calculateLiabilitiesBurden(SmeProfileState profile, double annualProfitMargin) {
-    double revenue = profile.annualRevenueAmount2;
-    double liabilities = profile.totalLiabilities;
-
-    if (revenue <= 0) return _LiabilitiesResult(0, 0, 0);
-
-    double debtToRevenue = (liabilities / revenue) * 100;
-
-    // Monthly Debt Service = Total_Liabilities × 0.10 / 12
-    double monthlyDebtService = liabilities * 0.10 / 12;
-    double monthlyRevenue = profile.monthlyAvgRevenue ?? (revenue / 12);
-    double monthlyExpenses = profile.monthlyAvgExpenses;
-    double monthlyProfit = monthlyRevenue - monthlyExpenses;
-
-    double debtServiceRatio = monthlyProfit > 0 ? (monthlyDebtService / monthlyProfit) : 100;
-
-    double score = 100 - (debtToRevenue * 1.5) - (debtServiceRatio * 100);
-    if (debtToRevenue > 150) score -= 60;
-    else if (debtToRevenue > 100) score -= 40;
-
-    return _LiabilitiesResult(debtToRevenue, debtServiceRatio, score.clamp(0, 100));
-  }
-
-  static _PaymentHistoryResult _calculatePaymentHistory(SmeProfileState profile) {
-    int totalPayments = profile.onTimePayments + profile.latePayments;
-    if (totalPayments == 0) return _PaymentHistoryResult(100, 50); // Neutral baseline
-
-    double onTimeRate = (profile.onTimePayments / totalPayments) * 100;
-    
-    double penalty = (profile.latePayments * 1.0) + 
-                     (profile.latePaymentsOver30Days * 2.0) + 
-                     (profile.latePaymentsOver60Days * 5.0);
-    
-    double score = onTimeRate - penalty;
-    if (onTimeRate < 60) score -= 30;
-    else if (onTimeRate < 80) score -= 10;
-
-    return _PaymentHistoryResult(onTimeRate, score.clamp(0, 100));
-  }
-
-  static double _calculateBusinessStability(SmeProfileState profile) {
-    double years = profile.yearsOfOperation.toDouble();
-    double score = min(years * 10, 100);
-
-    if (years < 0.5) score -= 50;
-    else if (years < 1.0) score -= 20;
-
-    return score.clamp(0, 100);
-  }
-
-  static _DocumentationResult _calculateDocumentationQuality(SmeProfileState profile) {
-    int required = 3;
-    int submitted = profile.numDocumentsSubmitted;
-    double completeness = (submitted / required) * 100;
-
-    double bonus = 0;
-    if (profile.areDocumentsRecent) bonus += 10;
-    if (profile.areDocumentsComplete) bonus += 5;
-    if (profile.areDocumentsConsistent) bonus += 5;
-
-    double score = completeness + bonus;
-    return _DocumentationResult(completeness, score.clamp(0, 100));
-  }
-}
-
-class _RevenueTrendResult {
-  final double yoyGrowth;
-  final double cagr;
-  final double volatility;
-  final double score;
-  _RevenueTrendResult(this.yoyGrowth, this.cagr, this.volatility, this.score);
-}
-
-class _ExpenseRatioResult {
-  final double ratio;
-  final double profitMargin;
-  final double efficiencyTrend;
-  final double score;
-  _ExpenseRatioResult(this.ratio, this.profitMargin, this.efficiencyTrend, this.score);
-}
-
-class _LiabilitiesResult {
-  final double debtToRevenue;
-  final double debtServiceRatio;
-  final double score;
-  _LiabilitiesResult(this.debtToRevenue, this.debtServiceRatio, this.score);
-}
-
-class _PaymentHistoryResult {
-  final double onTimeRate;
-  final double score;
-  _PaymentHistoryResult(this.onTimeRate, this.score);
-}
-
-class _DocumentationResult {
-  final double completeness;
-  final double score;
-  _DocumentationResult(this.completeness, this.score);
 }

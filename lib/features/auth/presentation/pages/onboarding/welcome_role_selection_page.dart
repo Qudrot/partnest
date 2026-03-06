@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:partnex/core/theme/app_colors.dart';
+import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/input_method_selection_page.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/investor_onboarding_page.dart';
@@ -46,7 +47,8 @@ class WelcomeRoleSelectionPage extends StatelessWidget {
                     children: [
                       _RoleCard(
                         title: 'I\'m an SME',
-                        description: 'Get your credibility score and access funding opportunities',
+                        description:
+                            'Get your credibility score and access funding opportunities',
                         ctaText: 'Continue as SME',
                         icon: LucideIcons.building,
                         isPrimary: true,
@@ -215,7 +217,9 @@ class _RoleCardState extends State<_RoleCard> {
                 child: CustomButton(
                   text: widget.ctaText,
                   onPressed: () {},
-                  variant: widget.isPrimary ? ButtonVariant.primary : ButtonVariant.secondary,
+                  variant: widget.isPrimary
+                      ? ButtonVariant.primary
+                      : ButtonVariant.secondary,
                 ),
               ),
             ],

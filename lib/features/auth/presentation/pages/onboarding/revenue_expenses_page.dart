@@ -3,9 +3,11 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:partnex/core/theme/app_colors.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
+import 'package:partnex/core/theme/widgets/custom_progress_indicator.dart';
 import 'package:partnex/core/theme/widgets/custom_currency_field.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/liabilities_history_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 
 class RevenueExpensesPage extends StatefulWidget {
@@ -55,21 +57,36 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
     int validYearCount = 0;
 
     final a1 = double.tryParse(_amount1Controller.text.replaceAll(',', ''));
-    if (a1 != null) { totalValidYearsRev = (totalValidYearsRev ?? 0) + a1; validYearCount++; }
+    if (a1 != null && a1 > 0) {
+      totalValidYearsRev = (totalValidYearsRev ?? 0) + a1;
+      validYearCount++;
+    }
 
     final a2 = double.tryParse(_amount2Controller.text.replaceAll(',', ''));
-    if (a2 != null) { totalValidYearsRev = (totalValidYearsRev ?? 0) + a2; validYearCount++; }
+    if (a2 != null && a2 > 0) {
+      totalValidYearsRev = (totalValidYearsRev ?? 0) + a2;
+      validYearCount++;
+    }
 
+    // ONLY count Year 3 if it is visible AND greater than 0
     final a3 = double.tryParse(_amount3Controller.text.replaceAll(',', ''));
-    if (a3 != null) { totalValidYearsRev = (totalValidYearsRev ?? 0) + a3; validYearCount++; }
+    if (a3 != null && a3 > 0 && _showYear3) {
+      totalValidYearsRev = (totalValidYearsRev ?? 0) + a3;
+      validYearCount++;
+    }
 
-    final mExp = double.tryParse(_monthlyExpController.text.replaceAll(',', ''));
-    final mRev = double.tryParse(_monthlyRevController.text.replaceAll(',', ''));
+    final mExp = double.tryParse(
+      _monthlyExpController.text.replaceAll(',', ''),
+    );
+    final mRev = double.tryParse(
+      _monthlyRevController.text.replaceAll(',', ''),
+    );
 
     if (mExp != null) {
       if (mRev != null) {
         if (mExp > mRev) {
-          _expenseWarning = 'Your expenses exceed your revenue. Please verify this is correct.';
+          _expenseWarning =
+              'Your expenses exceed your revenue. Please verify this is correct.';
         } else {
           _expenseWarning = null;
         }
@@ -77,7 +94,6 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
         _expenseWarning = null;
       }
 
-      // Calculate aggregated annual metrics
       if (validYearCount > 0) {
         final avgAnnualRev = totalValidYearsRev! / validYearCount;
         final annualExp = mExp * 12;
@@ -111,27 +127,30 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
     final profileState = context.read<SmeProfileCubit>().state;
     if (profileState.annualRevenueYear1 > 0) {
       _year1Controller.text = profileState.annualRevenueYear1.toString();
-      _amount1Controller.text = profileState.annualRevenueAmount1.toStringAsFixed(0);
+      _amount1Controller.text = profileState.annualRevenueAmount1
+          .toStringAsFixed(0);
       _year2Controller.text = profileState.annualRevenueYear2.toString();
-      _amount2Controller.text = profileState.annualRevenueAmount2.toStringAsFixed(0);
-      
+      _amount2Controller.text = profileState.annualRevenueAmount2
+          .toStringAsFixed(0);
+
       if (profileState.annualRevenueYear3 != null) {
         _year3Controller.text = profileState.annualRevenueYear3.toString();
-        _amount3Controller.text = profileState.annualRevenueAmount3?.toStringAsFixed(0) ?? '';
+        _amount3Controller.text =
+            profileState.annualRevenueAmount3?.toStringAsFixed(0) ?? '';
         _showYear3 = true;
       }
 
       if (profileState.monthlyAvgRevenue != null) {
-        _monthlyRevController.text = profileState.monthlyAvgRevenue!.toStringAsFixed(0);
+        _monthlyRevController.text = profileState.monthlyAvgRevenue!
+            .toStringAsFixed(0);
       }
-      _monthlyExpController.text = profileState.monthlyAvgExpenses.toStringAsFixed(0);
+      _monthlyExpController.text = profileState.monthlyAvgExpenses
+          .toStringAsFixed(0);
 
-      // Trigger initial calculation
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _onFieldChanged('');
       });
     } else {
-      // Auto-fill recent years
       final currentYear = DateTime.now().year;
       _year1Controller.text = (currentYear - 2).toString();
       _year2Controller.text = (currentYear - 1).toString();
@@ -170,16 +189,26 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Year', style: AppTypography.textTheme.labelLarge?.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.slate900)),
-                  const SizedBox(height: 4),
+                  Text(
+                    'Year',
+                    style: AppTypography.textTheme.labelLarge?.copyWith(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.slate900,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
                   TextFormField(
                     controller: yearCtrl,
                     keyboardType: TextInputType.number,
                     maxLength: 4,
                     onChanged: _onFieldChanged,
                     validator: (val) {
-                      if (isOptional && yearCtrl.text.isEmpty && amountCtrl.text.isEmpty) return null;
-                      if (val == null || val.isEmpty || val.length != 4) return 'Valid year';
+                      if (isOptional &&
+                          (amountCtrl.text.isEmpty || amountCtrl.text == '0'))
+                        return null;
+                      if (val == null || val.isEmpty || val.length != 4)
+                        return 'Valid year';
                       return null;
                     },
                     style: AppTypography.textTheme.bodyMedium?.copyWith(
@@ -189,54 +218,83 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                     decoration: InputDecoration(
                       counterText: "",
                       hintText: 'e.g., 2024',
-                      hintStyle: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate400),
+                      hintStyle: AppTypography.textTheme.bodyMedium?.copyWith(
+                        color: AppColors.slate400,
+                      ),
                       filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      fillColor: AppColors.neutralWhite,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.smd,
+                        vertical: AppSpacing.sm,
+                      ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
                         borderSide: const BorderSide(color: AppColors.slate200),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
                         borderSide: const BorderSide(color: AppColors.slate200),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: AppColors.trustBlue, width: 2),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderSide: const BorderSide(
+                          color: AppColors.trustBlue,
+                          width: 2,
+                        ),
                       ),
                       errorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: AppColors.dangerRed, width: 2),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderSide: const BorderSide(
+                          color: AppColors.dangerRed,
+                          width: 2,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.sm),
             Expanded(
               flex: isMobile ? 60 : 55,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Revenue', style: AppTypography.textTheme.labelLarge?.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.slate900)),
-                  const SizedBox(height: 4),
+                  Text(
+                    'Revenue',
+                    style: AppTypography.textTheme.labelLarge?.copyWith(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.slate900,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
                   CustomCurrencyField(
                     label: '',
                     placeholder: 'e.g., 5,000,000',
                     controller: amountCtrl,
                     onChanged: _onFieldChanged,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    fillColor: AppColors.neutralWhite,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.smd,
+                      vertical: AppSpacing.sm,
+                    ),
                     validator: (val) {
-                      if (isOptional && yearCtrl.text.isEmpty && amountCtrl.text.isEmpty) return null;
+                      if (isOptional &&
+                          (val == null || val.isEmpty || val == '0'))
+                        return null;
                       if (val == null || val.isEmpty) return 'Valid amount';
                       return null;
                     },
                   ),
-                  const SizedBox(height: 4),
-                  Text(helperText, style: AppTypography.textTheme.bodySmall?.copyWith(fontSize: 12, color: AppColors.slate600)),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    helperText,
+                    style: AppTypography.textTheme.bodySmall?.copyWith(
+                      fontSize: 12,
+                      color: AppColors.slate600,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -252,7 +310,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.neutralWhite,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
@@ -266,76 +324,38 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
             fontSize: 18,
             color: AppColors.slate900,
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         ),
         centerTitle: true,
-        actions: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Text(
-                'Step 2 of 5',
-                style: AppTypography.textTheme.bodySmall?.copyWith(
-                  color: AppColors.slate600,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(4),
-          child: Container(
-            width: double.infinity,
-            height: 4,
-            color: AppColors.slate100,
-            alignment: Alignment.centerLeft,
-            child: FractionallySizedBox(
-              widthFactor: 0.40,
-              child: Container(color: AppColors.trustBlue),
-            ),
-          ),
-        ),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.neutralWhite,
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.md,
+                ),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Section 1: Annual Revenue History
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Annual Revenue History',
-                              style: AppTypography.textTheme.headlineSmall?.copyWith(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.slate900,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '(Required)',
-                            style: AppTypography.textTheme.bodySmall?.copyWith(
-                              fontSize: 12,
-                              color: AppColors.dangerRed,
-                            ),
-                          ),
-                        ],
+                      if (!widget.isEditing && !widget.isUpdatingRecord)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                          child: ProgressIndicatorWidget(progress: 0.60),
+                        ),
+                      Text(
+                        'Annual Revenue History',
+                        style: AppTypography.textTheme.headlineSmall?.copyWith(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.slate900,
+                        ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       Text(
                         'Provide at least 2 years of revenue data',
                         style: AppTypography.textTheme.bodySmall?.copyWith(
@@ -343,42 +363,92 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                           color: AppColors.slate600,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.md),
 
                       _buildRevenueRow(
                         yearCtrl: _year1Controller,
                         amountCtrl: _amount1Controller,
-                        helperText: 'Annual revenue for ${_year1Controller.text}',
+                        helperText:
+                            'Annual revenue for ${_year1Controller.text}',
                         isMobile: isMobile,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.smd),
 
                       _buildRevenueRow(
                         yearCtrl: _year2Controller,
                         amountCtrl: _amount2Controller,
-                        helperText: 'Annual revenue for ${_year2Controller.text}',
+                        helperText:
+                            'Annual revenue for ${_year2Controller.text}',
                         isMobile: isMobile,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.smd),
 
+                      // YEAR 3 LOGIC (UPDATED WITH DELETE BUTTON)
                       if (_showYear3) ...[
+                        Text(
+                          'Year 3 (Optional)',
+                          style: AppTypography.textTheme.labelMedium?.copyWith(
+                            color: AppColors.slate600,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
                         _buildRevenueRow(
                           yearCtrl: _year3Controller,
                           amountCtrl: _amount3Controller,
-                          helperText: 'Annual revenue for ${_year3Controller.text}',
+                          helperText:
+                              'Annual revenue for ${_year3Controller.text}',
                           isMobile: isMobile,
                           isOptional: true,
                         ),
-                        const SizedBox(height: 12),
+
+                        // NEW DELETE BUTTON AT THE BOTTOM
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _showYear3 = false;
+                                _year3Controller.clear();
+                                _amount3Controller.clear();
+                                _onFieldChanged('');
+                              });
+                            },
+                            icon: const Icon(
+                              LucideIcons.trash2,
+                              size: AppSpacing.md,
+                              color: AppColors.dangerRed,
+                            ),
+                            label: Text(
+                              'Delete Year 3',
+                              style: AppTypography.textTheme.labelMedium
+                                  ?.copyWith(
+                                    color: AppColors.dangerRed,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 0,
+                                vertical: AppSpacing.sm,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.smd),
                       ] else ...[
                         TextButton.icon(
                           onPressed: () {
                             setState(() {
                               _showYear3 = true;
-                              _year3Controller.text = (DateTime.now().year).toString();
+                              _year3Controller.text = (DateTime.now().year)
+                                  .toString();
                             });
                           },
-                          icon: const Icon(LucideIcons.plus, size: 16, color: AppColors.trustBlue),
+                          icon: const Icon(
+                            LucideIcons.plus,
+                            size: AppSpacing.md,
+                            color: AppColors.trustBlue,
+                          ),
                           label: Text(
                             'Add Another Year',
                             style: AppTypography.textTheme.labelLarge?.copyWith(
@@ -390,42 +460,31 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                           style: TextButton.styleFrom(
                             backgroundColor: Colors.transparent,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              side: const BorderSide(color: AppColors.trustBlue, width: 1),
+                              borderRadius: BorderRadius.circular(AppRadius.md),
+                              side: const BorderSide(
+                                color: AppColors.trustBlue,
+                                width: 1,
+                              ),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.smd,
+                              vertical: AppSpacing.smd,
+                            ),
                             minimumSize: const Size(0, 40),
                           ),
                         ),
                       ],
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xl),
 
-                      // Section 2: Monthly Financials (Average)
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Monthly Financials (Average)',
-                              style: AppTypography.textTheme.headlineSmall?.copyWith(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.slate900,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '(Optional)',
-                            style: AppTypography.textTheme.bodySmall?.copyWith(
-                              fontSize: 12,
-                              color: AppColors.slate600,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        'Monthly Financials (Average)',
+                        style: AppTypography.textTheme.headlineSmall?.copyWith(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.slate900,
+                        ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       Text(
                         'Average monthly figures for the last 12 months',
                         style: AppTypography.textTheme.bodySmall?.copyWith(
@@ -433,50 +492,64 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                           color: AppColors.slate600,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.md),
 
-                      Text('Monthly Revenue', style: AppTypography.textTheme.labelLarge?.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.slate900)),
-                      const SizedBox(height: 4),
+                      Text(
+                        'Monthly Revenue',
+                        style: AppTypography.textTheme.labelLarge?.copyWith(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.slate900,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
                       CustomCurrencyField(
                         label: '',
                         placeholder: 'e.g., 500,000',
                         controller: _monthlyRevController,
                         onChanged: _onFieldChanged,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        fillColor: AppColors.neutralWhite,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.smd,
+                          vertical: AppSpacing.sm,
+                        ),
                       ),
-                      const SizedBox(height: 4),
-                      Text('Average monthly revenue for the last 12 months', style: AppTypography.textTheme.bodySmall?.copyWith(fontSize: 12, color: AppColors.slate600)),
-                      const SizedBox(height: 16),
-                      
-                      Text('Monthly Expenses', style: AppTypography.textTheme.labelLarge?.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.slate900)),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.md),
+
+                      Text(
+                        'Monthly Expenses',
+                        style: AppTypography.textTheme.labelLarge?.copyWith(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.slate900,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
                       CustomCurrencyField(
                         label: '',
                         placeholder: 'e.g., 300,000',
                         controller: _monthlyExpController,
                         onChanged: _onFieldChanged,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        fillColor: AppColors.neutralWhite,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.smd,
+                          vertical: AppSpacing.sm,
+                        ),
                         warningText: _expenseWarning,
                         validator: (val) {
-                          if (val == null || val.isEmpty) return 'Please enter a valid expense amount';
-                          final num = double.tryParse(val.replaceAll(',', ''));
-                          if (num == null || num < 0) return 'Please enter a valid expense amount';
+                          if (val == null || val.isEmpty)
+                            return 'Please enter a valid expense amount';
                           return null;
                         },
                       ),
-                      const SizedBox(height: 4),
-                      Text('Average monthly operating expenses for the last 12 months', style: AppTypography.textTheme.bodySmall?.copyWith(fontSize: 12, color: AppColors.slate600)),
 
-                      // Real-time Calculations
                       if (_profitMargin != null || _annualProfit != null) ...[
-                        const SizedBox(height: 24),
+                        const SizedBox(height: AppSpacing.xl),
                         Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(AppSpacing.md),
                           decoration: BoxDecoration(
                             color: AppColors.slate50,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(AppRadius.md),
                             border: Border.all(color: AppColors.slate200),
                           ),
                           child: Column(
@@ -484,52 +557,87 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                             children: [
                               Text(
                                 'Real-Time Calculations',
-                                style: AppTypography.textTheme.labelLarge?.copyWith(
-                                  color: AppColors.slate900,
-                                ),
+                                style: AppTypography.textTheme.labelLarge
+                                    ?.copyWith(color: AppColors.slate900),
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: AppSpacing.smd),
                               if (_profitMargin != null) ...[
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Profit Margin', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate600)),
-                                    Text('${_profitMargin!.toStringAsFixed(1)}%', style: AppTypography.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: AppColors.slate900)),
+                                    Text(
+                                      'Profit Margin',
+                                      style: AppTypography.textTheme.bodyMedium
+                                          ?.copyWith(color: AppColors.slate600),
+                                    ),
+                                    Text(
+                                      '${_profitMargin!.toStringAsFixed(1)}%',
+                                      style: AppTypography.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.slate900,
+                                          ),
+                                    ),
                                   ],
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: AppSpacing.sm),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Expense Ratio', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate600)),
-                                    Text('${_expenseRatio!.toStringAsFixed(1)}%', style: AppTypography.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: AppColors.slate900)),
+                                    Text(
+                                      'Expense Ratio',
+                                      style: AppTypography.textTheme.bodyMedium
+                                          ?.copyWith(color: AppColors.slate600),
+                                    ),
+                                    Text(
+                                      '${_expenseRatio!.toStringAsFixed(1)}%',
+                                      style: AppTypography.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.slate900,
+                                          ),
+                                    ),
                                   ],
                                 ),
                               ],
-                              if (_annualProfit != null && _profitMargin != null) const SizedBox(height: 8),
+                              if (_annualProfit != null &&
+                                  _profitMargin != null)
+                                const SizedBox(height: AppSpacing.sm),
                               if (_annualProfit != null)
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Estimated Annual Profit', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate600)),
-                                    Text('NGN ${_annualProfit!.toStringAsFixed(0).replaceAll(RegExp(r'\B(?=(\d{3})+(?!\d))'), ',')}', style: AppTypography.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: AppColors.slate900)),
+                                    Text(
+                                      'Estimated Annual Profit',
+                                      style: AppTypography.textTheme.bodyMedium
+                                          ?.copyWith(color: AppColors.slate600),
+                                    ),
+                                    Text(
+                                      'NGN ${_annualProfit!.toStringAsFixed(0).replaceAll(RegExp(r'\B(?=(\d{3})+(?!\d))'), ',')}',
+                                      style: AppTypography.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.slate900,
+                                          ),
+                                    ),
                                   ],
                                 ),
                             ],
                           ),
                         ),
                       ],
-
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppSpacing.xxl),
                     ],
                   ),
                 ),
               ),
             ),
 
-            // Navigation Buttons
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(AppSpacing.md),
               child: Row(
                 children: [
                   Expanded(
@@ -539,7 +647,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.smd),
                   Expanded(
                     child: CustomButton(
                       text: widget.isEditing ? 'Save Changes' : 'Next',
@@ -547,15 +655,49 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                       isDisabled: !_isFormValid,
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
+                          // SAFE EXTRACTION: If year 3 is hidden or 0, we completely nullify it
+                          double? val3 = _amount3Controller.text.isNotEmpty
+                              ? double.tryParse(
+                                  _amount3Controller.text.replaceAll(',', ''),
+                                )
+                              : null;
+                          if (!_showYear3 || val3 == null || val3 <= 0) {
+                            val3 = null;
+                          }
+                          int? year3 =
+                              (_showYear3 &&
+                                  val3 != null &&
+                                  _year3Controller.text.isNotEmpty)
+                              ? int.tryParse(_year3Controller.text)
+                              : null;
+
                           context.read<SmeProfileCubit>().updateRevenueExpenses(
-                            annualRevenueYear1: int.parse(_year1Controller.text),
-                            annualRevenueAmount1: double.parse(_amount1Controller.text.replaceAll(',', '')),
-                            annualRevenueYear2: int.parse(_year2Controller.text),
-                            annualRevenueAmount2: double.parse(_amount2Controller.text.replaceAll(',', '')),
-                            annualRevenueYear3: _year3Controller.text.isNotEmpty ? int.parse(_year3Controller.text) : null,
-                            annualRevenueAmount3: _amount3Controller.text.isNotEmpty ? double.parse(_amount3Controller.text.replaceAll(',', '')) : null,
-                            monthlyAvgRevenue: _monthlyRevController.text.isNotEmpty ? double.parse(_monthlyRevController.text.replaceAll(',', '')) : null,
-                            monthlyAvgExpenses: double.parse(_monthlyExpController.text.replaceAll(',', '')),
+                            annualRevenueYear1: int.parse(
+                              _year1Controller.text,
+                            ),
+                            annualRevenueAmount1: double.parse(
+                              _amount1Controller.text.replaceAll(',', ''),
+                            ),
+                            annualRevenueYear2: int.parse(
+                              _year2Controller.text,
+                            ),
+                            annualRevenueAmount2: double.parse(
+                              _amount2Controller.text.replaceAll(',', ''),
+                            ),
+                            annualRevenueYear3: year3,
+                            annualRevenueAmount3: val3, // Fully sanitized!
+                            monthlyAvgRevenue:
+                                _monthlyRevController.text.isNotEmpty
+                                ? double.parse(
+                                    _monthlyRevController.text.replaceAll(
+                                      ',',
+                                      '',
+                                    ),
+                                  )
+                                : null,
+                            monthlyAvgExpenses: double.parse(
+                              _monthlyExpController.text.replaceAll(',', ''),
+                            ),
                           );
 
                           if (widget.isEditing) {
@@ -564,7 +706,9 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => LiabilitiesHistoryPage(isUpdatingRecord: widget.isUpdatingRecord),
+                                builder: (_) => LiabilitiesHistoryPage(
+                                  isUpdatingRecord: widget.isUpdatingRecord,
+                                ),
                               ),
                             );
                           }

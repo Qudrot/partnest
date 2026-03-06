@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:partnex/core/theme/app_colors.dart';
+import 'package:partnex/core/theme/app_sizes.dart';
 
 enum CardVariant { standard, elevated, outlined }
 

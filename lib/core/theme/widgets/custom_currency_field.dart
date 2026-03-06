@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:partnex/core/theme/app_colors.dart';
+import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 
 class CustomCurrencyField extends StatelessWidget {
@@ -65,8 +66,8 @@ class CustomCurrencyField extends StatelessWidget {
               color: AppColors.dangerRed,
             ),
             filled: true,
-            fillColor: fillColor ?? MaterialStateColor.resolveWith((Set<MaterialState> states) {
-              if (states.contains(MaterialState.error) || states.contains(MaterialState.focused)) {
+            fillColor: fillColor ?? WidgetStateColor.resolveWith((Set<WidgetState> states) {
+              if (states.contains(WidgetState.error) || states.contains(WidgetState.focused)) {
                 return AppColors.slate50;
               }
               return AppColors.slate100;

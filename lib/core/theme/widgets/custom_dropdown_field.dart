@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:partnex/core/theme/app_colors.dart';
+import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 
 class CustomDropdownField extends StatelessWidget {
@@ -30,7 +31,7 @@ class CustomDropdownField extends StatelessWidget {
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
           isExpanded: true,
-          value: value,
+          initialValue: value,
           icon: const Icon(LucideIcons.chevronDown, color: AppColors.slate600),
           decoration: InputDecoration(
             hintText: placeholder,
@@ -42,8 +43,8 @@ class CustomDropdownField extends StatelessWidget {
               color: AppColors.dangerRed,
             ),
             filled: true,
-            fillColor: MaterialStateColor.resolveWith((Set<MaterialState> states) {
-              if (states.contains(MaterialState.error) || states.contains(MaterialState.focused)) {
+            fillColor: WidgetStateColor.resolveWith((Set<WidgetState> states) {
+              if (states.contains(WidgetState.error) || states.contains(WidgetState.focused)) {
                 return AppColors.slate50;
               }
               return AppColors.slate100;

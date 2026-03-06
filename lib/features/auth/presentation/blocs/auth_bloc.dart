@@ -3,6 +3,7 @@ import 'package:partnex/features/auth/data/repositories/auth_repository.dart';
 import 'package:partnex/core/services/ui_service.dart';
 import 'package:partnex/features/auth/presentation/pages/dashboard/credibility_dashboard_page.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/sme_discovery_feed_page.dart';
+import 'package:partnex/features/auth/presentation/pages/onboarding/business_profile_page.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/input_method_selection_page.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/investor_onboarding_page.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/investor_profile_page.dart';
@@ -37,7 +38,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (user.profileCompleted) {
           uiService.replaceWith(const CredibilityDashboardPage());
         } else {
-          uiService.replaceWith(const InputMethodSelectionPage());
+          // Direct to Business Profile (Step 1) first
+          uiService.replaceWith(const BusinessProfilePage());
         }
       }
     } catch (e) {
@@ -66,7 +68,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (user.role == UserRole.investor) {
         uiService.replaceWith(const InvestorOnboardingPage());
       } else {
-        uiService.replaceWith(const InputMethodSelectionPage());
+        // Direct to Business Profile (Step 1) first
+        uiService.replaceWith(const BusinessProfilePage());
       }
     } catch (e) {
       final msg = e.toString().replaceAll('Exception: ', '');
@@ -94,7 +97,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await authRepository.submitInvestorProfile(event.profileData);
       emit(InvestorProfileSubmittedSuccess());
       if (event.isEditing) {
-        uiService.showSnackBar('Criteria updated successfully');
+        uiService.showSnackBar('Your investment preferences have been successfully updated.');
         uiService.replaceWith(const InvestorProfilePage());
       } else {
         uiService.replaceWith(const SmeDiscoveryFeedPage());
@@ -110,6 +113,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       await authRepository.logout();
+      
       emit(AuthUnauthenticated());
       uiService.clearAndNavigateTo(const LoginPage());
     } catch (e) {

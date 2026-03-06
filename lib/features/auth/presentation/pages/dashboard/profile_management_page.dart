@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:partnex/core/theme/app_colors.dart';
 import 'package:partnex/core/theme/app_sizes.dart';
@@ -15,6 +15,8 @@ import 'package:partnex/features/auth/data/models/credibility_score.dart';
 import 'package:partnex/core/services/ui_service.dart';
 import 'package:partnex/features/auth/presentation/pages/login_page.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/business_profile_page.dart';
+import 'package:partnex/features/auth/presentation/pages/investor/investor_onboarding_page.dart';
+import 'package:partnex/features/auth/data/models/user_model.dart';
 
 class ProfileManagementPage extends StatefulWidget {
   const ProfileManagementPage({super.key});
@@ -38,11 +40,14 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
       child: Scaffold(
         backgroundColor: AppColors.slate50,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.neutralWhite,
           elevation: 1,
           shadowColor: AppColors.slate200,
           leading: IconButton(
-            icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
+            icon: const Icon(
+              LucideIcons.chevronLeft,
+              color: AppColors.slate900,
+            ),
             onPressed: () => uiService.goBack(),
           ),
           title: Text(
@@ -80,14 +85,23 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                 }
               }
 
+              final authState = context.watch<AuthBloc>().state;
+              final userRole = (authState is AuthAuthenticated)
+                  ? authState.user.role
+                  : UserRole.sme;
+              final isInvestor = userRole == UserRole.investor;
+
               return ListView(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xl),
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.xl,
+                ),
                 children: [
                   // Profile Summary Card
                   Container(
                     padding: EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.neutralWhite,
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(color: AppColors.slate200),
                       boxShadow: [
@@ -112,10 +126,11 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                               child: Center(
                                 child: Text(
                                   '$scoreValue',
-                                  style: AppTypography.textTheme.headlineMedium?.copyWith(
-                                    color: Colors.white,
-                                    fontSize: 24,
-                                  ),
+                                  style: AppTypography.textTheme.headlineMedium
+                                      ?.copyWith(
+                                        color: AppColors.neutralWhite,
+                                        fontSize: 24,
+                                      ),
                                 ),
                               ),
                             ),
@@ -125,33 +140,49 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    profileState.businessName.isNotEmpty ? profileState.businessName : 'Your Business',
-                                    style: AppTypography.textTheme.headlineMedium?.copyWith(
-                                      color: AppColors.slate900,
-                                      fontSize: 20,
-                                    ),
+                                    isInvestor
+                                        ? 'Investor Profile'
+                                        : (profileState.businessName.isNotEmpty
+                                              ? profileState.businessName
+                                              : 'Your Business'),
+                                    style: AppTypography
+                                        .textTheme
+                                        .headlineMedium
+                                        ?.copyWith(
+                                          color: AppColors.slate900,
+                                          fontSize: 20,
+                                        ),
                                   ),
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
-                                    'Industry: ${profileState.industry.isNotEmpty ? profileState.industry : 'N/A'}',
-                                    style: AppTypography.textTheme.bodyMedium?.copyWith(
-                                      color: AppColors.slate600,
-                                    ),
+                                    isInvestor
+                                        ? 'Verified Angel'
+                                        : 'Industry: ${profileState.industry.isNotEmpty ? profileState.industry : 'N/A'}',
+                                    style: AppTypography.textTheme.bodyMedium
+                                        ?.copyWith(color: AppColors.slate600),
                                   ),
                                   const SizedBox(height: AppSpacing.sm),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.sm,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: riskColor.withValues(alpha: 0.1),
-                                      borderRadius: BorderRadius.circular(AppRadius.sm),
-                                      border: Border.all(color: riskColor.withValues(alpha: 0.3)),
+                                      borderRadius: BorderRadius.circular(
+                                        AppRadius.sm,
+                                      ),
+                                      border: Border.all(
+                                        color: riskColor.withValues(alpha: 0.3),
+                                      ),
                                     ),
                                     child: Text(
                                       riskLevelString,
-                                      style: AppTypography.textTheme.labelSmall?.copyWith(
-                                        color: riskColor,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                      style: AppTypography.textTheme.labelSmall
+                                          ?.copyWith(
+                                            color: riskColor,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -160,33 +191,6 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                           ],
                         ),
                         const SizedBox(height: AppSpacing.smd),
-                        // Edit Profile Link
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(AppRadius.sm),
-                            onTap: () => uiService.navigateTo(
-                              const BusinessProfilePage(isEditMode: true),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xs),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(LucideIcons.pencil, size: 14, color: AppColors.trustBlue),
-                                  const SizedBox(width: AppSpacing.xs),
-                                  Text(
-                                    'Edit Profile',
-                                    style: AppTypography.textTheme.labelSmall?.copyWith(
-                                      color: AppColors.trustBlue,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -203,16 +207,22 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                   const SizedBox(height: AppSpacing.smd),
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.neutralWhite,
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(color: AppColors.slate200),
                     ),
                     child: Column(
                       children: [
                         _ActionTile(
-                          title: 'Edit Profile Information',
+                          title: isInvestor
+                              ? 'Update Investment Preferences'
+                              : 'Edit Profile Information',
                           icon: LucideIcons.edit2,
-                          onTap: () => uiService.navigateTo(const BusinessProfilePage(isEditMode: true)),
+                          onTap: () => uiService.navigateTo(
+                            isInvestor
+                                ? const InvestorOnboardingPage(isEditing: true)
+                                : const BusinessProfilePage(isEditMode: true),
+                          ),
                         ),
                         Divider(height: 1, color: AppColors.slate200),
                         _ActionTile(
@@ -242,7 +252,7 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                   const SizedBox(height: AppSpacing.smd),
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.neutralWhite,
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(color: AppColors.slate200),
                     ),
@@ -250,18 +260,22 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                       children: [
                         _ToggleTile(
                           title: 'Data Sharing with Investors',
-                          subtitle: 'Allow verified investors to view your score',
+                          subtitle:
+                              'Allow verified investors to view your score',
                           icon: LucideIcons.shield,
                           value: _dataPrivacyEnabled,
-                          onChanged: (val) => setState(() => _dataPrivacyEnabled = val),
+                          onChanged: (val) =>
+                              setState(() => _dataPrivacyEnabled = val),
                         ),
                         Divider(height: 1, color: AppColors.slate200),
                         _ToggleTile(
                           title: 'Score Update Notifications',
-                          subtitle: 'Receive alerts when your credibility score changes',
+                          subtitle:
+                              'Receive alerts when your credibility score changes',
                           icon: LucideIcons.bellRing,
                           value: _notificationsEnabled,
-                          onChanged: (val) => setState(() => _notificationsEnabled = val),
+                          onChanged: (val) =>
+                              setState(() => _notificationsEnabled = val),
                         ),
                         Divider(height: 1, color: AppColors.slate200),
                         _ActionTile(
@@ -288,7 +302,11 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                       onPressed: () {
                         context.read<AuthBloc>().add(LogoutEvent());
                       },
-                      icon: const Icon(LucideIcons.logOut, size: 16, color: AppColors.slate600),
+                      icon: const Icon(
+                        LucideIcons.logOut,
+                        size: 16,
+                        color: AppColors.slate600,
+                      ),
                       label: Text(
                         'Log Out',
                         style: AppTypography.textTheme.bodyMedium?.copyWith(
@@ -331,7 +349,11 @@ class _ActionTile extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
       ),
-      trailing: const Icon(LucideIcons.chevronRight, size: 16, color: AppColors.slate400),
+      trailing: const Icon(
+        LucideIcons.chevronRight,
+        size: 16,
+        color: AppColors.slate400,
+      ),
       onTap: onTap,
     );
   }

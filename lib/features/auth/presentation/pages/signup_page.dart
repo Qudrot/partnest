@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:partnex/core/theme/app_colors.dart';
+import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
 import 'package:partnex/core/theme/widgets/custom_input_field.dart';
@@ -117,7 +118,7 @@ class _SignupPageState extends State<SignupPage> {
               children: [
                 // Header
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(AppSpacing.md),
                   child: Center(
                     child: Text(
                       'Create Account',
@@ -133,13 +134,13 @@ class _SignupPageState extends State<SignupPage> {
                 // Body
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                     child: Form(
                       key: _formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppSpacing.sm),
                           // const PartnexLogo(size: 48, variant: PartnexLogoVariant.brandCombo),
                           // const SizedBox(height: 16),
                           Text(
@@ -149,7 +150,7 @@ class _SignupPageState extends State<SignupPage> {
                               color: AppColors.slate600,
                             ),
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: AppSpacing.xl),
                           
                           CustomInputField(
                             label: 'Full Name',
@@ -162,7 +163,7 @@ class _SignupPageState extends State<SignupPage> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppSpacing.md),
                           
                           CustomInputField(
                             label: 'Email Address',
@@ -179,7 +180,7 @@ class _SignupPageState extends State<SignupPage> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppSpacing.md),
                           
                           CustomInputField(
                             label: 'Password',
@@ -201,19 +202,19 @@ class _SignupPageState extends State<SignupPage> {
                             ),
                             validator: (value) {
                               if (value == null || _passwordStrength < 0.75) {
-                                return 'Password must be at least 8 characters with 1 uppercase letter and 1 number';
+                                return 'Password must be at least 8 characters, include 1 uppercase letter and 1 number.';
                               }
                               return null;
                             },
                           ),
                           
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppSpacing.sm),
                           // Password Strength Indicator
                           Row(
                             children: [
                               Expanded(
                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(2),
+                                  borderRadius: BorderRadius.circular(AppRadius.sm),
                                   child: LinearProgressIndicator(
                                     value: _passwordStrength,
                                     backgroundColor: AppColors.slate200,
@@ -222,7 +223,7 @@ class _SignupPageState extends State<SignupPage> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: AppSpacing.sm),
                               Text(
                                 _passwordStrengthText,
                                 style: AppTypography.textTheme.bodySmall?.copyWith(
@@ -232,7 +233,7 @@ class _SignupPageState extends State<SignupPage> {
                             ],
                           ),
                           
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppSpacing.md),
                         
                           CustomInputField(
                             label: 'Confirm Password',
@@ -259,7 +260,7 @@ class _SignupPageState extends State<SignupPage> {
                             },
                           ),
                         
-                          const SizedBox(height: 24),
+                          const SizedBox(height: AppSpacing.xl),
 
                           // Role Toggle
                           Text(
@@ -268,19 +269,20 @@ class _SignupPageState extends State<SignupPage> {
                               color: AppColors.slate900,
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: AppSpacing.smd),
                           Row(
                             children: [
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () => setState(() => _selectedRole = 'sme'),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.smd),
                                     decoration: BoxDecoration(
-                                      color: _selectedRole == 'sme' ? AppColors.trustBlue : AppColors.slate50,
-                                      borderRadius: BorderRadius.circular(8),
+                                      color: _selectedRole == 'sme' ? AppColors.neutralWhite : AppColors.slate50,
+                                      borderRadius: BorderRadius.circular(AppRadius.md),
                                       border: Border.all(
                                         color: _selectedRole == 'sme' ? AppColors.trustBlue : AppColors.slate200,
+                                        width: _selectedRole == 'sme' ? 2.5 : 1.0,
                                       ),
                                     ),
                                     child: Row(
@@ -289,13 +291,13 @@ class _SignupPageState extends State<SignupPage> {
                                         Icon(
                                           LucideIcons.building,
                                           size: 18,
-                                          color: _selectedRole == 'sme' ? Colors.white : AppColors.slate600,
+                                          color: _selectedRole == 'sme' ? AppColors.trustBlue : AppColors.slate600,
                                         ),
-                                        const SizedBox(width: 8),
+                                        const SizedBox(width: AppSpacing.sm),
                                         Text(
                                           'SME',
                                           style: AppTypography.textTheme.bodyMedium?.copyWith(
-                                            color: _selectedRole == 'sme' ? Colors.white : AppColors.slate600,
+                                            color: _selectedRole == 'sme' ? AppColors.trustBlue : AppColors.slate600,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
@@ -304,17 +306,18 @@ class _SignupPageState extends State<SignupPage> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: AppSpacing.smd),
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () => setState(() => _selectedRole = 'investor'),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.smd),
                                     decoration: BoxDecoration(
-                                      color: _selectedRole == 'investor' ? AppColors.trustBlue : AppColors.slate50,
-                                      borderRadius: BorderRadius.circular(8),
+                                      color: _selectedRole == 'investor' ? AppColors.neutralWhite : AppColors.slate50,
+                                      borderRadius: BorderRadius.circular(AppRadius.md),
                                       border: Border.all(
                                         color: _selectedRole == 'investor' ? AppColors.trustBlue : AppColors.slate200,
+                                        width: _selectedRole == 'investor' ? 2.5 : 1.0,
                                       ),
                                     ),
                                     child: Row(
@@ -323,13 +326,13 @@ class _SignupPageState extends State<SignupPage> {
                                         Icon(
                                           LucideIcons.briefcase,
                                           size: 18,
-                                          color: _selectedRole == 'investor' ? Colors.white : AppColors.slate600,
+                                          color: _selectedRole == 'investor' ? AppColors.trustBlue : AppColors.slate600,
                                         ),
-                                        const SizedBox(width: 8),
+                                        const SizedBox(width: AppSpacing.sm),
                                         Text(
                                           'Investor',
                                           style: AppTypography.textTheme.bodyMedium?.copyWith(
-                                            color: _selectedRole == 'investor' ? Colors.white : AppColors.slate600,
+                                            color: _selectedRole == 'investor' ? AppColors.trustBlue : AppColors.slate600,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
@@ -341,7 +344,7 @@ class _SignupPageState extends State<SignupPage> {
                             ],
                           ),
                           
-                          const SizedBox(height: 24),
+                          const SizedBox(height: AppSpacing.xl),
                           
                           CustomButton(
                             text: 'Create Account',
@@ -349,7 +352,7 @@ class _SignupPageState extends State<SignupPage> {
                             isLoading: isLoading,
                           ),
                           
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppSpacing.md),
                           
                           CustomButton(
                             text: 'Already have an account? Sign in',
@@ -359,7 +362,7 @@ class _SignupPageState extends State<SignupPage> {
                             },
                           ),
                           
-                          const SizedBox(height: 24),
+                          const SizedBox(height: AppSpacing.xl),
                         ],
                       ),
                     ),
@@ -368,7 +371,7 @@ class _SignupPageState extends State<SignupPage> {
                 
                 // Shared Footer matching WelcomeRoleSelectionPage
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 24.0, top: 16.0, left: 16.0, right: 16.0),
+                  padding: const EdgeInsets.only(bottom: AppSpacing.xl, top: AppSpacing.md, left: AppSpacing.md, right: AppSpacing.md),
                   child: Text.rich(
                     TextSpan(
                       text: 'By continuing, you agree to our ',

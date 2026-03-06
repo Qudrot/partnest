@@ -18,7 +18,9 @@ class AppColors {
   static const Color trustBlue = Color(0xFF0066CC);
   static const Color successGreen = Color(0xFF10B981);
   static const Color warningAmber = Color(0xFFF59E0B);
+  static const Color warningOrange = Color(0xFFF97316); // moderate-risk signals
   static const Color dangerRed = Color(0xFFEF4444);
+  static const Color criticalRed = Color(0xFF991B1B);   // critical/severe risk
 
   static const Color neutralGray = Color(0xFF6B7280);
 }

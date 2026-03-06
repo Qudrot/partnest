@@ -1,0 +1,179 @@
+﻿Analyzing partnest...                                           
+
+   info - 'background' is deprecated and shouldn't be used. Use surface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:15:9 - deprecated_member_use
+   info - 'MaterialStateProperty' is deprecated and shouldn't be used. Use WidgetStateProperty instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:51:30 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:52:19 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:54:35 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:57:35 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:60:35 - deprecated_member_use
+   info - 'MaterialStateProperty' is deprecated and shouldn't be used. Use WidgetStateProperty instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:98:30 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:99:19 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:101:35 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:104:35 - deprecated_member_use
+   info - 'MaterialStateProperty' is deprecated and shouldn't be used. Use WidgetStateProperty instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:141:30 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:142:19 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:144:35 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:147:35 - deprecated_member_use
+   info - 'MaterialStateProperty' is deprecated and shouldn't be used. Use WidgetStateProperty instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:185:30 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:186:19 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:188:35 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:191:35 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_button.dart:194:35 - deprecated_member_use
+   info - 'MaterialStateColor' is deprecated and shouldn't be used. Use WidgetStateColor instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_currency_field.dart:68:37 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_currency_field.dart:68:73 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_currency_field.dart:69:35 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_currency_field.dart:69:75 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\core\theme\widgets\custom_dropdown_field.dart:33:11 - deprecated_member_use
+   info - 'MaterialStateColor' is deprecated and shouldn't be used. Use WidgetStateColor instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_dropdown_field.dart:45:24 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_dropdown_field.dart:45:60 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_dropdown_field.dart:46:35 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_dropdown_field.dart:46:75 - deprecated_member_use
+   info - 'MaterialStateColor' is deprecated and shouldn't be used. Use WidgetStateColor instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_input_field.dart:58:24 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_input_field.dart:58:60 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_input_field.dart:59:35 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\core\theme\widgets\custom_input_field.dart:59:75 - deprecated_member_use
+   info - Parameter 'key' could be a super parameter - lib\core\theme\widgets\partnex_logo.dart:33:9 - use_super_parameters
+warning - The value of the local variable 'tSecondary' isn't used - lib\core\theme\widgets\partnex_logo.dart:78:11 - unused_local_variable
+warning - The value of the local variable 'linePaint' isn't used - lib\core\theme\widgets\partnex_logo.dart:134:17 - unused_local_variable
+warning - The value of the local variable 'lineXStart' isn't used - lib\core\theme\widgets\partnex_logo.dart:155:18 - unused_local_variable
+warning - The value of the local variable 'curveOuterX' isn't used - lib\core\theme\widgets\partnex_logo.dart:156:18 - unused_local_variable
+warning - The value of the local variable 'yPadding' isn't used - lib\core\theme\widgets\partnex_logo.dart:160:18 - unused_local_variable
+warning - The value of the local variable 'y1' isn't used - lib\core\theme\widgets\partnex_logo.dart:163:18 - unused_local_variable
+warning - The value of the local variable 'y2' isn't used - lib\core\theme\widgets\partnex_logo.dart:164:18 - unused_local_variable
+warning - The value of the local variable 'y3' isn't used - lib\core\theme\widgets\partnex_logo.dart:165:18 - unused_local_variable
+warning - The value of the local variable 'y4' isn't used - lib\core\theme\widgets\partnex_logo.dart:166:18 - unused_local_variable
+warning - The value of the local variable 'years' isn't used - lib\core\utils\financial_metrics_calculator.dart:74:9 - unused_local_variable
+   info - Statements in an if should be enclosed in a block - lib\core\utils\financial_metrics_calculator.dart:99:19 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\core\utils\financial_metrics_calculator.dart:100:25 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\core\utils\financial_metrics_calculator.dart:120:22 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\core\utils\financial_metrics_calculator.dart:121:26 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\core\utils\financial_metrics_calculator.dart:143:30 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\core\utils\financial_metrics_calculator.dart:144:35 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\core\utils\financial_metrics_calculator.dart:160:26 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\core\utils\financial_metrics_calculator.dart:161:31 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\core\utils\financial_metrics_calculator.dart:170:22 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\core\utils\financial_metrics_calculator.dart:171:27 - curly_braces_in_flow_control_structures
+warning - The value of the local variable 'score' isn't used - lib\features\auth\data\repositories\api_auth_repository.dart:70:19 - unused_local_variable
+   info - Don't invoke 'print' in production code - lib\features\auth\presentation\blocs\discovery_cubit\discovery_cubit.dart:28:9 - avoid_print
+warning - The value of the field '_secondsRemaining' isn't used - lib\features\auth\presentation\pages\dashboard\analysis_state_page.dart:27:7 - unused_field
+warning - Unused import: 'package:partnex/features/auth/presentation/blocs/auth_event.dart' - lib\features\auth\presentation\pages\dashboard\credibility_dashboard_page.dart:14:8 - unused_import
+warning - Unused import: 'package:partnex/core/theme/widgets/partnex_logo.dart' - lib\features\auth\presentation\pages\investor\investor_onboarding_page.dart:7:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/investor/investor_profile_page.dart' - lib\features\auth\presentation\pages\investor\investor_onboarding_page.dart:14:8 - unused_import
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\auth\presentation\pages\investor\investor_onboarding_page.dart:260:27 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\auth\presentation\pages\investor\investor_onboarding_page.dart:263:27 - deprecated_member_use
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/investor/deep_dive_evidence_page.dart' - lib\features\auth\presentation\pages\investor\sme_discovery_feed_page.dart:8:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/blocs/auth_event.dart' - lib\features\auth\presentation\pages\investor\sme_discovery_feed_page.dart:13:8 - unused_import
+warning - Unused import: 'package:partnex/core/theme/widgets/custom_button.dart' - lib\features\auth\presentation\pages\investor\sme_profile_expanded_page.dart:5:8 - unused_import
+warning - The declaration '_toggleWatchlist' isn't referenced - lib\features\auth\presentation\pages\investor\sme_profile_expanded_page.dart:324:8 - unused_element
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/dashboard/credibility_dashboard_page.dart' - lib\features\auth\presentation\pages\login_page.dart:12:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/investor/sme_discovery_feed_page.dart' - lib\features\auth\presentation\pages\login_page.dart:13:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/onboarding/input_method_selection_page.dart' - lib\features\auth\presentation\pages\login_page.dart:14:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/data/models/user_model.dart' - lib\features\auth\presentation\pages\login_page.dart:15:8 - unused_import
+  error - Expected to find ')' - lib\features\auth\presentation\pages\login_page.dart:142:25 - expected_token
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:145:19 - expected_token
+warning - Dead code - lib\features\auth\presentation\pages\login_page.dart:145:20 - dead_code
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:145:20 - missing_identifier
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:145:20 - unexpected_token
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:146:44 - expected_token
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:146:45 - missing_identifier
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:146:45 - unexpected_token
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:151:19 - expected_token
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:151:20 - missing_identifier
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:151:20 - unexpected_token
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:152:44 - expected_token
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:152:45 - missing_identifier
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:152:45 - unexpected_token
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:162:19 - expected_token
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:162:20 - missing_identifier
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:162:20 - unexpected_token
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:163:44 - expected_token
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:163:45 - missing_identifier
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:163:45 - unexpected_token
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:170:19 - expected_token
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:170:20 - missing_identifier
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:170:20 - unexpected_token
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:171:44 - expected_token
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:171:45 - missing_identifier
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:171:45 - expected_token
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:171:45 - unexpected_token
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:172:17 - missing_identifier
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:172:17 - expected_token
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:172:17 - unexpected_token
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:172:18 - missing_identifier
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:172:18 - unexpected_token
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:173:15 - expected_token
+  error - Expected to find '}' - lib\features\auth\presentation\pages\login_page.dart:173:15 - expected_token
+warning - Dead code - lib\features\auth\presentation\pages\login_page.dart:173:16 - dead_code
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:173:16 - missing_identifier
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:173:16 - expected_token
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:173:16 - unexpected_token
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:174:13 - missing_identifier
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:174:13 - expected_token
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:174:13 - unexpected_token
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:174:14 - missing_identifier
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:174:14 - expected_token
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:174:14 - unexpected_token
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:175:11 - missing_identifier
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:175:11 - expected_token
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:175:11 - unexpected_token
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:175:12 - missing_identifier
+  error - Expected to find ';' - lib\features\auth\presentation\pages\login_page.dart:175:12 - expected_token
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:175:12 - unexpected_token
+  error - Expected an identifier - lib\features\auth\presentation\pages\login_page.dart:176:9 - missing_identifier
+  error - Unexpected text ';' - lib\features\auth\presentation\pages\login_page.dart:176:9 - unexpected_token
+   info - Unnecessary empty statement - lib\features\auth\presentation\pages\login_page.dart:176:10 - empty_statements
+  error - Expected a class member - lib\features\auth\presentation\pages\login_page.dart:177:8 - expected_class_member
+  error - Expected a class member - lib\features\auth\presentation\pages\login_page.dart:178:5 - expected_class_member
+  error - Expected a class member - lib\features\auth\presentation\pages\login_page.dart:178:6 - expected_class_member
+  error - Expected a method, getter, setter or operator declaration - lib\features\auth\presentation\pages\login_page.dart:180:1 - expected_executable
+warning - Unused import: 'package:partnex/features/auth/presentation/blocs/auth_event.dart' - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:15:8 - unused_import
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:173:29 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:197:29 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:211:29 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:225:29 - curly_braces_in_flow_control_structures
+warning - Unused import: 'package:partnex/features/auth/presentation/blocs/auth_event.dart' - lib\features\auth\presentation\pages\onboarding\csv_upload_page.dart:17:8 - unused_import
+   info - The private field _isUploading could be 'final' - lib\features\auth\presentation\pages\onboarding\csv_upload_page.dart:33:8 - prefer_final_fields
+   info - The private field _isError could be 'final' - lib\features\auth\presentation\pages\onboarding\csv_upload_page.dart:35:8 - prefer_final_fields
+   info - The private field _errorMessage could be 'final' - lib\features\auth\presentation\pages\onboarding\csv_upload_page.dart:36:10 - prefer_final_fields
+   info - Use a 'SizedBox' to add whitespace to a layout - lib\features\auth\presentation\pages\onboarding\csv_upload_page.dart:170:26 - sized_box_for_whitespace
+   info - 'MaterialStateProperty' is deprecated and shouldn't be used. Use WidgetStateProperty instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\features\auth\presentation\pages\onboarding\csv_upload_page.dart:413:24 - deprecated_member_use
+   info - 'MaterialState' is deprecated and shouldn't be used. Use WidgetState instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre - lib\features\auth\presentation\pages\onboarding\csv_upload_page.dart:413:71 - deprecated_member_use
+warning - Unused import: 'package:partnex/features/auth/data/models/user_model.dart' - lib\features\auth\presentation\pages\signup_page.dart:13:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/investor/investor_onboarding_page.dart' - lib\features\auth\presentation\pages\signup_page.dart:14:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/onboarding/input_method_selection_page.dart' - lib\features\auth\presentation\pages\signup_page.dart:15:8 - unused_import
+   info - Don't invoke 'print' in production code - print_json.dart:5:3 - avoid_print
+   info - Don't invoke 'print' in production code - test\export_direct_test.dart:67:5 - avoid_print
+   info - Don't invoke 'print' in production code - test\export_logo_pngs_test.dart:44:7 - avoid_print
+   info - The variable name 'UThickness' isn't a lowerCamelCase identifier - test\generate_icon_test.dart:32:13 - non_constant_identifier_names
+   info - Don't invoke 'print' in production code - test\generate_icon_test.dart:72:3 - avoid_print
+warning - The value of the local variable 'white' isn't used - test\generate_pngs_test.dart:8:19 - unused_local_variable
+   info - The variable name 'UThickness' isn't a lowerCamelCase identifier - test\generate_pngs_test.dart:29:15 - non_constant_identifier_names
+   info - Don't invoke 'print' in production code - test\generate_pngs_test.dart:101:3 - avoid_print
+   info - Don't invoke 'print' in production code - test\generate_pngs_test.dart:102:3 - avoid_print
+   info - Don't invoke 'print' in production code - test\generate_pngs_test.dart:103:3 - avoid_print
+warning - Unused import: 'package:flutter/material.dart' - test\unit_test.dart:1:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_state.dart' - test\unit_test.dart:4:8 - unused_import
+   info - Don't invoke 'print' in production code - test_feed.dart:21:5 - avoid_print
+   info - Don't invoke 'print' in production code - test_feed.dart:24:5 - avoid_print
+   info - Don't invoke 'print' in production code - test_feed.dart:26:5 - avoid_print
+
+flutter : 156 issues 
+found. (ran in 8.8s)
+At line:1 char:1
++ flutter analyze 
+--no-pub > 
+analyze_fixed_1.txt 
+2>&1
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (156 issues fo   
+ und. (ran in 8.8s)    
+:String) [], Remot    
+eException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:partnex/core/theme/app_colors.dart';
+import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 
 class CustomInputField extends StatelessWidget {
@@ -13,6 +14,7 @@ class CustomInputField extends StatelessWidget {
   final int? maxLines;
   final void Function(String)? onChanged;
   final Iterable<String>? autofillHints;
+  final TextInputType? keyboardType;
 
   const CustomInputField({
     super.key,
@@ -26,6 +28,7 @@ class CustomInputField extends StatelessWidget {
     this.maxLines = 1,
     this.onChanged,
     this.autofillHints,
+    this.keyboardType,
   });
 
   @override
@@ -42,6 +45,7 @@ class CustomInputField extends StatelessWidget {
           maxLines: maxLines,
           onChanged: onChanged,
           autofillHints: autofillHints,
+          keyboardType: keyboardType,
           style: AppTypography.textTheme.bodyMedium?.copyWith(
             color: AppColors.slate900,
           ),
@@ -55,8 +59,8 @@ class CustomInputField extends StatelessWidget {
               color: AppColors.dangerRed,
             ),
             filled: true,
-            fillColor: MaterialStateColor.resolveWith((Set<MaterialState> states) {
-              if (states.contains(MaterialState.error) || states.contains(MaterialState.focused)) {
+            fillColor: WidgetStateColor.resolveWith((Set<WidgetState> states) {
+              if (states.contains(WidgetState.error) || states.contains(WidgetState.focused)) {
                 return AppColors.slate50;
               }
               return AppColors.slate100;

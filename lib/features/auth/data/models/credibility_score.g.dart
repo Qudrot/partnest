@@ -18,6 +18,7 @@ CredibilityScore _$CredibilityScoreFromJson(Map<String, dynamic> json) =>
       generalExplanation: json['generalExplanation'] as String?,
       modelVersion: json['modelVersion'] as String,
       calculatedAt: DateTime.parse(json['calculatedAt'] as String),
+      impactScore: (json['impactScore'] as num?)?.toDouble() ?? 0.7,
     );
 
 Map<String, dynamic> _$CredibilityScoreToJson(CredibilityScore instance) =>
@@ -30,6 +31,7 @@ Map<String, dynamic> _$CredibilityScoreToJson(CredibilityScore instance) =>
       'generalExplanation': instance.generalExplanation,
       'modelVersion': instance.modelVersion,
       'calculatedAt': instance.calculatedAt.toIso8601String(),
+      'impactScore': instance.impactScore,
     };
 
 const _$RiskLevelEnumMap = {

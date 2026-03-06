@@ -66,7 +66,10 @@ class SmeProfileCubit extends Cubit<SmeProfileState> {
     ));
   }
 
-  /// Entry point for UI to trigger background CSV processing
+  void updateFromMap(Map<String, dynamic> map) {
+    emit(SmeProfileState.fromMap(map));
+  }
+
   Future<void> processCsv(String csvString, String fileName) async {
     emit(state.copyWith(
       csvProcessingStatus: CsvProcessingStatus.processing,
@@ -75,7 +78,6 @@ class SmeProfileCubit extends Cubit<SmeProfileState> {
     ));
 
     try {
-      // Offload extraction to a separate Isolate
       final result = await compute(_parseCsvIsolate, csvString);
 
       if (result.containsKey('error')) {
@@ -86,19 +88,42 @@ class SmeProfileCubit extends Cubit<SmeProfileState> {
         return;
       }
 
-      // Update state with extracted data
+      final yearlyRevMap = result['yearlyRevenue'] as Map<int, double>;
+      final sortedYears = yearlyRevMap.keys.toList()..sort((a, b) => b.compareTo(a)); // Descending
+      
+      int y1 = DateTime.now().year;
+      double a1 = 0.0;
+      int y2 = DateTime.now().year - 1;
+      double a2 = 0.0; // Defaults to 0 if CSV only has 1 year of data!
+      
+      if (sortedYears.isNotEmpty) {
+        y1 = sortedYears[0];
+        a1 = yearlyRevMap[y1]!;
+        if (sortedYears.length > 1) {
+          y2 = sortedYears[1];
+          a2 = yearlyRevMap[y2]!;
+        } else {
+          y2 = y1 - 1;
+        }
+      }
+      
+      // Calculate realistic monthly expenses based on rows of data
+      double mths = result['estimatedMonths'] as double;
+      if (mths < 1) mths = 1;
+      double monthlyExp = (result['totalExpenses'] as double) / mths;
+
       emit(state.copyWith(
-        annualRevenueYear1: DateTime.now().year - 1,
-        annualRevenueAmount1: (result['totalRevenue'] as double),
-        annualRevenueYear2: DateTime.now().year - 2,
-        annualRevenueAmount2: (result['totalRevenue'] as double) * 0.8,
-        monthlyAvgExpenses: (result['totalExpenses'] as double) / 12,
+        annualRevenueYear1: y1,
+        annualRevenueAmount1: a1,
+        annualRevenueYear2: y2,
+        annualRevenueAmount2: a2, 
+        monthlyAvgExpenses: monthlyExp,
         totalLiabilities: (result['totalDebt'] as double),
         outstandingLoans: (result['totalDebt'] as double),
         priorFundingSource: "Extracted from CSV",
-        onTimePayments: 12, // Default healthy baseline for bank-verified data
+        onTimePayments: 12, 
         latePayments: 0,
-        numDocumentsSubmitted: 1, // The CSV itself
+        numDocumentsSubmitted: 1, 
         areDocumentsRecent: true,
         areDocumentsComplete: true,
         areDocumentsConsistent: true,
@@ -112,61 +137,110 @@ class SmeProfileCubit extends Cubit<SmeProfileState> {
     }
   }
 
-  /// Pure function that runs in a background Isolate
+  // --- THE BULLETPROOF PARSER HELPER ---
+  static double _sanitizeAmount(String rawValue) {
+    if (rawValue.isEmpty) return 0.0;
+
+    // 1. Remove commas, spaces, and currency symbols
+    String cleanString = rawValue
+        .replaceAll(',', '')
+        .replaceAll(' ', '')
+        .replaceAll('₦', '')
+        .replaceAll('N', '')
+        .trim();
+
+    // 2. Parse it safely (defaults to 0.0 if it's text)
+    double parsedValue = double.tryParse(cleanString) ?? 0.0;
+
+    // 3. FORCE ABSOLUTE VALUE to prevent negative debits from ruining the math
+    return parsedValue.abs(); 
+  }
+
   static Map<String, dynamic> _parseCsvIsolate(String csvString) {
     try {
+      // Decode the raw CSV string
       final rows = CsvCodec().decoder.convert(csvString);
-      if (rows.isEmpty) return {'error': 'The CSV file is empty.'};
+      if (rows.isEmpty) return {'error': 'The uploaded file appears to be empty.'};
 
-      final headers = rows.first.map((e) => e.toString().toLowerCase()).toList();
-      
-      int creditIdx = -1;
-      int debitIdx = -1;
-      int descIdx = -1;
+      int headerRowIndex = -1;
+      int creditIdx = -1, debitIdx = -1, descIdx = -1, dateIdx = -1;
 
-      for (int i = 0; i < headers.length; i++) {
-        if (headers[i].contains("credit") || headers[i].contains("deposit")) {
-          creditIdx = i;
-        } else if (headers[i].contains("debit") || headers[i].contains("withdrawal")) {
-          debitIdx = i;
-        } else if (headers[i].contains("narration") || headers[i].contains("description") || headers[i].contains("details")) {
-          descIdx = i;
+      // 1. Find the Headers
+      for (int i = 0; i < rows.length; i++) {
+        final rowStrs = rows[i].map((e) => e.toString().toLowerCase()).toList();
+        if (rowStrs.any((s) => s.contains("credit") || s.contains("deposit")) ||
+            rowStrs.any((s) => s.contains("debit") || s.contains("withdrawal"))) {
+          headerRowIndex = i;
+          for (int j = 0; j < rowStrs.length; j++) {
+            if (rowStrs[j].contains("credit") || rowStrs[j].contains("deposit")) creditIdx = j;
+            else if (rowStrs[j].contains("debit") || rowStrs[j].contains("withdrawal")) debitIdx = j;
+            else if (rowStrs[j].contains("narration") || rowStrs[j].contains("desc") || rowStrs[j].contains("details")) descIdx = j;
+            else if (rowStrs[j].contains("date") || rowStrs[j].contains("time")) dateIdx = j;
+          }
+          break;
         }
       }
 
-      double totalRevenue = 0.0;
+      if (headerRowIndex == -1 || (creditIdx == -1 && debitIdx == -1)) {
+        return {'error': 'We couldn\'t recognize the bank statement format. Please ensure it\'s a standard CSV export.'};
+      }
+
+      Map<int, double> yearlyRevenue = {};
       double totalExpenses = 0.0;
       double totalDebt = 0.0;
+      int fallbackYear = DateTime.now().year;
 
-      for (int i = 1; i < rows.length; i++) {
+      // 2. Extract Data Grouped By Year (Using Bulletproof Parser)
+      for (int i = headerRowIndex + 1; i < rows.length; i++) {
         final row = rows[i];
-        
+        int rowYear = fallbackYear;
+
+        // Smart Date Extraction
+        if (dateIdx != -1 && dateIdx < row.length) {
+          String dateStr = row[dateIdx].toString();
+          final match4 = RegExp(r'\b(20\d{2})\b').firstMatch(dateStr);
+          if (match4 != null) {
+            rowYear = int.parse(match4.group(1)!);
+          } else {
+            final match2 = RegExp(r'[/-](\d{2})(?:\s|$)').firstMatch(dateStr);
+            if (match2 != null) {
+              rowYear = 2000 + int.parse(match2.group(1)!);
+            }
+          }
+        }
+
+        // Credit / Revenue Extraction
         if (creditIdx != -1 && creditIdx < row.length) {
-          final val = double.tryParse(row[creditIdx].toString().replaceAll(RegExp(r'[^0-9.]'), ''));
-          if (val != null) totalRevenue += val;
+          final val = _sanitizeAmount(row[creditIdx].toString());
+          if (val > 0) {
+            yearlyRevenue[rowYear] = (yearlyRevenue[rowYear] ?? 0.0) + val;
+          }
         }
 
+        // Debit / Expenses & Debt Extraction
         if (debitIdx != -1 && debitIdx < row.length) {
-          final val = double.tryParse(row[debitIdx].toString().replaceAll(RegExp(r'[^0-9.]'), ''));
-          if (val != null) totalExpenses += val;
-        }
-
-        if (descIdx != -1 && descIdx < row.length && debitIdx != -1 && debitIdx < row.length) {
-          final desc = row[descIdx].toString().toLowerCase();
-          if (desc.contains("loan") || desc.contains("fairmoney") || desc.contains("branch") || desc.contains("carbon")) {
-            final debtVal = double.tryParse(row[debitIdx].toString().replaceAll(RegExp(r'[^0-9.]'), ''));
-            if (debtVal != null) totalDebt += debtVal;
+          final val = _sanitizeAmount(row[debitIdx].toString());
+          if (val > 0) {
+            totalExpenses += val;
+            
+            if (descIdx != -1 && descIdx < row.length) {
+              final desc = row[descIdx].toString().toLowerCase();
+              if (desc.contains("loan") || desc.contains("repayment") || desc.contains("carbon") || desc.contains("fairmoney") || desc.contains("branch")) {
+                totalDebt += val;
+              }
+            }
           }
         }
       }
-
+      
       return {
-        'totalRevenue': totalRevenue,
+        'yearlyRevenue': yearlyRevenue,
         'totalExpenses': totalExpenses,
         'totalDebt': totalDebt,
+        'estimatedMonths': (rows.length - headerRowIndex) / 30, // rough assumption of 1 trans per day
       };
-    } catch (e) {
-      return {'error': e.toString()};
+    } catch(e) {
+      return {'error': 'We encountered an issue processing this file. Please try again or use a different statement.'};
     }
   }
   

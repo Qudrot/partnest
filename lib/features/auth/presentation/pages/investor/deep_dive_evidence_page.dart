@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:partnex/core/theme/app_colors.dart';
+import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
 
@@ -10,9 +11,9 @@ class DeepDiveEvidencePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.neutralWhite,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.neutralWhite,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
@@ -31,7 +32,11 @@ class DeepDiveEvidencePage extends StatelessWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(LucideIcons.download, size: 20, color: AppColors.slate900),
+            icon: const Icon(
+              LucideIcons.download,
+              size: 20,
+              color: AppColors.slate900,
+            ),
             onPressed: () {},
           ),
         ],
@@ -63,9 +68,12 @@ class DeepDiveEvidencePage extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: AppColors.neutralWhite.withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(color: AppColors.successGreen),
                         ),
@@ -90,15 +98,17 @@ class DeepDiveEvidencePage extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
 
             // Evidence Sections (Expandable)
             _buildEvidenceSection(
               title: 'Revenue Consistency',
               contribution: '+15% impact on score',
-              evidenceExplanation: 'Strong revenue consistency with low volatility across 3 years.',
-              chartPlaceholderText: '[Line Chart: Year 1: ₦500K, Year 2: ₦600K, Year 3: ₦750K]',
+              evidenceExplanation:
+                  'Strong revenue consistency with low volatility across 3 years.',
+              chartPlaceholderText:
+                  '[Line Chart: Year 1: ₦500K, Year 2: ₦600K, Year 3: ₦750K]',
               metrics: [
                 {'YoY Growth': '+22%'},
                 {'Monthly Avg': '₦1.2M'},
@@ -109,8 +119,10 @@ class DeepDiveEvidencePage extends StatelessWidget {
               title: 'Expense Ratio',
               contribution: '-5% impact',
               contributionColor: AppColors.dangerRed,
-              evidenceExplanation: 'Operating expenses have grown slightly faster than revenue.',
-              chartPlaceholderText: '[Pie Chart: COGS 40%, OpEx 35%, Admin 15%, Other 10%]',
+              evidenceExplanation:
+                  'Operating expenses have grown slightly faster than revenue.',
+              chartPlaceholderText:
+                  '[Pie Chart: COGS 40%, OpEx 35%, Admin 15%, Other 10%]',
               metrics: [
                 {'Monthly Revenue': '₦1.2M'},
                 {'Monthly Expenses': '₦800K'},
@@ -121,8 +133,10 @@ class DeepDiveEvidencePage extends StatelessWidget {
             _buildEvidenceSection(
               title: 'Repayment Behavior',
               contribution: '+10% impact',
-              evidenceExplanation: 'Perfect payment history; 24 of 24 payments on time.',
-              chartPlaceholderText: '[Bar Chart: Timeline Jan-Dec 100% on time]',
+              evidenceExplanation:
+                  'Perfect payment history; 24 of 24 payments on time.',
+              chartPlaceholderText:
+                  '[Bar Chart: Timeline Jan-Dec 100% on time]',
               metrics: [
                 {'Total Obligations': '24'},
                 {'On-Time Payments': '24 (100%)'},
@@ -198,8 +212,8 @@ class DeepDiveEvidencePage extends StatelessWidget {
             const SizedBox(height: 32),
             CustomButton(
               text: 'Back to Discovery',
-               variant: ButtonVariant.secondary,
-               onPressed: () => Navigator.pop(context),
+              variant: ButtonVariant.secondary,
+              onPressed: () => Navigator.pop(context),
             ),
             const SizedBox(height: 24),
           ],
@@ -218,9 +232,9 @@ class DeepDiveEvidencePage extends StatelessWidget {
   }) {
     return Container(
       decoration: BoxDecoration(
-         color: AppColors.slate50,
-         border: Border.all(color: AppColors.slate200),
-         borderRadius: BorderRadius.circular(6),
+        color: AppColors.slate50,
+        border: Border.all(color: AppColors.slate200),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Theme(
         data: ThemeData(dividerColor: Colors.transparent),
@@ -248,7 +262,12 @@ class DeepDiveEvidencePage extends StatelessWidget {
               ),
             ],
           ),
-          childrenPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 0),
+          childrenPadding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+            bottom: 16,
+            top: 0,
+          ),
           children: [
             Text(
               evidenceExplanation,
@@ -258,53 +277,55 @@ class DeepDiveEvidencePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            
+
             // Visual Chart Placeholder
             Container(
               height: 120,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.neutralWhite,
                 border: Border.all(color: AppColors.slate200),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Center(
                 child: Text(
                   chartPlaceholderText,
-                  style: AppTypography.textTheme.bodySmall?.copyWith(color: AppColors.slate400),
+                  style: AppTypography.textTheme.bodySmall?.copyWith(
+                    color: AppColors.slate400,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Key Metrics Breakdown
             ...metrics.map((m) {
-               String key = m.keys.first;
-               String val = m.values.first;
-               return Padding(
-                 padding: const EdgeInsets.only(bottom: 6.0),
-                 child: Row(
-                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                   children: [
-                     Text(
-                       key,
-                       style: AppTypography.textTheme.labelMedium?.copyWith(
-                         color: AppColors.slate600,
-                         fontSize: 12,
-                       ),
-                     ),
-                     Text(
-                       val,
-                       style: AppTypography.textTheme.bodyMedium?.copyWith(
-                         color: AppColors.slate900,
-                         fontWeight: FontWeight.w600,
-                         fontSize: 14,
-                       ),
-                     ),
-                   ],
-                 ),
-               );
+              String key = m.keys.first;
+              String val = m.values.first;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 6.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      key,
+                      style: AppTypography.textTheme.labelMedium?.copyWith(
+                        color: AppColors.slate600,
+                        fontSize: 12,
+                      ),
+                    ),
+                    Text(
+                      val,
+                      style: AppTypography.textTheme.bodyMedium?.copyWith(
+                        color: AppColors.slate900,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              );
             }),
           ],
         ),
@@ -312,21 +333,25 @@ class DeepDiveEvidencePage extends StatelessWidget {
     );
   }
 
-  Widget _buildFinancialTableGroup(String title, List<String> columns, List<List<String>> rows) {
+  Widget _buildFinancialTableGroup(
+    String title,
+    List<String> columns,
+    List<List<String>> rows,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-           title,
-           style: AppTypography.textTheme.headlineSmall?.copyWith(
-             color: AppColors.slate900,
-             fontSize: 14,
-           ),
+          title,
+          style: AppTypography.textTheme.headlineSmall?.copyWith(
+            color: AppColors.slate900,
+            fontSize: 14,
+          ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.neutralWhite,
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: AppColors.slate200),
           ),
@@ -337,15 +362,19 @@ class DeepDiveEvidencePage extends StatelessWidget {
               dataRowMinHeight: 40,
               dataRowMaxHeight: 40,
               headingRowHeight: 40,
-              columns: columns.map((col) => DataColumn(
-                label: Text(
-                  col,
-                  style: AppTypography.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.slate900,
-                  ),
-                ),
-              )).toList(),
+              columns: columns
+                  .map(
+                    (col) => DataColumn(
+                      label: Text(
+                        col,
+                        style: AppTypography.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.slate900,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
               rows: rows.map((rowCells) {
                 return DataRow(
                   cells: rowCells.map((cellValue) {
@@ -354,8 +383,12 @@ class DeepDiveEvidencePage extends StatelessWidget {
                       Text(
                         cellValue,
                         style: AppTypography.textTheme.bodySmall?.copyWith(
-                          fontWeight: isFirstCol ? FontWeight.w600 : FontWeight.w400,
-                          color: isFirstCol ? AppColors.slate900 : AppColors.slate700,
+                          fontWeight: isFirstCol
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                          color: isFirstCol
+                              ? AppColors.slate900
+                              : AppColors.slate700,
                         ),
                       ),
                     );
@@ -369,7 +402,11 @@ class DeepDiveEvidencePage extends StatelessWidget {
     );
   }
 
-  Widget _buildDocumentCard({required String title, required String metadata, IconData iconData = LucideIcons.fileText}) {
+  Widget _buildDocumentCard({
+    required String title,
+    required String metadata,
+    IconData iconData = LucideIcons.fileText,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -406,8 +443,12 @@ class DeepDiveEvidencePage extends StatelessWidget {
             ),
           ),
           IconButton(
-             icon: const Icon(LucideIcons.download, size: 20, color: AppColors.trustBlue),
-             onPressed: () {},
+            icon: const Icon(
+              LucideIcons.download,
+              size: 20,
+              color: AppColors.trustBlue,
+            ),
+            onPressed: () {},
           ),
         ],
       ),

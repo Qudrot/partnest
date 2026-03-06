@@ -60,54 +60,73 @@ class ApiAuthRepository implements AuthRepository {
       if (token != null && (token as String).isNotEmpty) {
         await _secureStorage.write(key: 'jwt_token', value: token);
         await _secureStorage.write(key: 'user_role', value: parsedRole.name);
-        // CRITICAL: Also inject into the live Dio client immediately so
-        // subsequent calls in the same session don't miss the header.
         apiClient.setToken(token);
 
-        // Fallback check: if the login payload skipped the flag, manually check the score endpoint
-        if (parsedRole == UserRole.sme && !isProfileCompleted) {
+        // Double-check profile completion if it wasn't clear from login response
+        if (!isProfileCompleted && parsedRole == UserRole.sme) {
           try {
-            final score = await getMyScore(); // getMyScore calls POST /api/score/run and throws if not found
+            // Since GET /api/sme/profile often 404s, try fetching the score instead
+            await getMyScore();
             isProfileCompleted = true;
-            if (kDebugMode) print('LOGIN RECOVERY: Found existing SME score, updating flag.');
-          } catch (_) {}
+            if (kDebugMode) print('Login: Score fetched successfully. Profile is complete.');
+          } catch (_) {
+            try {
+              final profile = await getMySmeProfile();
+              isProfileCompleted = profile.isNotEmpty;
+            } catch (_) {}
+          }
         }
 
         await _secureStorage.write(key: 'profile_completed', value: isProfileCompleted.toString());
-        if (kDebugMode) print('TOKEN STORED + INJECTED: ${token.substring(0, 20)}...');
-      } else {
-        if (kDebugMode) print('WARNING: No token found in login response! Keys: ${response.data.keys}');
       }
 
       return UserModel(
-        id: userData['id'].toString(), // Backend returns int, UserModel expects String
+        id: userData['id'].toString(),
         email: userData['email'],
-        name: 'SME user', // Your backend 'users' table doesn't have 'name', you may want to add it!
+        name: userData['name'] ?? 'SME user',
         role: parsedRole,
-        profilePicture: '', 
+        profilePicture: userData['profile_picture'] ?? '', 
         profileCompleted: isProfileCompleted,
       );
     } catch (e) {
-      if (e is DioException) {
-        // Backend may return a Map {"message":"..."} or a raw String
-        final d = e.response?.data;
-        final msg = (d is Map) ? d['message']?.toString() : d?.toString();
-        
-        final lowerMsg = msg?.toLowerCase() ?? '';
-        if (lowerMsg.contains('invalid credential') || lowerMsg.contains('incorrect password') || e.response?.statusCode == 401) {
-           throw Exception('The email or password you entered is incorrect. Double-check and try again.');
-        } else if (lowerMsg.contains('not found') || lowerMsg.contains('no user') || lowerMsg.contains('unregistered') || e.response?.statusCode == 404) {
-           throw Exception('Account not found. It looks like you are new here!|REGISTRATION_REDIRECT');
-        }
-        
-        if (msg == null && e.type != DioExceptionType.badResponse) {
-           throw Exception('Network error: ${e.message}. Please check your internet connection.');
-        }
-        
-        throw Exception(msg ?? 'Failed to sign in. Please try again.');
-      }
-      throw Exception(e.toString());
+      throw _handleDioError(e);
     }
+  }
+
+  /// UX-friendly error mapper for Dio exceptions
+  dynamic _handleDioError(dynamic e) {
+    if (e is DioException) {
+      final d = e.response?.data;
+      String? msg;
+      
+      if (d is Map) {
+        msg = d['message']?.toString() ?? d['error']?.toString();
+      } else if (d is String && d.contains('<body')) {
+        final match = RegExp(r'<pre>(.*?)</pre>').firstMatch(d);
+        msg = match?.group(1) ?? 'Service temporarily unavailable (404/500)';
+      } else {
+        msg = d?.toString();
+      }
+
+      final lowerMsg = msg?.toLowerCase() ?? '';
+      final statusCode = e.response?.statusCode;
+
+      if (lowerMsg.contains('invalid credential') || statusCode == 401) {
+        return Exception('Incorrect email or password. Please try again.');
+      } 
+      if (lowerMsg.contains('not found') || statusCode == 404) {
+        if (e.requestOptions.path.contains('login')) {
+          return Exception('Account not found. It looks like you are new here!|REGISTRATION_REDIRECT');
+        }
+        return Exception('The requested resource was not found.');
+      }
+      if (statusCode == 409 || lowerMsg.contains('already exists')) {
+        return Exception('This email is already registered. Try logging in instead.');
+      }
+
+      return Exception(msg ?? 'Network error. Please check your connection.');
+    }
+    return e;
   }
 
   @override
@@ -152,11 +171,7 @@ class ApiAuthRepository implements AuthRepository {
         await _secureStorage.write(key: 'jwt_token', value: token);
         await _secureStorage.write(key: 'user_role', value: parsedRole.name);
         await _secureStorage.write(key: 'profile_completed', value: 'false');
-        // CRITICAL: Also inject into the live Dio client immediately.
         apiClient.setToken(token);
-        if (kDebugMode) print('TOKEN STORED + INJECTED: ${token.substring(0, 20)}...');
-      } else {
-        if (kDebugMode) print('WARNING: No token found in signup response! Keys: ${response.data.keys}');
       }
 
       return UserModel(
@@ -168,22 +183,7 @@ class ApiAuthRepository implements AuthRepository {
         profileCompleted: false,
       );
     } catch (e) {
-      if (e is DioException) {
-        final d = e.response?.data;
-        final msg = (d is Map) ? d['message']?.toString() : d?.toString();
-        
-        final lowerMsg = msg?.toLowerCase() ?? '';
-        if (lowerMsg.contains('already exist') || lowerMsg.contains('duplicate') || e.response?.statusCode == 409) {
-           throw Exception('An account with this email already exists. Try logging in instead.');
-        }
-        
-        if (msg == null && e.type != DioExceptionType.badResponse) {
-           throw Exception('Network error: ${e.message}. Please check your internet connection.');
-        }
-
-        throw Exception(msg ?? 'Failed to register. Please try again.');
-      }
-      throw Exception(e.toString());
+      throw _handleDioError(e);
     }
   }
 
@@ -202,15 +202,15 @@ class ApiAuthRepository implements AuthRepository {
       }
 
       if (token == null || token.isEmpty) {
-        throw Exception('Session expired. Please log in again to continue.');
+        throw Exception('Your session has expired. Please sign in again to continue.');
       }
 
       // Build explicit auth options for every protected request.
       // This is the most reliable approach — no interceptor dependency.
       final authOptions = Options(
         headers: {'Authorization': 'Bearer $token'},
-        receiveTimeout: const Duration(seconds: 60),
-        sendTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 180),
+        sendTimeout: const Duration(seconds: 180),
       );
 
       final Map<String, dynamic> payload = {
@@ -241,6 +241,7 @@ class ApiAuthRepository implements AuthRepository {
       }
 
       try {
+        // 1. Try creating the profile first (POST)
         await apiClient.dio.post(
           '/api/sme/profile',
           data: payload,
@@ -248,11 +249,48 @@ class ApiAuthRepository implements AuthRepository {
         );
       } catch (e) {
         if (e is DioException) {
-          final msg = (e.response?.data['message'] ?? e.response?.data['error'] ?? '').toString().toLowerCase();
-          if (msg.contains('already exists')) {
-            if (kDebugMode) print('Profile already exists, proceeding to score generation...');
-            // In a complete implementation, you might want to call PUT here to update the profile instead.
-            // For now, we catch the exception and proceed so the user can get their score.
+          final statusCode = e.response?.statusCode;
+          final msg = (e.response?.data is Map) 
+              ? (e.response?.data['message'] ?? e.response?.data['error'] ?? '').toString().toLowerCase()
+              : e.response?.data?.toString().toLowerCase() ?? '';
+          
+          if (statusCode == 409 || statusCode == 400 || msg.contains('already exists')) {
+            if (kDebugMode) print('Profile exists, attempting UPDATE (PUT) instead...');
+            try {
+              // 2. Fallback to PUT
+              await apiClient.dio.put(
+                '/api/sme/profile',
+                data: payload,
+                options: authOptions,
+              );
+            } catch (putError) {
+              if (putError is DioException && putError.response?.statusCode == 404) {
+                 if (kDebugMode) print('PUT failed with 404, attempting PATCH instead...');
+                 // 3. Last resort: PATCH
+                 try {
+                   await apiClient.dio.patch(
+                     '/api/sme/profile',
+                     data: payload,
+                     options: authOptions,
+                   );
+                 } catch (patchError) {
+                   if (patchError is DioException && patchError.response?.statusCode == 404) {
+                     if (kDebugMode) {
+                       print('PATCH also failed with 404.');
+                       print('Backend does not support profile updates. Proceeding to score generation with existing data.');
+                     }
+                     // We consume the error here and allow the execution to continue to score generation
+                   } else {
+                     rethrow;
+                   }
+                 }
+              } else if (putError is DioException && putError.response?.statusCode == 405) {
+                // Method Not Allowed
+                 if (kDebugMode) print('PUT 405 Method Not Allowed. Backend does not support updates. Proceeding to score generation.');
+              } else {
+                rethrow;
+              }
+            }
           } else {
             rethrow;
           }
@@ -261,8 +299,13 @@ class ApiAuthRepository implements AuthRepository {
         }
       }
 
+     
       // 3. Run Credibility Score
       if (kDebugMode) print('RUNNING SCORE GENERATION');
+
+      try {
+        await _secureStorage.write(key: 'cached_sme_profile', value: jsonEncode(data));
+      } catch (_) {}
 
       final scoreResponse = await apiClient.dio.post(
         '/api/score/run',
@@ -272,6 +315,8 @@ class ApiAuthRepository implements AuthRepository {
       final scoreData = scoreResponse.data;
       if (kDebugMode) {
         print('Model Version generated: ${scoreData['model_version']}');
+        // 👇 NEW PRINT STATEMENT HERE 👇
+        print('RAW SCORE DATA: $scoreData');
       }
 
       // Extract risk level string and map to enum
@@ -282,26 +327,43 @@ class ApiAuthRepository implements AuthRepository {
       // Mark profile as completed locally
       await _secureStorage.write(key: 'profile_completed', value: 'true');
 
-      return CredibilityScore(
+   final explanationData = scoreData['explanation'];
+      String? explanationText;
+      if (explanationData is Map) {
+        explanationText = explanationData['note']?.toString();
+      } else {
+        explanationText = explanationData?.toString();
+      }
+   
+   return CredibilityScore(
         id: DateTime.now().millisecondsSinceEpoch.toString(), 
         organisationId: scoreData['sme_id']?.toString() ?? 'unknown_sme',
         totalScore: (scoreData['score'] as num?)?.toDouble() ?? 0.0,
         riskLevel: rLevel,
         topContributingFactors: [],
-        generalExplanation: scoreData['explanation_json']?.toString(),
+        generalExplanation: explanationText, // Fixed variable!
         modelVersion: scoreData['model_version']?.toString() ?? 'fallback-v1',
         calculatedAt: DateTime.now(),
+        impactScore: (scoreData['impact_score'] as num?)?.toDouble() ?? 0.7,
       );
 
     } catch (e) {
       if (kDebugMode) {
         print('Score Generation Error in submitSmeProfile: $e');
         if (e is DioException) {
-          print('DioException response data: ${e.response?.data}');
+           print('DioException [${e.response?.statusCode}] to ${e.requestOptions.uri}');
+           print('FULL ERROR DATA: ${e.response?.data}');
         }
       }
       if (e is DioException) {
-        throw Exception(e.response?.data['message'] ?? e.response?.data['error'] ?? 'Failed to generate credibility score.');
+        final data = e.response?.data;
+        String errorMessage = 'Failed to generate credibility score.';
+        if (data is Map) {
+          errorMessage = data['message'] ?? data['error'] ?? errorMessage;
+        } else if (data != null) {
+          errorMessage = data.toString();
+        }
+        throw Exception(errorMessage);
       }
       throw Exception(e.toString());
     }
@@ -316,7 +378,7 @@ class ApiAuthRepository implements AuthRepository {
       }
 
       if (token == null || token.isEmpty) {
-        throw Exception('Session expired. Please log in again.');
+        throw Exception('Your session has expired. Please sign in again to continue.');
       }
 
 
@@ -334,9 +396,12 @@ class ApiAuthRepository implements AuthRepository {
       // Update local role to investor
       await _secureStorage.write(key: 'user_role', value: 'investor');
       await _secureStorage.write(key: 'profile_completed', value: 'true');
+      try {
+        await _secureStorage.write(key: 'cached_investor_profile', value: jsonEncode(data));
+      } catch (_) {}
     } catch (e) {
       if (e is DioException) {
-        throw Exception(e.response?.data['message'] ?? e.response?.data['error'] ?? 'Failed to save investor profile.');
+        throw Exception(e.response?.data['message'] ?? e.response?.data['error'] ?? 'We couldn\'t save your profile preferences. Please try again.');
       }
       throw Exception(e.toString());
     }
@@ -391,7 +456,7 @@ class ApiAuthRepository implements AuthRepository {
         token = await _secureStorage.read(key: 'jwt_token');
       }
       if (token == null || token.isEmpty) {
-        throw Exception('Session expired.');
+        throw Exception('Your session has expired. Please sign in again to continue.');
       }
 
       final authOptions = Options(headers: {'Authorization': 'Bearer $token'});
@@ -407,11 +472,18 @@ class ApiAuthRepository implements AuthRepository {
       return {};
     } on DioException catch (e) {
       if (e.response?.statusCode == 404 || e.response?.statusCode == 403) {
+        try {
+          final cachedStr = await _secureStorage.read(key: 'cached_sme_profile');
+          if (cachedStr != null && cachedStr.isNotEmpty) {
+            if (kDebugMode) print('Recovered SME Profile from SecureStorage cache.');
+            return jsonDecode(cachedStr) as Map<String, dynamic>;
+          }
+        } catch (_) {}
         return {}; // Return empty if profile endpoint doesn't exist yet or is forbidden
       }
-      throw Exception('Failed to fetch SME profile: $e');
+      throw Exception('Unable to load business details. Please check your connection and try again.');
     } catch (e) {
-      throw Exception('Failed to fetch SME profile: $e');
+      throw Exception('Unable to load business details. Please check your connection and try again.');
     }
   }
 
@@ -463,7 +535,7 @@ class ApiAuthRepository implements AuthRepository {
            print('DioException response data: ${e.response?.data}');
          }
        }
-       throw Exception('Failed to fetch credibility score.');
+       throw Exception('We couldn\'t generate your credibility score at this time. Please try again.');
      }
   }
 
@@ -482,7 +554,7 @@ class ApiAuthRepository implements AuthRepository {
       );
     } catch (e) {
       if (e is DioException) {
-        throw Exception(e.response?.data['message'] ?? e.response?.data['error'] ?? 'Failed to upload statement of account.');
+        throw Exception(e.response?.data['message'] ?? e.response?.data['error'] ?? 'We couldn\'t upload your statement. Please check the file format and try again.');
       }
       throw Exception(e.toString());
     }

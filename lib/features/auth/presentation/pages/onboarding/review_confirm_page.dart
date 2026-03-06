@@ -9,6 +9,7 @@ import 'package:partnex/core/theme/app_colors.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
 import 'package:partnex/core/theme/widgets/custom_progress_indicator.dart';
+import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
@@ -19,6 +20,7 @@ import 'package:partnex/features/auth/presentation/pages/onboarding/business_pro
 import 'package:partnex/features/auth/presentation/pages/onboarding/liabilities_history_page.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/revenue_expenses_page.dart';
 import 'package:partnex/features/auth/presentation/pages/dashboard/analysis_state_page.dart';
+import 'package:partnex/core/services/ui_service.dart';
 
 class ReviewConfirmPage extends StatefulWidget {
   final bool isDocumentUpload;
@@ -42,69 +44,46 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
     context.read<AuthBloc>().add(SubmitSmeProfileEvent(state.toMap()));
   }
 
-  /// Re-opens file picker so the user can swap out their uploaded document.
   Future<void> _rePickDocument() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['csv', 'pdf', 'xls', 'xlsx'],
+        allowedExtensions: ['csv'],
         withData: true,
       );
 
       if (result != null) {
         final file = result.files.single;
-
-        // If CSV, trigger background processing
-        if (file.name.toLowerCase().endsWith('.csv')) {
-          String csvString = '';
-          if (file.bytes != null) {
-            csvString = utf8.decode(file.bytes!);
-          } else if (file.path != null) {
-            csvString = await File(file.path!).readAsString();
-          }
-          if (csvString.isNotEmpty) {
-             if (mounted) {
-              context.read<SmeProfileCubit>().processCsv(csvString, file.name);
-             }
-          }
+        String csvString = '';
+        if (file.bytes != null) {
+          csvString = utf8.decode(file.bytes!);
+        } else if (file.path != null) {
+          csvString = await File(file.path!).readAsString();
         }
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('File replaced: ${file.name}'),
-              backgroundColor: AppColors.successGreen,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+        if (csvString.isNotEmpty && mounted) {
+          context.read<SmeProfileCubit>().processCsv(csvString, file.name);
+          uiService.showSnackBar('Successfully updated file: ${file.name}');
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error replacing file: ${e.toString()}'),
-            backgroundColor: AppColors.dangerRed,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        uiService.showSnackBar('We couldn\'t update the file. Please try again.', isError: true);
       }
     }
   }
 
-
   Widget _buildSummarySection({
     required String title,
-    required Map<String, String> data,
-    required VoidCallback onEdit,
+    required Map<String, dynamic> data,
+    VoidCallback? onEdit,
     String editLabel = 'Edit',
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.slate50,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: AppColors.slate200),
       ),
       child: Column(
@@ -113,57 +92,39 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: AppTypography.textTheme.headlineSmall?.copyWith(
-                  fontSize: 16,
-                  color: AppColors.slate900,
-                ),
-              ),
-              InkWell(
-                onTap: onEdit,
-                borderRadius: BorderRadius.circular(4),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  child: Text(
-                    editLabel,
-                    style: AppTypography.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.trustBlue,
-                      fontWeight: FontWeight.w600,
-                    ),
+              Text(title, style: AppTypography.textTheme.headlineSmall?.copyWith(fontSize: 16, color: AppColors.slate900)),
+              if (onEdit != null)
+                InkWell(
+                  onTap: onEdit,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                    child: Text(editLabel, style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.trustBlue, fontWeight: FontWeight.w600)),
                   ),
                 ),
-              ),
             ],
           ),
-          const SizedBox(height: 12),
-          ...data.entries.map(
-            (entry) => Padding(
-              padding: const EdgeInsets.only(bottom: 12.0),
+          const SizedBox(height: AppSpacing.smd),
+          ...data.entries.map((entry) {
+            bool isMissingError = entry.value.toString().contains('MISSING');
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.smd),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    entry.key,
-                    style: AppTypography.textTheme.labelMedium?.copyWith(
-                      color: AppColors.slate600,
-                      fontSize: 12,
-                    ),
-                  ),
+                  Text(entry.key, style: AppTypography.textTheme.labelMedium?.copyWith(color: AppColors.slate600, fontSize: 12)),
                   const SizedBox(height: 2),
                   Text(
-                    entry.value,
+                    entry.value.toString(),
                     style: AppTypography.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.slate900,
+                      color: isMissingError ? AppColors.dangerRed : AppColors.slate900,
+                      fontWeight: isMissingError ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                 ],
               ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );
@@ -175,76 +136,64 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
       listener: (context, state) {
         if (state is SmeProfileSubmittedSuccess) {
           context.read<ScoreCubit>().loadScore(state.score);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AnalysisStatePage()),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const AnalysisStatePage()));
         } else if (state is SmeProfileSubmissionError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: AppColors.dangerRed,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          uiService.showSnackBar(state.message, isError: true);
         }
       },
       builder: (context, authState) {
         final profileState = context.watch<SmeProfileCubit>().state;
         final isSubmitting = authState is SmeProfileSubmitting;
+        
+        // Critical validation: Did the CSV fail to provide Year 2?
+        final bool missingYear2 = profileState.annualRevenueAmount2 <= 0;
 
         return Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            leading: IconButton(
-              icon: const Icon(
-                LucideIcons.chevronLeft,
+            leading: IconButton(icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900), onPressed: () => Navigator.pop(context)),
+            title: Text(
+              'Review Your Information',
+              style: AppTypography.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
                 color: AppColors.slate900,
               ),
-              onPressed: () => Navigator.pop(context),
             ),
+            centerTitle: true,
           ),
           body: SafeArea(
             child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 4.0,
+                if (!widget.isUpdatingRecord)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+                    child: Column(
+                      children: [
+                        const ProgressIndicatorWidget(progress: 1.0),
+                      ],
+                    ),
                   ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Review Your Information',
-                        style: AppTypography.textTheme.displayMedium?.copyWith(
-                          fontSize: 24,
-                          color: AppColors.slate900,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      ProgressIndicatorWidget(
-                        progress: widget.isDocumentUpload ? 1.0 : 0.80,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        widget.isDocumentUpload ? 'Step 3 of 3' : 'Step 4 of 5',
-                        style: AppTypography.textTheme.bodySmall?.copyWith(
-                          color: AppColors.slate600,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.md),
 
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                     child: Column(
                       children: [
-                        // --- Business Profile Section ---
+                        if (missingYear2 && widget.isDocumentUpload)
+                          Container(
+                            padding: const EdgeInsets.all(AppSpacing.smd),
+                            margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                            decoration: BoxDecoration(color: AppColors.warningAmber.withOpacity(0.1), borderRadius: BorderRadius.circular(AppRadius.md), border: Border.all(color: AppColors.warningAmber)),
+                            child: Row(children: [
+                              const Icon(LucideIcons.alertTriangle, color: AppColors.warningAmber, size: 20),
+                              const SizedBox(width: AppSpacing.smd),
+                              Expanded(child: Text("Your statement only contained 1 year of data. The AI requires at least 2 years. Please tap 'Edit' below to add your previous year's revenue.", style: TextStyle(color: AppColors.warningAmber, fontSize: 13, fontWeight: FontWeight.w600))),
+                            ]),
+                          ),
+
                         if (!widget.isUpdatingRecord)
                           _buildSummarySection(
                             title: 'Business Profile',
@@ -252,173 +201,88 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                               'Business Name': profileState.businessName,
                               'Industry': profileState.industry,
                               'Location': profileState.location,
-                              'Years of Operation': profileState
-                                  .yearsOfOperation
-                                  .toString(),
-                              'Employees': profileState.numberOfEmployees
-                                  .toString(),
+                              'Years of Operation': profileState.yearsOfOperation.toString(),
+                              'Employees': profileState.numberOfEmployees.toString(),
                             },
-                            onEdit: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => BusinessProfilePage(
-                                    isDocumentUpload: widget.isDocumentUpload,
-                                    isEditing: true,
-                                  ),
-                                ),
-                              );
-                            },
+                            onEdit: widget.isDocumentUpload ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => BusinessProfilePage(isDocumentUpload: widget.isDocumentUpload, isEditing: true))),
                           ),
 
-                        // --- Manual Entry: Revenue & Expenses + Liabilities ---
-                        if (!widget.isDocumentUpload) ...[
-                          _buildSummarySection(
-                            title: 'Revenue & Expenses',
-                            data: {
-                              'Year ${profileState.annualRevenueYear1} Revenue':
-                                  '₦${profileState.annualRevenueAmount1.toStringAsFixed(0)}',
-                              'Year ${profileState.annualRevenueYear2} Revenue':
-                                  '₦${profileState.annualRevenueAmount2.toStringAsFixed(0)}',
-                              if (profileState.annualRevenueYear3 != null)
-                                'Year ${profileState.annualRevenueYear3} Revenue':
-                                    '₦${profileState.annualRevenueAmount3?.toStringAsFixed(0) ?? 0}',
-                              'Monthly Revenue (Approx)':
-                                  profileState.monthlyAvgRevenue != null
-                                  ? '₦${profileState.monthlyAvgRevenue?.toStringAsFixed(0)}'
-                                  : 'N/A',
-                              'Monthly Expenses':
-                                  '₦${profileState.monthlyAvgExpenses.toStringAsFixed(0)}',
-                            },
-                            onEdit: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const RevenueExpensesPage(
-                                    isEditing: true,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+                        // ALWAYS show the Revenue & Expenses block, even for CSVs, so they can verify!
+                        _buildSummarySection(
+                          title: 'Revenue & Expenses',
+                          data: {
+                            'Year ${profileState.annualRevenueYear1} Revenue': '₦${profileState.annualRevenueAmount1.toStringAsFixed(0)}',
+                            'Year ${profileState.annualRevenueYear2} Revenue': missingYear2 
+                                ? 'MISSING (Required for AI)' 
+                                : '₦${profileState.annualRevenueAmount2.toStringAsFixed(0)}',
+                            'Monthly Expenses': '₦${profileState.monthlyAvgExpenses.toStringAsFixed(0)}',
+                          },
+                          onEdit: widget.isDocumentUpload ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RevenueExpensesPage(isEditing: true))),
+                        ),
 
+                        // Only show Liabilities block if it was Manual Entry (or if we extracted liabilities)
+                        if (!widget.isDocumentUpload || profileState.totalLiabilities > 0)
                           _buildSummarySection(
                             title: 'Liabilities & History',
                             data: {
-                              'Total Liabilities':
-                                  '₦${profileState.totalLiabilities.toStringAsFixed(0)}',
-                              'Outstanding Loans':
-                                  '₦${profileState.outstandingLoans.toStringAsFixed(0)}',
-                              'Prior Funding':
-                                  profileState.hasPriorFunding == true
-                                  ? 'Yes'
-                                  : 'No',
-                              'Prior Funding Amount':
-                                  profileState.priorFundingAmount != null
-                                  ? '₦${profileState.priorFundingAmount!.toStringAsFixed(0)}'
-                                  : 'N/A',
-                              'Funding Source':
-                                  profileState.priorFundingSource ?? 'N/A',
-                              'Funding Year':
-                                  profileState.fundingYear?.toString() ?? 'N/A',
-                              'Repayment History':
-                                  profileState.repaymentHistory ?? 'N/A',
+                              'Total Liabilities': '₦${profileState.totalLiabilities.toStringAsFixed(0)}',
+                              'Outstanding Loans': '₦${profileState.outstandingLoans.toStringAsFixed(0)}',
+                              'Prior Funding': profileState.hasPriorFunding == true ? 'Yes' : 'No',
                             },
-                            onEdit: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const LiabilitiesHistoryPage(
-                                    isEditing: true,
-                                  ),
-                                ),
-                              );
-                            },
+                            onEdit: widget.isDocumentUpload ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LiabilitiesHistoryPage(isEditing: true))),
                           ),
-                        ] else ...[
-                          // --- Document Upload: show file summary + Change Upload ---
+
+                        if (widget.isDocumentUpload)
                           _buildSummarySection(
                             title: 'Financial Documents',
-                            editLabel: 'Change',
+                            editLabel: 'Replace File',
                             data: {
-                              'Uploaded File':
-                                  profileState.documentFileName ??
-                                  'Document Attached',
+                              'Uploaded File': profileState.documentFileName ?? 'Document Attached',
                               'Status': 'Ready for Submission',
                             },
                             onEdit: _rePickDocument,
                           ),
-                        ],
 
-                        const SizedBox(height: 24),
-
-                        // Confirmation Checkbox
+                        const SizedBox(height: AppSpacing.xl),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(
-                              height: 24,
-                              width: 24,
+                              height: AppSpacing.xl, width: AppSpacing.xl,
                               child: Checkbox(
                                 value: _isConfirmed,
-                                onChanged: (val) {
-                                  setState(() => _isConfirmed = val ?? false);
-                                },
+                                onChanged: (val) => setState(() => _isConfirmed = val ?? false),
                                 activeColor: AppColors.trustBlue,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                side: const BorderSide(
-                                  color: AppColors.slate400,
-                                ),
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: AppSpacing.smd),
                             Expanded(
                               child: GestureDetector(
-                                onTap: () => setState(
-                                  () => _isConfirmed = !_isConfirmed,
-                                ),
-                                child: Text(
-                                  'I confirm this information is accurate and complete',
-                                  style: AppTypography.textTheme.bodyMedium
-                                      ?.copyWith(color: AppColors.slate900),
-                                ),
+                                onTap: () => setState(() => _isConfirmed = !_isConfirmed),
+                                child: Text('I confirm this information is accurate and complete', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate900)),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: AppSpacing.xxl),
                       ],
                     ),
                   ),
                 ),
 
-                // Navigation Buttons
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(AppSpacing.md),
                   child: Row(
                     children: [
+                      Expanded(child: CustomButton(text: 'Previous', variant: ButtonVariant.secondary, isDisabled: isSubmitting, onPressed: () => Navigator.pop(context))),
+                      const SizedBox(width: AppSpacing.smd),
                       Expanded(
                         child: CustomButton(
-                          text: 'Previous',
-                          variant: ButtonVariant.secondary,
-                          isDisabled: isSubmitting,
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      // Submit Button
-                      Expanded(
-                        child: CustomButton(
-                          text: widget.isUpdatingRecord
-                              ? 'Generate New Score'
-                              : 'Generate Score',
+                          text: widget.isUpdatingRecord ? 'Generate Score' : 'Generate Score',
                           variant: ButtonVariant.primary,
                           isLoading: isSubmitting || profileState.csvProcessingStatus == CsvProcessingStatus.processing,
-                          isDisabled: !_isConfirmed || 
-                                     isSubmitting || 
-                                     profileState.csvProcessingStatus == CsvProcessingStatus.processing,
+                          // Lock the button if Year 2 is 0!
+                          isDisabled: !_isConfirmed || isSubmitting || missingYear2 || profileState.csvProcessingStatus == CsvProcessingStatus.processing,
                           onPressed: _submitData,
                         ),
                       ),

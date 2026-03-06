@@ -18,6 +18,7 @@ class CredibilityScore {
   final String? generalExplanation;
   final String modelVersion;
   final DateTime calculatedAt;
+  final double impactScore;
 
   CredibilityScore({
     required this.id,
@@ -28,6 +29,7 @@ class CredibilityScore {
     this.generalExplanation,
     required this.modelVersion,
     required this.calculatedAt,
+    this.impactScore = 0.7,
   });
 
   factory CredibilityScore.fromJson(Map<String, dynamic> json) => _$CredibilityScoreFromJson(json);

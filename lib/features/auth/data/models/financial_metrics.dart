@@ -1,84 +1,76 @@
 import 'package:equatable/equatable.dart';
 
+enum MetricStatus { positive, moderate, concerning, critical }
+
+class ScoreDriver extends Equatable {
+  final String name;
+  final double scoreValue; // The 0-100 score mapped to this driver
+  final String rawDisplayValue; // e.g., "+25% YoY" or "86.2% margin"
+  final MetricStatus status; // High, Medium, Low, Critical status
+  final double weight; // The percentage weight of this driver
+
+  const ScoreDriver({
+    required this.name,
+    required this.scoreValue,
+    required this.rawDisplayValue,
+    required this.status,
+    required this.weight,
+  });
+
+  @override
+  List<Object?> get props => [name, scoreValue, rawDisplayValue, status, weight];
+}
+
 class FinancialMetrics extends Equatable {
-  // 1. Revenue Trend
+  // Category 1: Revenue Metrics
   final double yoyGrowth;
   final double cagr;
-  final double revenueVolatility;
-  final double revenueTrendScore;
+  final double revenuePerEmployee;
 
-  // 2. Expense Ratio
+  // Category 2: Profitability Metrics
   final double expenseRatio;
   final double profitMargin;
-  final double efficiencyTrend; // +1, 0, -1
-  final double expenseRatioScore;
+  final double monthlyProfit;
 
-  // 3. Liabilities Burden
-  final double debtToRevenueRatio;
+  // Category 3: Debt & Liabilities Metrics
+  final double liabilitiesToRevenueRatio;
   final double debtServiceRatio;
-  final double liabilitiesBurdenScore;
+  final double liabilitiesPerEmployee;
+  final double liabilitiesCoverageRatio;
 
-  // 4. Payment History
-  final double onTimePaymentRate;
-  final double paymentReliabilityScore;
+  // Category 4: Maturity Metrics
+  final int yearsOfOperation;
+  final double employeesPerYear;
 
-  // 5. Business Stability
-  final double businessStabilityScore;
+  // Category 5: Efficiency Metrics
+  final double revenueGrowthPerEmployee;
 
-  // 6. Financial Documentation
-  final double documentationCompletenessScore;
-  final double documentationQualityScore;
-
-  // Overall Score & Drivers
-  final double totalCredibilityScore;
-  final List<DriverResult> rankedDrivers;
+  // Final Derived Output (The Top 5 Drivers)
+  final List<ScoreDriver> rankedDrivers;
 
   const FinancialMetrics({
     required this.yoyGrowth,
     required this.cagr,
-    required this.revenueVolatility,
-    required this.revenueTrendScore,
+    required this.revenuePerEmployee,
     required this.expenseRatio,
     required this.profitMargin,
-    required this.efficiencyTrend,
-    required this.expenseRatioScore,
-    required this.debtToRevenueRatio,
+    required this.monthlyProfit,
+    required this.liabilitiesToRevenueRatio,
     required this.debtServiceRatio,
-    required this.liabilitiesBurdenScore,
-    required this.onTimePaymentRate,
-    required this.paymentReliabilityScore,
-    required this.businessStabilityScore,
-    required this.documentationCompletenessScore,
-    required this.documentationQualityScore,
-    required this.totalCredibilityScore,
+    required this.liabilitiesPerEmployee,
+    required this.liabilitiesCoverageRatio,
+    required this.yearsOfOperation,
+    required this.employeesPerYear,
+    required this.revenueGrowthPerEmployee,
     required this.rankedDrivers,
   });
 
   @override
   List<Object?> get props => [
-    yoyGrowth, cagr, revenueVolatility, revenueTrendScore,
-    expenseRatio, profitMargin, efficiencyTrend, expenseRatioScore,
-    debtToRevenueRatio, debtServiceRatio, liabilitiesBurdenScore,
-    onTimePaymentRate, paymentReliabilityScore,
-    businessStabilityScore,
-    documentationCompletenessScore, documentationQualityScore,
-    totalCredibilityScore, rankedDrivers,
-  ];
-}
-
-class DriverResult extends Equatable {
-  final String name;
-  final double score; // 0-100
-  final double weight; // e.g., 0.35
-  final double contribution; // score * weight
-
-  const DriverResult({
-    required this.name,
-    required this.score,
-    required this.weight,
-    required this.contribution,
-  });
-
-  @override
-  List<Object?> get props => [name, score, weight, contribution];
+        yoyGrowth, cagr, revenuePerEmployee,
+        expenseRatio, profitMargin, monthlyProfit,
+        liabilitiesToRevenueRatio, debtServiceRatio, liabilitiesPerEmployee, liabilitiesCoverageRatio,
+        yearsOfOperation, employeesPerYear, revenueGrowthPerEmployee,
+        rankedDrivers,
+      ];
 }

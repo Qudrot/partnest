@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:partnex/core/theme/app_colors.dart';
+import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 
 enum ButtonVariant { primary, secondary, tertiary, danger }
@@ -48,16 +49,16 @@ class CustomButton extends StatelessWidget {
             minimumSize: const Size(0, 44),
             elevation: 0,
           ).copyWith(
-            backgroundColor: MaterialStateProperty.resolveWith<Color>((
-              Set<MaterialState> states,
+            backgroundColor: WidgetStateProperty.resolveWith<Color>((
+              Set<WidgetState> states,
             ) {
-              if (states.contains(MaterialState.disabled)) {
+              if (states.contains(WidgetState.disabled)) {
                 return AppColors.neutralGray;
               }
-              if (states.contains(MaterialState.pressed)) {
+              if (states.contains(WidgetState.pressed)) {
                 return AppColors.trustBlue.withValues(alpha: 0.8);
               }
-              if (states.contains(MaterialState.hovered)) {
+              if (states.contains(WidgetState.hovered)) {
                 return AppColors.trustBlue.withValues(alpha: 0.9);
               }
               return AppColors.trustBlue;
@@ -95,13 +96,13 @@ class CustomButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
             minimumSize: const Size(0, 44),
           ).copyWith(
-            backgroundColor: MaterialStateProperty.resolveWith<Color>((
-              Set<MaterialState> states,
+            backgroundColor: WidgetStateProperty.resolveWith<Color>((
+              Set<WidgetState> states,
             ) {
-              if (states.contains(MaterialState.pressed) && !isDisabled) {
+              if (states.contains(WidgetState.pressed) && !isDisabled) {
                 return AppColors.slate100;
               }
-              if (states.contains(MaterialState.hovered) && !isDisabled) {
+              if (states.contains(WidgetState.hovered) && !isDisabled) {
                 return AppColors.slate50;
               }
               return AppColors.slate100;
@@ -138,13 +139,13 @@ class CustomButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(6),
             ),
           ).copyWith(
-            backgroundColor: MaterialStateProperty.resolveWith<Color>((
-              Set<MaterialState> states,
+            backgroundColor: WidgetStateProperty.resolveWith<Color>((
+              Set<WidgetState> states,
             ) {
-              if (states.contains(MaterialState.pressed) && !isDisabled) {
+              if (states.contains(WidgetState.pressed) && !isDisabled) {
                 return AppColors.slate100;
               }
-              if (states.contains(MaterialState.hovered) && !isDisabled) {
+              if (states.contains(WidgetState.hovered) && !isDisabled) {
                 return AppColors.slate50;
               }
               return Colors.transparent;
@@ -182,16 +183,16 @@ class CustomButton extends StatelessWidget {
             minimumSize: const Size(0, 44),
             elevation: 0,
           ).copyWith(
-            backgroundColor: MaterialStateProperty.resolveWith<Color>((
-              Set<MaterialState> states,
+            backgroundColor: WidgetStateProperty.resolveWith<Color>((
+              Set<WidgetState> states,
             ) {
-              if (states.contains(MaterialState.disabled)) {
+              if (states.contains(WidgetState.disabled)) {
                 return AppColors.neutralGray;
               }
-              if (states.contains(MaterialState.pressed)) {
+              if (states.contains(WidgetState.pressed)) {
                 return AppColors.dangerRed.withValues(alpha: 0.8);
               }
-              if (states.contains(MaterialState.hovered)) {
+              if (states.contains(WidgetState.hovered)) {
                 return AppColors.dangerRed.withValues(alpha: 0.9);
               }
               return AppColors.dangerRed;

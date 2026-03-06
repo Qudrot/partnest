@@ -1,52 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:partnex/core/theme/app_colors.dart';
+import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
+import 'package:partnex/core/theme/widgets/metric_mini_card.dart'; // <-- Added Import
 import 'package:partnex/features/auth/presentation/pages/dashboard/score_drivers_detail_page.dart';
 import 'package:partnex/features/auth/presentation/pages/dashboard/profile_management_page.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/sme_discovery_feed_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_state.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
-import 'package:partnex/features/auth/presentation/pages/login_page.dart';
 import 'package:partnex/features/auth/data/models/credibility_score.dart';
+import 'package:partnex/features/auth/data/models/financial_metrics.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/input_method_selection_page.dart';
+import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart'; 
 import 'package:intl/intl.dart';
 
 class CredibilityDashboardPage extends StatefulWidget {
   const CredibilityDashboardPage({super.key});
 
   @override
-  State<CredibilityDashboardPage> createState() => _CredibilityDashboardPageState();
+  State<CredibilityDashboardPage> createState() =>
+      _CredibilityDashboardPageState();
 }
 
 class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
-
-  // Helper function to dynamically derive monthly revenue since it is now optional
-  double getCalculatedMonthlyRev(Map<String, dynamic> profile) {
-    double mRev = double.tryParse(profile['monthly_revenue']?.toString() ?? '0') ?? 0.0;
-    if (mRev <= 0) {
-      // Fallback to average of submitted annual revenues / 12
-      double a1 = double.tryParse(profile['annual_revenue_amount_1']?.toString() ?? '0') ?? 0.0;
-      double a2 = double.tryParse(profile['annual_revenue_amount_2']?.toString() ?? '0') ?? 0.0;
-      double a3 = double.tryParse(profile['annual_revenue_amount_3']?.toString() ?? '0') ?? 0.0;
-      int validYears = 0;
-      double tRev = 0;
-      if (a1 > 0) { tRev += a1; validYears++; }
-      if (a2 > 0) { tRev += a2; validYears++; }
-      if (a3 > 0) { tRev += a3; validYears++; }
-      
-      if (validYears > 0) {
-        mRev = (tRev / validYears) / 12;
-      }
-    }
-    return mRev;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -58,32 +37,52 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
     });
   }
 
+  Color _getStatusColor(MetricStatus status) {
+    switch (status) {
+      case MetricStatus.positive:
+        return AppColors.successGreen;
+      case MetricStatus.moderate:
+        return AppColors.warningOrange;
+      case MetricStatus.concerning:
+        return AppColors.dangerRed;
+      case MetricStatus.critical:
+        return AppColors.criticalRed;
+    }
+    return AppColors.slate600;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ScoreCubit, ScoreState>(
       builder: (context, state) {
-        // Active loading (score fetch in progress) — show spinner
         if (state is ScoreLoading) {
           return const Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(child: CircularProgressIndicator(color: AppColors.trustBlue)),
+            backgroundColor: AppColors.neutralWhite,
+            body: Center(
+              child: CircularProgressIndicator(color: AppColors.trustBlue),
+            ),
           );
         }
 
-        // No score submitted yet — show welcome dashboard
         if (state is ScoreInitial) {
           return Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.neutralWhite,
             appBar: AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.neutralWhite,
               elevation: 0,
               automaticallyImplyLeading: false,
               leading: IconButton(
-                icon: const Icon(LucideIcons.menu, size: 24, color: AppColors.slate900),
+                icon: const Icon(
+                  LucideIcons.menu,
+                  size: 24,
+                  color: AppColors.slate900,
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const ProfileManagementPage()),
+                    MaterialPageRoute(
+                      builder: (_) => const ProfileManagementPage(),
+                    ),
                   );
                 },
               ),
@@ -96,29 +95,10 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                 ),
               ),
               centerTitle: true,
-              actions: [
-                TextButton.icon(
-                  icon: const Icon(LucideIcons.plus, size: 16, color: AppColors.trustBlue),
-                  label: Text('Add new', style: AppTypography.textTheme.labelMedium?.copyWith(color: AppColors.trustBlue)),
-                  onPressed: () {
-                    // Navigate to the InputMethodSelectionPage with isUpdatingRecord = true
-                  },
-                ),
-                const SizedBox(width: 8),
-              ],
             ),
-            body: BlocListener<AuthBloc, AuthState>(
-              listener: (context, state) {
-                if (state is AuthUnauthenticated) {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const LoginPage()),
-                    (route) => false,
-                  );
-                }
-              },
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -126,12 +106,16 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: AppColors.trustBlue.withValues(alpha: 0.1),
+                        color: AppColors.trustBlue.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(LucideIcons.barChart2, size: 40, color: AppColors.trustBlue),
+                      child: const Icon(
+                        LucideIcons.barChart2,
+                        size: 40,
+                        color: AppColors.trustBlue,
+                      ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.xl),
                     Text(
                       'Welcome to Partnex!',
                       style: AppTypography.textTheme.headlineMedium?.copyWith(
@@ -140,7 +124,7 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.smd),
                     Text(
                       'No credibility score yet. Submit your business profile to generate your AI-powered credibility score.',
                       textAlign: TextAlign.center,
@@ -149,51 +133,57 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                         fontSize: 14,
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppSpacing.xxl),
                     CustomButton(
                       text: 'Explore SMEs (Investor)',
                       variant: ButtonVariant.primary,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const SmeDiscoveryFeedPage()),
-                        );
-                      },
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SmeDiscoveryFeedPage(),
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-            ),
             ),
           );
         }
 
         if (state is ScoreError) {
           return Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(child: Text('Error loading score: ${state.message}')),
+            backgroundColor: AppColors.neutralWhite,
+            body: Center(child: Text('We couldn\'t load your credibility score. Please try again.', style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.slate600), textAlign: TextAlign.center)),
           );
         }
 
-        final scoreData = (state as ScoreLoadedSuccess).score;
+        if (state is! ScoreLoadedSuccess) {
+          return const Scaffold(backgroundColor: AppColors.neutralWhite);
+        }
 
+        final scoreData = state.score;
         String riskLevelString = 'High Risk';
         Color riskColor = AppColors.dangerRed;
 
-        if (scoreData.riskLevel == RiskLevel.low) {
+        final String lowerRisk = scoreData.riskLevel.toString().toLowerCase();
+
+        if (lowerRisk.contains('low')) {
           riskLevelString = 'Low Risk';
           riskColor = AppColors.successGreen;
-        } else if (scoreData.riskLevel == RiskLevel.medium) {
+        } else if (lowerRisk.contains('medium')) {
           riskLevelString = 'Medium Risk';
-          riskColor = AppColors.warningAmber;
+          riskColor = AppColors.warningOrange;
         }
 
-        final formattedDate = DateFormat('MMM d, yyyy h:mm a').format(scoreData.calculatedAt);
+        final formattedDate = DateFormat(
+          'MMM d, yyyy h:mm a',
+        ).format(scoreData.calculatedAt);
 
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.neutralWhite,
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.neutralWhite,
             elevation: 0,
             automaticallyImplyLeading: false,
             titleSpacing: 16,
@@ -202,16 +192,20 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const ProfileManagementPage()),
-                    );
-                  },
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ProfileManagementPage(),
+                    ),
+                  ),
                   borderRadius: BorderRadius.circular(8),
                   child: const Padding(
-                    padding: EdgeInsets.all(4.0),
-                    child: Icon(LucideIcons.menu, size: 24, color: AppColors.slate900),
+                    padding: EdgeInsets.all(AppSpacing.xs),
+                    child: Icon(
+                      LucideIcons.menu,
+                      size: 24,
+                      color: AppColors.slate900,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -223,17 +217,37 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
             actions: [
               TextButton.icon(
-                icon: const Icon(LucideIcons.plus, size: 16, color: AppColors.trustBlue),
-                label: Text('Add new', style: AppTypography.textTheme.labelMedium?.copyWith(color: AppColors.trustBlue)),
+                icon: const Icon(
+                  LucideIcons.plus,
+                  size: 16,
+                  color: AppColors.trustBlue,
+                ),
+                label: Text(
+                  'Add new',
+                  style: AppTypography.textTheme.labelMedium?.copyWith(
+                    color: AppColors.trustBlue,
+                  ),
+                ),
                 onPressed: () {
+                  // SECURE FIX: Grab the current values from the state
+                  final currentProfileState = context.read<SmeProfileCubit>().state;
+                  
+                  // Re-inject them with Failsafes (so AI never gets a 0)
+                  context.read<SmeProfileCubit>().updateBusinessProfile(
+                    businessName: currentProfileState.businessName.isNotEmpty ? currentProfileState.businessName : 'My Business',
+                    industry: currentProfileState.industry.isNotEmpty ? currentProfileState.industry : 'Technology',
+                    location: currentProfileState.location.isNotEmpty ? currentProfileState.location : 'Nigeria',
+                    // Failsafe: If years/employees are 0, default to 1 so the AI math doesn't break
+                    yearsOfOperation: currentProfileState.yearsOfOperation > 0 ? currentProfileState.yearsOfOperation : 1,
+                    numberOfEmployees: currentProfileState.numberOfEmployees > 0 ? currentProfileState.numberOfEmployees : 1,
+                  );
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -245,33 +259,25 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
               const SizedBox(width: 8),
             ],
           ),
-          body: BlocListener<AuthBloc, AuthState>(
-            listener: (context, state) {
-              if (state is AuthUnauthenticated) {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                  (route) => false,
-                );
-              }
-            },
-            child: SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 16.0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Primary Score Area
-                  const SizedBox(height: 8),
                   Center(
                     child: Column(
                       children: [
                         GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const ScoreDriversDetailPage()),
-                            );
-                          },
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ScoreDriversDetailPage(),
+                            ),
+                          ),
                           child: Container(
                             width: 120,
                             height: 120,
@@ -289,18 +295,22 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                             child: Center(
                               child: Text(
                                 scoreData.totalScore.toInt().toString(),
-                                style: AppTypography.textTheme.displayLarge?.copyWith(
-                                  fontSize: 56,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                ),
+                                style: AppTypography.textTheme.displayLarge
+                                    ?.copyWith(
+                                      fontSize: 56,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.neutralWhite,
+                                    ),
                               ),
                             ),
                           ),
                         ),
                         const SizedBox(height: 12),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: riskColor,
                             borderRadius: BorderRadius.circular(4),
@@ -308,33 +318,25 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                           child: Text(
                             riskLevelString,
                             style: AppTypography.textTheme.bodyMedium?.copyWith(
-                              color: Colors.white,
+                              color: AppColors.neutralWhite,
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(LucideIcons.clock, size: 14, color: AppColors.slate400),
-                            const SizedBox(width: 4),
-                            Text(
-                              'Generated on $formattedDate',
-                              style: AppTypography.textTheme.bodySmall?.copyWith(
-                                color: AppColors.slate600,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          'Generated on $formattedDate',
+                          style: AppTypography.textTheme.bodySmall?.copyWith(
+                            color: AppColors.slate600,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 32),
 
-                  // Key Metrics Area
                   if (state.financialMetrics != null) ...[
                     GridView.count(
                       crossAxisCount: 2,
@@ -342,53 +344,73 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                       physics: const NeverScrollableScrollPhysics(),
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
-                      childAspectRatio: 1.15,
+                      childAspectRatio: 1.4, 
                       children: [
-                        _buildMetricMiniCard(
+                        // Card 1 - Replaced with custom widget
+                        MetricMiniCard(
                           label: 'Revenue Trend',
                           value: '${state.financialMetrics!.yoyGrowth > 0 ? '+' : ''}${state.financialMetrics!.yoyGrowth.toStringAsFixed(0)}% YoY',
-                          status: state.financialMetrics!.yoyGrowth >= 0 ? 'Positive' : 'Negative',
-                          statusColor: state.financialMetrics!.yoyGrowth >= 0 ? AppColors.successGreen : AppColors.dangerRed,
+                          status: state.financialMetrics!.yoyGrowth >= 15
+                              ? 'Positive'
+                              : (state.financialMetrics!.yoyGrowth >= 0
+                                    ? 'Moderate'
+                                    : 'Declining'),
+                          statusColor: state.financialMetrics!.yoyGrowth >= 15
+                              ? AppColors.successGreen
+                              : (state.financialMetrics!.yoyGrowth >= 0
+                                    ? AppColors.warningOrange
+                                    : AppColors.dangerRed),
                         ),
-                        _buildMetricMiniCard(
+                        // Card 2 - Replaced with custom widget
+                        MetricMiniCard(
                           label: 'Expense Ratio',
                           value: '${state.financialMetrics!.expenseRatio.toStringAsFixed(0)}%',
-                          status: state.financialMetrics!.expenseRatio <= 60 ? 'Healthy' : (state.financialMetrics!.expenseRatio <= 85 ? 'Moderate' : 'Stressed'),
-                          statusColor: state.financialMetrics!.expenseRatio <= 60 ? AppColors.trustBlue : (state.financialMetrics!.expenseRatio <= 85 ? AppColors.warningAmber : AppColors.dangerRed),
+                          status: state.financialMetrics!.expenseRatio <= 60
+                              ? 'Healthy'
+                              : (state.financialMetrics!.expenseRatio <= 75
+                                    ? 'Moderate'
+                                    : 'High'),
+                          statusColor: state.financialMetrics!.expenseRatio <= 60
+                              ? AppColors.trustBlue
+                              : (state.financialMetrics!.expenseRatio <= 75
+                                    ? AppColors.warningOrange
+                                    : AppColors.dangerRed),
                         ),
-                        _buildMetricMiniCard(
-                          label: 'Liabilities',
-                          value: '₦${state.financialMetrics!.debtToRevenueRatio >= 1000 ? '${(state.financialMetrics!.debtToRevenueRatio/1000).toStringAsFixed(1)}K' : state.financialMetrics!.debtToRevenueRatio.toStringAsFixed(0)}',
-                          status: state.financialMetrics!.debtToRevenueRatio <= 30 ? 'Low' : (state.financialMetrics!.debtToRevenueRatio <= 70 ? 'Moderate' : 'High'),
-                          statusColor: state.financialMetrics!.debtToRevenueRatio <= 30 ? AppColors.successGreen : (state.financialMetrics!.debtToRevenueRatio <= 70 ? AppColors.warningAmber : AppColors.dangerRed),
+                        // Card 3 - Replaced with custom widget
+                        MetricMiniCard(
+                          label: 'Profit Margin',
+                          value: '${state.financialMetrics!.profitMargin.toStringAsFixed(0)}%',
+                          status: state.financialMetrics!.profitMargin >= 15
+                              ? 'Healthy'
+                              : (state.financialMetrics!.profitMargin >= 0
+                                    ? 'Moderate'
+                                    : 'Negative'),
+                          statusColor: state.financialMetrics!.profitMargin >= 15
+                              ? AppColors.successGreen
+                              : (state.financialMetrics!.profitMargin >= 0
+                                    ? AppColors.warningOrange
+                                    : AppColors.dangerRed),
                         ),
-                        _buildMetricMiniCard(
-                          label: 'Payment History',
-                          value: state.financialMetrics!.onTimePaymentRate >= 95 ? 'On Time' : '${state.financialMetrics!.onTimePaymentRate.toStringAsFixed(0)}% On Time',
-                          status: state.financialMetrics!.onTimePaymentRate >= 90 ? 'Positive' : 'Attention',
-                          statusColor: state.financialMetrics!.onTimePaymentRate >= 90 ? AppColors.successGreen : AppColors.warningAmber,
+                        // Card 4 - Replaced with custom widget
+                        MetricMiniCard(
+                          label: 'Impact Score',
+                          value: scoreData.impactScore.toStringAsFixed(1),
+                          status: scoreData.impactScore >= 0.8
+                              ? 'Excellent'
+                              : (scoreData.impactScore >= 0.5
+                                    ? 'Good'
+                                    : 'Low'),
+                          statusColor: scoreData.impactScore >= 0.8
+                              ? AppColors.trustBlue
+                              : (scoreData.impactScore >= 0.5
+                                    ? AppColors.successGreen
+                                    : AppColors.dangerRed),
                         ),
-                      ],
-                    ),
-                  ] else ...[
-                    GridView.count(
-                      crossAxisCount: 2,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 1.15,
-                      children: [
-                        _buildMetricMiniCard(label: 'Revenue Trend', value: 'N/A', status: 'N/A', statusColor: AppColors.slate400),
-                        _buildMetricMiniCard(label: 'Expense Ratio', value: 'N/A', status: 'N/A', statusColor: AppColors.slate400),
-                        _buildMetricMiniCard(label: 'Liabilities', value: 'N/A', status: 'N/A', statusColor: AppColors.slate400),
-                        _buildMetricMiniCard(label: 'Payment History', value: 'N/A', status: 'N/A', statusColor: AppColors.slate400),
                       ],
                     ),
                   ],
                   const SizedBox(height: 32),
 
-                  // Score Drivers Area
                   Text(
                     'What Drives Your Score',
                     style: AppTypography.textTheme.headlineMedium?.copyWith(
@@ -409,32 +431,23 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
 
                   if (state.financialMetrics != null) ...[
                     Column(
-                      children: state.financialMetrics!.rankedDrivers.take(3).map((driver) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: _buildDriverBar(
-                            driverName: driver.name,
-                            percentage: driver.score / 100,
-                            statusColor: driver.score >= 80 ? AppColors.successGreen : (driver.score >= 50 ? AppColors.warningAmber : AppColors.dangerRed),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ] else ...[
-                    Column(
-                      children: [
-                        _buildDriverBar(driverName: 'Payment History', percentage: 0.5, statusColor: AppColors.slate300),
-                        const SizedBox(height: 12),
-                        _buildDriverBar(driverName: 'Revenue Trend', percentage: 0.5, statusColor: AppColors.slate300),
-                        const SizedBox(height: 12),
-                        _buildDriverBar(driverName: 'Expense Ratio', percentage: 0.5, statusColor: AppColors.slate300),
-                      ],
+                      children: state.financialMetrics!.rankedDrivers
+                          .take(3)
+                          .map((driver) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _buildDriverBar(
+                                driverName: driver.name,
+                                percentage: driver.scoreValue / 100,
+                                statusColor: _getStatusColor(driver.status),
+                              ),
+                            );
+                          })
+                          .toList(),
                     ),
                   ],
 
                   const SizedBox(height: 32),
-
-                  // Actions Area
                   CustomButton(
                     text: 'Apply for Funding',
                     variant: ButtonVariant.primary,
@@ -444,69 +457,20 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                   CustomButton(
                     text: 'View Detailed Breakdown',
                     variant: ButtonVariant.secondary,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const ScoreDriversDetailPage(),
-                        ),
-                      );
-                    },
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ScoreDriversDetailPage(),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 24),
                 ],
               ),
             ),
           ),
-          ),
         );
       },
-    );
-  }
-
-  Widget _buildMetricMiniCard({
-    required String label,
-    required String value,
-    required String status,
-    required Color statusColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.slate200),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: AppTypography.textTheme.labelMedium?.copyWith(
-              color: AppColors.slate600,
-              fontWeight: FontWeight.w500,
-              fontSize: 14,
-            ),
-          ),
-          Text(
-            value,
-            style: AppTypography.textTheme.headlineSmall?.copyWith(
-              color: AppColors.slate900,
-              fontWeight: FontWeight.w700,
-              fontSize: 20,
-            ),
-          ),
-          Text(
-            status,
-            style: AppTypography.textTheme.labelSmall?.copyWith(
-              color: statusColor,
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -518,49 +482,48 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.neutralWhite,
         border: Border.all(color: AppColors.slate200),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 3,
-            child: Text(
-              driverName,
-              style: AppTypography.textTheme.bodyMedium?.copyWith(
-                color: AppColors.slate900,
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            flex: 4,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(2),
-              child: LinearProgressIndicator(
-                value: percentage,
-                backgroundColor: AppColors.slate100,
-                valueColor: AlwaysStoppedAnimation<Color>(statusColor),
-                minHeight: 6,
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
           Text(
-            '${(percentage * 100).toInt()}%',
+            driverName,
             style: AppTypography.textTheme.bodyMedium?.copyWith(
               color: AppColors.slate900,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w500,
               fontSize: 14,
             ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: LinearProgressIndicator(
+                    value: percentage,
+                    backgroundColor: AppColors.slate100,
+                    valueColor: AlwaysStoppedAnimation<Color>(statusColor),
+                    minHeight: 6,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                '${(percentage * 100).toInt()}%',
+                style: AppTypography.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.slate900,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
-
-
 }

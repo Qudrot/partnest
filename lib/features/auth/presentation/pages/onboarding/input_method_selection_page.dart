@@ -3,6 +3,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:partnex/core/theme/app_colors.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
+import 'package:partnex/core/theme/widgets/custom_progress_indicator.dart';
+import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/business_profile_page.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/csv_upload_page.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/revenue_expenses_page.dart';
@@ -43,11 +45,17 @@ class InputMethodSelectionPage extends StatelessWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 16),
+              if (!isUpdatingRecord)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: AppSpacing.xs),
+                  child: ProgressIndicatorWidget(progress: 0.40),
+                ),
+              if (!isUpdatingRecord)
+                const SizedBox(height: AppSpacing.md),
               Text(
                 'Choose the method that works best for you. You can always edit your information later.',
                 style: AppTypography.textTheme.bodyMedium?.copyWith(
@@ -55,7 +63,7 @@ class InputMethodSelectionPage extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xl),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -76,12 +84,12 @@ class InputMethodSelectionPage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => isUpdatingRecord ? const RevenueExpensesPage(isUpdatingRecord: true) : const BusinessProfilePage(),
+                              builder: (_) => isUpdatingRecord ? const RevenueExpensesPage(isUpdatingRecord: true) : const RevenueExpensesPage(),
                             ),
                           );
                         },
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.md),
                       _MethodCard(
                         title: 'CSV Upload',
                         description:
@@ -105,7 +113,7 @@ class InputMethodSelectionPage extends StatelessWidget {
                           );
                         },
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xl),
                       TextButton(
                         onPressed: () {
                           // TODO: handle help/support
@@ -174,10 +182,10 @@ class _MethodCardState extends State<_MethodCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(color: borderColor, width: borderWidth),
         ),
         child: Column(
@@ -185,8 +193,8 @@ class _MethodCardState extends State<_MethodCard> {
           children: [
             Row(
               children: [
-                Icon(widget.icon, color: AppColors.slate700, size: 24),
-                const SizedBox(width: 12),
+                Icon(widget.icon, color: AppColors.slate700, size: AppSpacing.xl),
+                const SizedBox(width: AppSpacing.smd),
                 Text(
                   widget.title,
                   style: AppTypography.textTheme.headlineSmall?.copyWith(
@@ -195,25 +203,25 @@ class _MethodCardState extends State<_MethodCard> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.smd),
             Text(
               widget.description,
               style: AppTypography.textTheme.bodyMedium?.copyWith(
                 color: AppColors.slate600,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             ...widget.benefits.map(
               (benefit) => Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
+                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                 child: Row(
                   children: [
                     const Icon(
                       LucideIcons.check,
                       color: AppColors.successGreen,
-                      size: 16,
+                      size: AppSpacing.md,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     Text(
                       benefit,
                       style: AppTypography.textTheme.bodySmall?.copyWith(
@@ -224,7 +232,7 @@ class _MethodCardState extends State<_MethodCard> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             SizedBox(
               width: double.infinity,
               child: CustomButton(

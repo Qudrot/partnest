@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<ScoreCubit>(
           create: (context) => ScoreCubit(
             authRepository: context.read<AuthBloc>().authRepository,
+            smeProfileCubit: context.read<SmeProfileCubit>(),
           ),
         ),
         BlocProvider<DiscoveryCubit>(
@@ -50,7 +51,7 @@ class MyApp extends StatelessWidget {
           }
         },
         child: MaterialApp(
-          title: 'Partnex MVP',
+          title: 'Partnex',
           theme: AppTheme.lightTheme,
           navigatorKey: uiService.navigatorKey,
           scaffoldMessengerKey: uiService.scaffoldMessengerKey,

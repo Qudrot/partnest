@@ -68,7 +68,19 @@ class ApiClient {
           print(
             'API ERROR: [${e.response?.statusCode}] ${e.requestOptions.uri}',
           );
-          print('Error Data: ${e.response?.data}');
+          
+          final data = e.response?.data;
+          if (data is String && data.contains('<!DOCTYPE html>')) {
+             // Extract text from <pre> if available
+             final preMatch = RegExp(r'<pre>(.*?)</pre>').firstMatch(data);
+             if (preMatch != null) {
+                print('Error Data (Cleaned): ${preMatch.group(1)}');
+             } else {
+                print('Error Data: (HTML Response suppressed in logs)');
+             }
+          } else {
+            print('Error Data: $data');
+          }
         }
         return handler.next(e);
       },

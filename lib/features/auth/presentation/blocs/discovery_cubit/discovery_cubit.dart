@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:partnex/core/services/ui_service.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/sme_profile_expanded_page.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/deep_dive_evidence_page.dart';
+import 'package:partnex/features/auth/data/models/sme_profile_data.dart';
 
 class DiscoveryCubit extends Cubit<DiscoveryState> {
   final AuthRepository authRepository;
@@ -28,8 +29,11 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
         print('DISCOVERY FEED FIRST ITEM: ${dataList.first}');
       }
       
-      // We pass the raw data list to state. We will map it in the UI or a model.
-      emit(DiscoveryLoaded(smes: dataList));
+      // Explicitly typed to avoid JS runtime type mismatch on Flutter Web
+      final List<SmeCardData> mappedSmes = [
+        for (final map in dataList) SmeCardData.fromMap(map),
+      ];
+      emit(DiscoveryLoaded(smes: mappedSmes));
     } catch (e) {
       if (kDebugMode) print('DiscoveryCubit Error: $e');
       
@@ -41,7 +45,8 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       
       emit(DiscoveryError('Failed to load SMEs:\n$errorMessage'));
     }
-  
+  }
+
   void reset() {
     emit(DiscoveryInitial());
   }
