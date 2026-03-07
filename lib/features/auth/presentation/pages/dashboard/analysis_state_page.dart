@@ -596,7 +596,7 @@ class _NumberStreamAnimationState extends State<NumberStreamAnimation> {
     
     // Randomize visual properties
     final value = _random.nextInt(90) + 10; // 10 to 99
-    final sizes = [28.0, 36.0, 48.0, 64.0, 80.0, 96.0, 112.0];
+    final sizes = [16.0, 24.0, 32.0, 48.0, 56.0, 64.0, 80.0];
     final fontSize = sizes[_random.nextInt(sizes.length)];
     final weights = [FontWeight.w600, FontWeight.w700, FontWeight.w800, FontWeight.w900, FontWeight.bold];
     final fontWeight = weights[_random.nextInt(weights.length)];

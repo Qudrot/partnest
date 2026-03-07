@@ -27,8 +27,10 @@ class CustomDropdownField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTypography.textTheme.labelLarge),
-        const SizedBox(height: 8),
+        if (label.isNotEmpty) ...[
+          Text(label, style: AppTypography.textTheme.labelLarge),
+          const SizedBox(height: 8),
+        ],
         DropdownButtonFormField<String>(
           isExpanded: true,
           initialValue: value,

@@ -32,8 +32,8 @@ class SmeCardData {
   // Metric Signals Implementation
   static const Color _positiveColor = Color(0xFF10B981);
   static const Color _moderateColor = Color(0xFFF97316);
-  static const Color _concerningColor = Color(0xFFEF4444);
-  static const Color _criticalColor = Color(0xFF991B1B);
+  static const Color _concerningColor = AppColors.dangerRed;
+  static const Color _criticalColor = AppColors.dangerRed;
 
   double get _prevRevenue {
     if (annualRevenue <= 0) return 0;
@@ -252,7 +252,10 @@ class SmeCardData {
       score: parseScore(
         map['score'] ??
             map['credibility_score'] ??
-            map['currentCredibilityScore'],
+            map['currentCredibilityScore'] ??
+            map['credibilityScore'] ??
+            map['current_credibility_score'] ??
+            map['totalScore'],
       ),
       riskLevel:
           map['risk_level']?.toString() ??

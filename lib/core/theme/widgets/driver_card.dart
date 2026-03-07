@@ -57,7 +57,7 @@ class _DriverCardState extends State<DriverCard> {
   Color get _badgeBackgroundColor {
     switch (widget.riskLevel) {
       case DriverRiskLevel.critical:
-        return const Color(0xFFFEE2E2);
+        return AppColors.dangerRed.withValues(alpha: 0.1);
       case DriverRiskLevel.needsWork:
       case DriverRiskLevel.moderate:
         return const Color(0xFFFEF3C7);
@@ -70,7 +70,7 @@ class _DriverCardState extends State<DriverCard> {
   Color get _badgeTextColor {
     switch (widget.riskLevel) {
       case DriverRiskLevel.critical:
-        return const Color(0xFFDC2626);
+        return AppColors.dangerRed;
       case DriverRiskLevel.needsWork:
       case DriverRiskLevel.moderate:
         return const Color(0xFFD97706);
@@ -83,7 +83,7 @@ class _DriverCardState extends State<DriverCard> {
   Color get _progressFillColor {
     switch (widget.riskLevel) {
       case DriverRiskLevel.critical:
-        return const Color(0xFFEF4444);
+        return AppColors.dangerRed;
       case DriverRiskLevel.needsWork:
       case DriverRiskLevel.moderate:
         return const Color(0xFFF97316);
@@ -96,7 +96,7 @@ class _DriverCardState extends State<DriverCard> {
 
   Color get _impactPointsColor => widget.impactPoints > 0
       ? const Color(0xFF10B981)
-      : const Color(0xFFEF4444);
+      : AppColors.dangerRed;
 
   @override
   Widget build(BuildContext context) {

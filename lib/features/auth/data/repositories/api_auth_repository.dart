@@ -315,7 +315,7 @@ class ApiAuthRepository implements AuthRepository {
       final scoreData = scoreResponse.data;
       if (kDebugMode) {
         print('Model Version generated: ${scoreData['model_version']}');
-        // 👇 NEW PRINT STATEMENT HERE 👇
+        //NEW PRINT STATEMENT HERE
         print('RAW SCORE DATA: $scoreData');
       }
 
@@ -460,7 +460,7 @@ class ApiAuthRepository implements AuthRepository {
       }
 
       final authOptions = Options(headers: {'Authorization': 'Bearer $token'});
-      final response = await apiClient.dio.get('/api/sme/profile', options: authOptions);
+      final response = await apiClient.dio.get('/api/sme/me', options: authOptions);
       
       final data = response.data;
       if (data is Map<String, dynamic>) {
@@ -528,6 +528,9 @@ class ApiAuthRepository implements AuthRepository {
         modelVersion: scoreData['model_version']?.toString() ?? 'fallback-v1',
         calculatedAt: DateTime.now(),
       );
+
+
+      
      } catch(e) {
        if (kDebugMode) {
          print('Score Generation Error: $e');

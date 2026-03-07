@@ -44,8 +44,10 @@ class CustomInputField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTypography.textTheme.labelLarge),
-        const SizedBox(height: 8),
+        if (label.isNotEmpty) ...[
+          Text(label, style: AppTypography.textTheme.labelLarge),
+          const SizedBox(height: 8),
+        ],
         TextFormField(
           controller: controller,
           obscureText: obscureText,
@@ -59,6 +61,7 @@ class CustomInputField extends StatelessWidget {
             color: AppColors.slate900,
           ),
           decoration: InputDecoration(
+            counterText: '', // Hides the maxLength character counter to fix alignment
             hintText: placeholder,
             hintStyle: AppTypography.textTheme.bodyMedium?.copyWith(
               color: AppColors.slate400,

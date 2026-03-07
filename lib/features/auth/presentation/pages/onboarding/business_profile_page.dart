@@ -89,9 +89,13 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
       if (profileState.numberOfEmployees > 0) {
         _employeesController.text = profileState.numberOfEmployees.toString();
       }
-      _selectedIndustry = profileState.industry.isNotEmpty
-          ? profileState.industry
-          : null;
+
+      // Normalization: Ensure stored industry matches UI dropdown items
+      String industry = profileState.industry;
+      if (industry == 'Technology') industry = 'Technology & Software';
+      if (industry == 'Agriculture') industry = 'Agriculture & Food';
+      
+      _selectedIndustry = _industries.contains(industry) ? industry : null;
     }
   }
 
