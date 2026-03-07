@@ -3,7 +3,7 @@ import 'package:partnex/core/theme/app_colors.dart';
 import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 
-enum ButtonVariant { primary, secondary, tertiary, danger, dangerOutline }
+enum ButtonVariant { primary, secondary, tertiary, danger, dangerOutline, dangerTertiary }
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -36,6 +36,8 @@ class CustomButton extends StatelessWidget {
         return _buildDangerButton(context);
       case ButtonVariant.dangerOutline:
         return _buildDangerOutlineButton(context);
+      case ButtonVariant.dangerTertiary:
+        return _buildDangerTertiaryButton(context);
     }
   }
 
@@ -47,10 +49,13 @@ class CustomButton extends StatelessWidget {
             backgroundColor: AppColors.trustBlue,
             disabledBackgroundColor: AppColors.neutralGray,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(AppRadius.button),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-            minimumSize: const Size(0, 44),
+            padding: const EdgeInsets.symmetric(
+              vertical: AppSpacing.smd,
+              horizontal: AppSpacing.xl,
+            ),
+            minimumSize: const Size(0, AppSizes.buttonHeight),
             elevation: 0,
           ).copyWith(
             backgroundColor: WidgetStateProperty.resolveWith<Color>((
@@ -102,10 +107,13 @@ class CustomButton extends StatelessWidget {
             backgroundColor: AppColors.slate100,
             side: const BorderSide(color: AppColors.slate200, width: 1),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(AppRadius.button),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-            minimumSize: const Size(0, 44),
+            padding: const EdgeInsets.symmetric(
+              vertical: AppSpacing.smd,
+              horizontal: AppSpacing.xl,
+            ),
+            minimumSize: const Size(0, AppSizes.buttonHeight),
           ).copyWith(
             backgroundColor: WidgetStateProperty.resolveWith<Color>((
               Set<WidgetState> states,
@@ -151,10 +159,13 @@ class CustomButton extends StatelessWidget {
       style:
           TextButton.styleFrom(
             backgroundColor: Colors.transparent,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-            minimumSize: const Size(0, 44),
+            padding: const EdgeInsets.symmetric(
+              vertical: AppSpacing.smd,
+              horizontal: AppSpacing.xl,
+            ),
+            minimumSize: const Size(0, AppSizes.buttonHeight),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(AppRadius.button),
             ),
           ).copyWith(
             backgroundColor: WidgetStateProperty.resolveWith<Color>((
@@ -202,10 +213,13 @@ class CustomButton extends StatelessWidget {
           ElevatedButton.styleFrom(
             backgroundColor: AppColors.dangerRed,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(AppRadius.button),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-            minimumSize: const Size(0, 44),
+            padding: const EdgeInsets.symmetric(
+              vertical: AppSpacing.smd,
+              horizontal: AppSpacing.xl,
+            ),
+            minimumSize: const Size(0, AppSizes.buttonHeight),
             elevation: 0,
           ).copyWith(
             backgroundColor: WidgetStateProperty.resolveWith<Color>((
@@ -301,6 +315,66 @@ class CustomButton extends StatelessWidget {
                     child: icon!,
                   ),
                   const SizedBox(width: 8)
+                ],
+                Text(
+                  text,
+                  style: AppTypography.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.dangerRed,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildDangerTertiaryButton(BuildContext context) {
+    return TextButton(
+      onPressed: isDisabled || isLoading ? null : onPressed,
+      style: TextButton.styleFrom(
+        backgroundColor: Colors.transparent,
+        padding: const EdgeInsets.symmetric(
+          vertical: AppSpacing.smd,
+          horizontal: AppSpacing.xl,
+        ),
+        minimumSize: const Size(0, AppSizes.buttonHeight),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.button),
+        ),
+      ).copyWith(
+        backgroundColor: WidgetStateProperty.resolveWith<Color>((
+          Set<WidgetState> states,
+        ) {
+          if (states.contains(WidgetState.pressed) && !isDisabled) {
+            return AppColors.dangerRed.withValues(alpha: 0.1);
+          }
+          if (states.contains(WidgetState.hovered) && !isDisabled) {
+            return AppColors.dangerRed.withValues(alpha: 0.05);
+          }
+          return Colors.transparent;
+        }),
+      ),
+      child: isLoading
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                color: AppColors.dangerRed,
+                strokeWidth: 2,
+              ),
+            )
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (icon != null) ...[
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      iconTheme: const IconThemeData(color: AppColors.dangerRed),
+                    ),
+                    child: icon!,
+                  ),
+                  const SizedBox(width: AppSpacing.sm)
                 ],
                 Text(
                   text,

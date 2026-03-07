@@ -187,21 +187,34 @@ class _InvestorProfilePageState extends State<InvestorProfilePage> {
 
             const SizedBox(height: AppSpacing.xxxxl),
 
-            Center(
-              child: CustomButton(
-                onPressed: () {
-                  context.read<AuthBloc>().add(LogoutEvent());
-                  uiService.clearAndNavigateTo(const LoginPage());
-                },
-                variant: ButtonVariant.tertiary,
-                icon: const Icon(
-                  LucideIcons.logOut,
-                  size: 16,
-                  color: AppColors.dangerRed,
-                ),
-                text: 'Log Out',
+            CustomButton(
+              onPressed: () {
+                context.read<AuthBloc>().add(LogoutEvent());
+                uiService.clearAndNavigateTo(const LoginPage());
+              },
+              variant: ButtonVariant.primary,
+              icon: const Icon(
+                LucideIcons.logOut,
+                size: 16,
+                color: AppColors.neutralWhite,
               ),
+              text: 'Log Out',
             ),
+
+            const SizedBox(height: AppSpacing.xl),
+
+                    // Danger Zone
+                  CustomButton(
+                    text: 'Delete Account',
+                    variant: ButtonVariant.dangerTertiary,
+                    icon: const Icon(
+                      LucideIcons.trash,
+                      size: 16,
+                      color: AppColors.dangerRed,),
+                    onPressed: () {},
+                  ),
+                  
+                  const SizedBox(height: AppSpacing.xxl),
           ],
         ),
       ),

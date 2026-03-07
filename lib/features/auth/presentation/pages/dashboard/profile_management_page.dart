@@ -289,28 +289,32 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
 
                   const SizedBox(height: AppSpacing.xxxxl),
 
-                  // Danger Zone
                   CustomButton(
-                    text: 'Delete Account',
-                    variant: ButtonVariant.tertiary,
-                    onPressed: () {},
+                    text: 'Log Out',
+                    variant: ButtonVariant.primary,
+                    icon: const Icon(
+                      LucideIcons.logOut,
+                      size: 16,
+                      color: AppColors.neutralWhite,
+                    ),
+                    onPressed: () {
+                      context.read<AuthBloc>().add(LogoutEvent());
+                    },
                   ),
 
                   const SizedBox(height: AppSpacing.xl),
-                  Center(
-                    child: CustomButton(
-                      text: 'Log Out',
-                      variant: ButtonVariant.tertiary,
-                      icon: const Icon(
-                        LucideIcons.logOut,
-                        size: 16,
-                        color: AppColors.slate600,
-                      ),
-                      onPressed: () {
-                        context.read<AuthBloc>().add(LogoutEvent());
-                      },
-                    ),
+
+                    // Danger Zone
+                  CustomButton(
+                    text: 'Delete Account',
+                    variant: ButtonVariant.dangerTertiary,
+                    icon: const Icon(
+                      LucideIcons.trash,
+                      size: 16,
+                      color: AppColors.dangerRed,),
+                    onPressed: () {},
                   ),
+                  
                   const SizedBox(height: AppSpacing.xxl),
                 ],
               );

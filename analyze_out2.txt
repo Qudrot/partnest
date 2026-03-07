@@ -21,8 +21,6 @@ warning - The value of the local variable 'y1' isn't used - lib\core\theme\widge
 warning - The value of the local variable 'y2' isn't used - lib\core\theme\widgets\partnex_logo.dart:165:18 - unused_local_variable
 warning - The value of the local variable 'y3' isn't used - lib\core\theme\widgets\partnex_logo.dart:166:18 - unused_local_variable
 warning - The value of the local variable 'y4' isn't used - lib\core\theme\widgets\partnex_logo.dart:167:18 - unused_local_variable
-   info - Statements in an if should be enclosed in a block - lib\features\auth\data\models\sme_profile_data.dart:175:7 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\features\auth\data\models\sme_profile_data.dart:177:7 - curly_braces_in_flow_control_structures
 warning - Unused import: 'package:partnex/features/auth/presentation/pages/onboarding/input_method_selection_page.dart' - lib\features\auth\presentation\blocs\auth_bloc.dart:7:8 - unused_import
    info - Don't invoke 'print' in production code - lib\features\auth\presentation\blocs\discovery_cubit\discovery_cubit.dart:29:9 - avoid_print
    info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\blocs\sme_profile_cubit\sme_profile_cubit.dart:160:82 - curly_braces_in_flow_control_structures
@@ -42,10 +40,8 @@ warning - The value of the field '_finalScoreData' isn't used - lib\features\aut
    info - Statements in a for should be enclosed in a block - lib\features\auth\presentation\pages\dashboard\analysis_state_page.dart:393:33 - curly_braces_in_flow_control_structures
    info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\pages\dashboard\analysis_state_page.dart:570:25 - deprecated_member_use
 warning - Unused import: 'package:partnex/core/theme/widgets/data_source_badge.dart' - lib\features\auth\presentation\pages\dashboard\credibility_dashboard_page.dart:8:8 - unused_import
-warning - Unused import: 'package:partnex/features/auth/data/models/credibility_score.dart' - lib\features\auth\presentation\pages\dashboard\credibility_dashboard_page.dart:15:8 - unused_import
-warning - Dead code - lib\features\auth\presentation\pages\dashboard\credibility_dashboard_page.dart:52:5 - dead_code
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\pages\dashboard\credibility_dashboard_page.dart:110:52 - deprecated_member_use
-warning - The value of the local variable 'profileState' isn't used - lib\features\auth\presentation\pages\dashboard\credibility_dashboard_page.dart:184:15 - unused_local_variable
+warning - Unused import: 'package:partnex/features/auth/data/models/credibility_score.dart' - lib\features\auth\presentation\pages\dashboard\credibility_dashboard_page.dart:14:8 - unused_import
+warning - The value of the local variable 'profileState' isn't used - lib\features\auth\presentation\pages\dashboard\credibility_dashboard_page.dart:217:15 - unused_local_variable
 warning - Unused import: 'package:partnex/core/theme/widgets/custom_input_field.dart' - lib\features\auth\presentation\pages\investor\comparison_watchlist_page.dart:10:8 - unused_import
 warning - Unused import: 'package:partnex/core/theme/app_sizes.dart' - lib\features\auth\presentation\pages\investor\deep_dive_evidence_page.dart:4:8 - unused_import
 warning - Unused import: 'package:partnex/core/theme/app_sizes.dart' - lib\features\auth\presentation\pages\investor\investor_onboarding_page.dart:4:8 - unused_import
