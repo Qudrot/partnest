@@ -135,6 +135,7 @@ class ApiAuthRepository implements AuthRepository {
     required String password,
     required String name,
     required String role,
+    String? position,
   }) async {
     try {
       // Calls POST /auth/register on your local backend
@@ -143,7 +144,9 @@ class ApiAuthRepository implements AuthRepository {
         data: {
           'email': email,
           'password': password,
-          'role': role, 
+          'name': name,
+          'role': role,
+          'position': position,
         },
       );
 
@@ -176,11 +179,12 @@ class ApiAuthRepository implements AuthRepository {
 
       return UserModel(
         id: userData['id'].toString(),
-        email: userData['email'],
-        name: name, 
+        email: userData['email'] ?? email,
+        name: userData['name'] ?? name, 
         role: parsedRole,
-        profilePicture: '', 
+        profilePicture: userData['profile_picture'] ?? '', 
         profileCompleted: false,
+        position: userData['position'] ?? position,
       );
     } catch (e) {
       throw _handleDioError(e);
@@ -219,10 +223,6 @@ class ApiAuthRepository implements AuthRepository {
         "location": data['location'],
         "years_of_operation": data['yearsOfOperation'],
         "number_of_employees": data['numberOfEmployees'],
-        "annual_revenue_year_1": data['annualRevenueYear1'],
-        "annual_revenue_amount_1": data['annualRevenueAmount1'],
-        "annual_revenue_year_2": data['annualRevenueYear2'],
-        "annual_revenue_amount_2": data['annualRevenueAmount2'],
         "monthly_expenses": data['monthlyAvgExpenses'],
         "existing_liabilities": data['totalLiabilities'],
         "prior_funding_history": data['hasPriorFunding'] == true
@@ -231,9 +231,31 @@ class ApiAuthRepository implements AuthRepository {
         "repayment_history": data['repaymentHistory'] ?? 'N/A',
       };
 
-      if (data['annualRevenueYear3'] != null) {
-        payload["annual_revenue_year_3"] = data['annualRevenueYear3'];
-        payload["annual_revenue_amount_3"] = data['annualRevenueAmount3'] ?? 0;
+      // Safely process and sort revenue years ascending (oldest first)
+      List<Map<String, dynamic>> revData = [];
+      if (data['annualRevenueYear1'] != null) {
+        revData.add({'year': data['annualRevenueYear1'], 'amount': data['annualRevenueAmount1'] ?? 0});
+      }
+      if (data['annualRevenueYear2'] != null) {
+        revData.add({'year': data['annualRevenueYear2'], 'amount': data['annualRevenueAmount2'] ?? 0});
+      }
+      if (data['annualRevenueYear3'] != null && (data['annualRevenueAmount3'] ?? 0) > 0) {
+        revData.add({'year': data['annualRevenueYear3'], 'amount': data['annualRevenueAmount3'] ?? 0});
+      }
+
+      revData.sort((a, b) => (a['year'] as int).compareTo(b['year'] as int));
+
+      if (revData.isNotEmpty) {
+        payload["annual_revenue_year_1"] = revData[0]['year'];
+        payload["annual_revenue_amount_1"] = revData[0]['amount'];
+      }
+      if (revData.length > 1) {
+        payload["annual_revenue_year_2"] = revData[1]['year'];
+        payload["annual_revenue_amount_2"] = revData[1]['amount'];
+      }
+      if (revData.length > 2) {
+        payload["annual_revenue_year_3"] = revData[2]['year'];
+        payload["annual_revenue_amount_3"] = revData[2]['amount'];
       }
 
       if (data['monthlyAvgRevenue'] != null) {
@@ -335,10 +357,31 @@ class ApiAuthRepository implements AuthRepository {
         explanationText = explanationData?.toString();
       }
    
-   return CredibilityScore(
+      double extractScoreSafe(Map data) {
+        // Try known keys first
+        final knownKeys = ['score', 'credibility_score', 'currentCredibilityScore', 'credibilityScore', 'current_credibility_score', 'totalScore', 'total_score', 'final_score', 'overall_score'];
+        for (var key in knownKeys) {
+          if (data[key] != null) {
+            if (data[key] is num) return (data[key] as num).toDouble();
+            final parsed = double.tryParse(data[key].toString());
+            if (parsed != null) return parsed;
+          }
+        }
+        // Fallback: search dynamically for any key containing 'score' with a numeric value
+        for (var entry in data.entries) {
+          if (entry.key.toString().toLowerCase().contains('score')) {
+            if (entry.value is num) return (entry.value as num).toDouble();
+            final parsed = double.tryParse(entry.value.toString());
+            if (parsed != null) return parsed;
+          }
+        }
+        return 0.0;
+      }
+
+      return CredibilityScore(
         id: DateTime.now().millisecondsSinceEpoch.toString(), 
         organisationId: scoreData['sme_id']?.toString() ?? 'unknown_sme',
-        totalScore: (scoreData['score'] as num?)?.toDouble() ?? 0.0,
+        totalScore: extractScoreSafe(scoreData is Map ? scoreData : {}),
         riskLevel: rLevel,
         topContributingFactors: [],
         generalExplanation: explanationText, // Fixed variable!
@@ -518,10 +561,33 @@ class ApiAuthRepository implements AuthRepository {
          // Try to pull drivers if the backend AI returns them in a specific format
       }
 
+      double extractScoreSafe(Map data) {
+        // Try known keys first
+        final knownKeys = ['score', 'credibility_score', 'currentCredibilityScore', 'credibilityScore', 'current_credibility_score', 'totalScore', 'total_score', 'final_score', 'overall_score'];
+        for (var key in knownKeys) {
+          if (data[key] != null) {
+            if (data[key] is num) return (data[key] as num).toDouble();
+            final parsed = double.tryParse(data[key].toString());
+            if (parsed != null) return parsed;
+          }
+        }
+        // Fallback: search dynamically for any key containing 'score' with a numeric value
+        for (var entry in data.entries) {
+          if (entry.key.toString().toLowerCase().contains('score')) {
+             // Avoid selecting impact_score as totalScore
+             if (entry.key.toString().toLowerCase() == 'impact_score') continue;
+             if (entry.value is num) return (entry.value as num).toDouble();
+             final parsed = double.tryParse(entry.value.toString());
+             if (parsed != null) return parsed;
+          }
+        }
+        return 0.0;
+      }
+
       return CredibilityScore(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         organisationId: scoreData['sme_id']?.toString() ?? 'unknown_sme',
-        totalScore: (scoreData['score'] as num?)?.toDouble() ?? 0.0,
+        totalScore: extractScoreSafe(scoreData is Map ? scoreData : {}),
         riskLevel: rLevel,
         topContributingFactors: topFactors,
         generalExplanation: scoreData['explanation_json']?.toString(),

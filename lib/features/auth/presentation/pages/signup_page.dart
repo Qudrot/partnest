@@ -24,6 +24,7 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _positionController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -50,6 +51,7 @@ class _SignupPageState extends State<SignupPage> {
   @override
   void dispose() {
     _nameController.dispose();
+    _positionController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -99,6 +101,7 @@ class _SignupPageState extends State<SignupPage> {
         password: _passwordController.text,
         name: _nameController.text.trim(),
         role: _selectedRole,
+        position: _positionController.text.trim(),
       ));
     }
   }
@@ -155,6 +158,17 @@ class _SignupPageState extends State<SignupPage> {
                               if (value == null || value.trim().length < 2) {
                                 return 'Please enter your full name';
                               }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+
+                          CustomInputField(
+                            label: 'Position / Title',
+                            placeholder: 'e.g., CEO, CTO, Founder',
+                            controller: _positionController,
+                            validator: (value) {
+                              // Optional field, no validation needed
                               return null;
                             },
                           ),

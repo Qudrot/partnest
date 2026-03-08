@@ -24,16 +24,18 @@ class SignupEvent extends AuthEvent {
   final String email;
   final String password;
   final String role;
+  final String position;
 
   const SignupEvent({
     required this.name,
     required this.email,
     required this.password,
     required this.role,
+    this.position = '',
   });
 
   @override
-  List<Object?> get props => [name, email, password, role];
+  List<Object?> get props => [name, email, password, role, position];
 }
 
 class SubmitSmeProfileEvent extends AuthEvent {

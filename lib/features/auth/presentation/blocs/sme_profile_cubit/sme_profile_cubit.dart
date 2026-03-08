@@ -12,6 +12,7 @@ class SmeProfileCubit extends Cubit<SmeProfileState> {
     required String location,
     required int yearsOfOperation,
     required int numberOfEmployees,
+    String? phoneNumber,
   }) {
     emit(state.copyWith(
       businessName: businessName,
@@ -19,6 +20,7 @@ class SmeProfileCubit extends Cubit<SmeProfileState> {
       location: location,
       yearsOfOperation: yearsOfOperation,
       numberOfEmployees: numberOfEmployees,
+      phoneNumber: phoneNumber,
     ));
   }
 
@@ -68,6 +70,22 @@ class SmeProfileCubit extends Cubit<SmeProfileState> {
 
   void updateFromMap(Map<String, dynamic> map) {
     emit(SmeProfileState.fromMap(map));
+  }
+
+  void updateBio({
+    required String bio,
+    String? websiteUrl,
+    String? whatsappNumber,
+    String? linkedinUrl,
+    String? twitterHandle,
+  }) {
+    emit(state.copyWith(
+      bio: bio,
+      websiteUrl: websiteUrl,
+      whatsappNumber: whatsappNumber,
+      linkedinUrl: linkedinUrl,
+      twitterHandle: twitterHandle,
+    ));
   }
 
   Future<void> processCsv(String csvString, String fileName) async {
@@ -255,6 +273,18 @@ class SmeProfileCubit extends Cubit<SmeProfileState> {
     }
   }
   
+  void updateContactInfo({
+    String? name,
+    String? email,
+    String? position,
+  }) {
+    emit(state.copyWith(
+      email: email,
+      contactPosition: position,
+    ));
+    // Note: businessName is usually the name field if identity is SME
+  }
+
   void reset() {
     emit(const SmeProfileState());
   }

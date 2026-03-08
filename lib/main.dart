@@ -22,13 +22,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<AuthBloc>(
-          create: (_) => AuthBloc(
-            authRepository: ApiAuthRepository(apiClient: ApiClient()),
-          ),
-        ),
         BlocProvider<SmeProfileCubit>(
           create: (_) => SmeProfileCubit(),
+        ),
+        BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(
+            authRepository: ApiAuthRepository(apiClient: ApiClient()),
+            smeProfileCubit: context.read<SmeProfileCubit>(),
+          ),
         ),
         BlocProvider<ScoreCubit>(
           create: (context) => ScoreCubit(

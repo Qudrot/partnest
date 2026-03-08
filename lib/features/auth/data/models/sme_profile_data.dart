@@ -17,6 +17,16 @@ class SmeCardData {
   final String riskLevel;
   final DateTime generatedAt;
   final DataSource dataSource;
+  
+  final String? website;
+  final String? bio;
+  final String? contactPersonName;
+  final String? contactPersonTitle;
+  final String? phoneNumber;
+  final String? email;
+  final String? whatsappNumber;
+  final String? linkedinUrl;
+  final String? twitterHandle;
 
   // Computed fields for UI:
   String get employeesText => '$numberOfEmployees employees';
@@ -193,6 +203,15 @@ class SmeCardData {
     required this.riskLevel,
     required this.generatedAt,
     this.dataSource = DataSource.selfReported,
+    this.website,
+    this.bio,
+    this.contactPersonName,
+    this.contactPersonTitle,
+    this.phoneNumber,
+    this.email,
+    this.whatsappNumber,
+    this.linkedinUrl,
+    this.twitterHandle,
   });
 
   factory SmeCardData.fromMap(Map<String, dynamic> map) {
@@ -266,6 +285,15 @@ class SmeCardData {
         (e) => e.name == (map['data_source'] ?? map['dataSource'] ?? 'selfReported'),
         orElse: () => DataSource.selfReported,
       ),
+      website: map['website']?.toString() ?? map['websiteUrl']?.toString(),
+      bio: map['bio']?.toString() ?? map['description']?.toString(),
+      contactPersonName: map['contact_person_name']?.toString() ?? map['contactPersonName']?.toString() ?? map['name']?.toString(),
+      contactPersonTitle: map['contact_person_title']?.toString() ?? map['contactPersonTitle']?.toString() ?? map['contactPosition']?.toString() ?? map['position']?.toString(),
+      phoneNumber: map['phone_number']?.toString() ?? map['phoneNumber']?.toString(),
+      email: map['email']?.toString(),
+      whatsappNumber: map['whatsapp_number']?.toString() ?? map['whatsappNumber']?.toString(),
+      linkedinUrl: map['linkedin_url']?.toString() ?? map['linkedinUrl']?.toString(),
+      twitterHandle: map['twitter_handle']?.toString() ?? map['twitterHandle']?.toString(),
     );
   }
 }

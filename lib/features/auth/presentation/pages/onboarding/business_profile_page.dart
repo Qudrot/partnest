@@ -46,6 +46,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
   final _locationController = TextEditingController();
   final _yearsController = TextEditingController();
   final _employeesController = TextEditingController();
+  final _phoneController = TextEditingController();
 
   String? _selectedIndustry;
 
@@ -97,6 +98,12 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
       
       _selectedIndustry = _industries.contains(industry) ? industry : null;
     }
+
+    // Load phone number from state if editing
+    final phone = context.read<SmeProfileCubit>().state.phoneNumber;
+    if (phone.isNotEmpty) {
+      _phoneController.text = phone;
+    }
   }
 
   @override
@@ -105,6 +112,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
     _locationController.dispose();
     _yearsController.dispose();
     _employeesController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -114,10 +122,13 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
-          onPressed: () => uiService.goBack(),
-        ),
+        leading: widget._inEditMode
+            ? IconButton(
+                icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
+                onPressed: () => uiService.goBack(),
+              )
+            : null,
+        automaticallyImplyLeading: false,
         title: Text(
           'Business Profile',
           style: AppTypography.textTheme.bodyLarge?.copyWith(
@@ -228,6 +239,17 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                               return null;
                             },
                           ),
+                          const SizedBox(height: AppSpacing.lg),
+                          CustomInputField(
+                            label: 'Phone Number',
+                            placeholder: 'e.g., +234 805 678 9012',
+                            controller: _phoneController,
+                            onChanged: _onFieldChanged,
+                            validator: (val) {
+                              // Optional field
+                              return null;
+                            },
+                          ),
                           const SizedBox(height: AppSpacing.xxl),
                         ],
                       ),
@@ -270,6 +292,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                                     numberOfEmployees: int.parse(
                                       _employeesController.text,
                                     ),
+                                    phoneNumber: _phoneController.text.trim(),
                                   );
                               if (widget._inEditMode) {
                                 uiService.showSnackBar(

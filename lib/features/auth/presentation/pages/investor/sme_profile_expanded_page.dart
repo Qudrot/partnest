@@ -7,7 +7,9 @@ import 'package:partnex/core/theme/widgets/custom_button.dart';
 import 'package:partnex/core/theme/widgets/driver_card.dart';
 import 'package:partnex/core/theme/widgets/metric_mini_card.dart';
 import 'package:partnex/core/theme/widgets/data_source_badge.dart';
+import 'package:partnex/core/theme/widgets/sme_bio_contact_card.dart';
 import 'package:partnex/features/auth/data/models/sme_profile_data.dart';
+import 'package:partnex/features/auth/presentation/pages/investor/investor_full_bio_screen.dart';
 
 
 // ---------------------------------------------------------------------------
@@ -15,7 +17,23 @@ import 'package:partnex/features/auth/data/models/sme_profile_data.dart';
 // ---------------------------------------------------------------------------
 class MessageSmeBottomSheet extends StatefulWidget {
   final String companyName;
-  const MessageSmeBottomSheet({super.key, required this.companyName});
+  final String? email;
+  final String? phoneNumber;
+  final String? website;
+  final String? whatsappNumber;
+  final String? linkedinUrl;
+  final String? twitterHandle;
+
+  const MessageSmeBottomSheet({
+    super.key,
+    required this.companyName,
+    this.email,
+    this.phoneNumber,
+    this.website,
+    this.whatsappNumber,
+    this.linkedinUrl,
+    this.twitterHandle,
+  });
   @override
   State<MessageSmeBottomSheet> createState() => _MessageSmeBottomSheetState();
 }
@@ -126,17 +144,28 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
             //   ),
             // ),
             const SizedBox(height: 24),
-            _buildDirectContact(
-              'Email',
-              'contact@${widget.companyName.toLowerCase().replaceAll(' ', '')}.com',
-              LucideIcons.mail,
-            ),
-            const SizedBox(height: 12),
-            _buildDirectContact(
-              'Phone',
-              '+234 805 678 9012',
-              LucideIcons.phone,
-            ),
+            if (widget.email != null && widget.email!.isNotEmpty)
+              _buildDirectContact(
+                'Email',
+                widget.email!,
+                LucideIcons.mail,
+              ),
+            if (widget.email != null && widget.email!.isNotEmpty)
+              const SizedBox(height: 12),
+            if (widget.phoneNumber != null && widget.phoneNumber!.isNotEmpty)
+              _buildDirectContact(
+                'Phone',
+                widget.phoneNumber!,
+                LucideIcons.phone,
+              ),
+            if (widget.phoneNumber != null && widget.phoneNumber!.isNotEmpty)
+              const SizedBox(height: 12),
+            if (widget.website != null && widget.website!.isNotEmpty)
+              _buildDirectContact(
+                'Website',
+                widget.website!,
+                LucideIcons.globe,
+              ),
             const SizedBox(height: 16),
           ],
         ),
@@ -229,8 +258,15 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) =>
-          MessageSmeBottomSheet(companyName: widget.sme.companyName),
+      builder: (context) => MessageSmeBottomSheet(
+        companyName: widget.sme.companyName,
+        email: widget.sme.email,
+        phoneNumber: widget.sme.phoneNumber,
+        website: widget.sme.website,
+        whatsappNumber: widget.sme.whatsappNumber,
+        linkedinUrl: widget.sme.linkedinUrl,
+        twitterHandle: widget.sme.twitterHandle,
+      ),
     );
   }
 
@@ -324,6 +360,26 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
                                       color: AppColors.slate600,
                                     ),
                               ),
+                              if (widget.sme.website != null && widget.sme.website!.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                InkWell(
+                                  onTap: () {},
+                                  child: Row(
+                                    children: [
+                                      const Icon(LucideIcons.globe, size: 12, color: AppColors.trustBlue),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        widget.sme.website!,
+                                        style: AppTypography.textTheme.bodyMedium?.copyWith(
+                                          fontSize: 13,
+                                          color: AppColors.trustBlue,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -453,7 +509,33 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: SmeBioContactCard(
+                      bio: widget.sme.bio,
+                      contactPersonName: widget.sme.contactPersonName,
+                      contactPersonTitle: widget.sme.contactPersonTitle,
+                      smeId: widget.sme.id,
+                      smeName: widget.sme.companyName,
+                      onReadMore: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => InvestorFullBioScreen(
+                              smeName: widget.sme.companyName,
+                              bio: widget.sme.bio,
+                              contactPersonName: widget.sme.contactPersonName,
+                              contactPersonTitle: widget.sme.contactPersonTitle,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
 
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),

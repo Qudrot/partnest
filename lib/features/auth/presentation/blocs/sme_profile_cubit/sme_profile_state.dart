@@ -48,6 +48,18 @@ class SmeProfileState extends Equatable {
   final String? csvErrorMessage;
   final DataSource dataSource;
 
+  // Bio & Social Links
+  final String bio;
+  final String websiteUrl;
+  final String whatsappNumber;
+  final String linkedinUrl;
+  final String twitterHandle;
+
+  // Contact Info (from signup + business profile)
+  final String contactPosition;
+  final String phoneNumber;
+  final String email;
+
   const SmeProfileState({
     this.businessName = '',
     this.industry = '',
@@ -81,6 +93,14 @@ class SmeProfileState extends Equatable {
     this.csvProcessingStatus = CsvProcessingStatus.initial,
     this.csvErrorMessage,
     this.dataSource = DataSource.selfReported,
+    this.bio = '',
+    this.websiteUrl = '',
+    this.whatsappNumber = '',
+    this.linkedinUrl = '',
+    this.twitterHandle = '',
+    this.contactPosition = '',
+    this.phoneNumber = '',
+    this.email = '',
   });
 
   SmeProfileState copyWith({
@@ -116,6 +136,14 @@ class SmeProfileState extends Equatable {
     CsvProcessingStatus? csvProcessingStatus,
     String? csvErrorMessage,
     DataSource? dataSource,
+    String? bio,
+    String? websiteUrl,
+    String? whatsappNumber,
+    String? linkedinUrl,
+    String? twitterHandle,
+    String? contactPosition,
+    String? phoneNumber,
+    String? email,
   }) {
     return SmeProfileState(
       businessName: businessName ?? this.businessName,
@@ -150,6 +178,14 @@ class SmeProfileState extends Equatable {
       csvProcessingStatus: csvProcessingStatus ?? this.csvProcessingStatus,
       csvErrorMessage: csvErrorMessage ?? this.csvErrorMessage,
       dataSource: dataSource ?? this.dataSource,
+      bio: bio ?? this.bio,
+      websiteUrl: websiteUrl ?? this.websiteUrl,
+      whatsappNumber: whatsappNumber ?? this.whatsappNumber,
+      linkedinUrl: linkedinUrl ?? this.linkedinUrl,
+      twitterHandle: twitterHandle ?? this.twitterHandle,
+      contactPosition: contactPosition ?? this.contactPosition,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      email: email ?? this.email,
     );
   }
 
@@ -185,6 +221,14 @@ class SmeProfileState extends Equatable {
       'areDocumentsComplete': areDocumentsComplete,
       'areDocumentsConsistent': areDocumentsConsistent,
       'dataSource': dataSource.name,
+      'bio': bio,
+      'websiteUrl': websiteUrl,
+      'whatsappNumber': whatsappNumber,
+      'linkedinUrl': linkedinUrl,
+      'twitterHandle': twitterHandle,
+      'contactPosition': contactPosition,
+      'phoneNumber': phoneNumber,
+      'email': email,
     };
   }
 
@@ -219,6 +263,14 @@ class SmeProfileState extends Equatable {
       areDocumentsComplete: map['areDocumentsComplete'] ?? false,
       areDocumentsConsistent: map['areDocumentsConsistent'] ?? false,
       dataSource: DataSource.values.firstWhere((e) => e.name == (map['dataSource'] ?? 'selfReported'), orElse: () => DataSource.selfReported),
+      bio: map['bio'] ?? '',
+      websiteUrl: map['websiteUrl'] ?? map['website'] ?? '',
+      whatsappNumber: map['whatsappNumber'] ?? map['whatsapp'] ?? '',
+      linkedinUrl: map['linkedinUrl'] ?? map['linkedin'] ?? '',
+      twitterHandle: map['twitterHandle'] ?? map['twitter'] ?? '',
+      contactPosition: map['contactPosition'] ?? map['position'] ?? '',
+      phoneNumber: map['phoneNumber'] ?? map['phone_number'] ?? '',
+      email: map['email'] ?? '',
     );
   }
 
@@ -255,5 +307,13 @@ class SmeProfileState extends Equatable {
         csvProcessingStatus,
         csvErrorMessage,
         dataSource,
+        bio,
+        websiteUrl,
+        whatsappNumber,
+        linkedinUrl,
+        twitterHandle,
+        contactPosition,
+        phoneNumber,
+        email,
       ];
 }

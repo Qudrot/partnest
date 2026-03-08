@@ -1,0 +1,35 @@
+﻿Analyzing 8 items...                                            
+
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/onboarding/input_method_selection_page.dart' - lib\features\auth\presentation\blocs\auth_bloc.dart:7:8 - unused_import
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\blocs\sme_profile_cubit\sme_profile_cubit.dart:178:82 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\blocs\sme_profile_cubit\sme_profile_cubit.dart:179:89 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\blocs\sme_profile_cubit\sme_profile_cubit.dart:180:87 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\blocs\sme_profile_cubit\sme_profile_cubit.dart:181:82 - curly_braces_in_flow_control_structures
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/onboarding/revenue_expenses_page.dart' - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:11:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/blocs/auth_event.dart' - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:16:8 - unused_import
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:186:33 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:210:33 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:224:33 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:238:33 - curly_braces_in_flow_control_structures
+
+flutter : 11 issues 
+found. (ran in 1.6s)
+At line:1 char:1
++ flutter analyze lib\f
+eatures\auth\presentati
+on\pages\signup_page.da
+rt ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (11 issues fou   
+ nd. (ran in 1.6s):    
+String) [], Remote    
+Exception
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 

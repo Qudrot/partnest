@@ -1,0 +1,49 @@
+﻿Analyzing 8 items...                                            
+
+  error - Undefined class 'SmeProfileCubit' - lib\features\auth\presentation\blocs\auth_bloc.dart:18:9 - undefined_class
+warning - The label 'password' isn't used - lib\features\auth\presentation\blocs\auth_bloc.dart:34:9 - unused_label
+  error - Expected to find ';' - lib\features\auth\presentation\blocs\auth_bloc.dart:34:25 - expected_token
+  error - Expected an identifier - lib\features\auth\presentation\blocs\auth_bloc.dart:34:33 - missing_identifier
+  error - Expected to find ';' - lib\features\auth\presentation\blocs\auth_bloc.dart:34:33 - expected_token
+  error - Unexpected text ',' - lib\features\auth\presentation\blocs\auth_bloc.dart:34:33 - unexpected_token
+  error - Expected an identifier - lib\features\auth\presentation\blocs\auth_bloc.dart:35:7 - missing_identifier
+  error - Unexpected text ')' - lib\features\auth\presentation\blocs\auth_bloc.dart:35:7 - unexpected_token
+   info - Unnecessary empty statement - lib\features\auth\presentation\blocs\auth_bloc.dart:35:8 - empty_statements
+  error - Undefined name 'user' - lib\features\auth\presentation\blocs\auth_bloc.dart:39:15 - undefined_identifier
+  error - Undefined name 'user' - lib\features\auth\presentation\blocs\auth_bloc.dart:40:16 - undefined_identifier
+  error - Undefined name 'user' - lib\features\auth\presentation\blocs\auth_bloc.dart:41:19 - undefined_identifier
+  error - Undefined name 'user' - lib\features\auth\presentation\blocs\auth_bloc.dart:44:30 - undefined_identifier
+  error - Undefined name 'user' - lib\features\auth\presentation\blocs\auth_bloc.dart:45:11 - undefined_identifier
+  error - Undefined name 'user' - lib\features\auth\presentation\blocs\auth_bloc.dart:48:13 - undefined_identifier
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\blocs\sme_profile_cubit\sme_profile_cubit.dart:178:82 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\blocs\sme_profile_cubit\sme_profile_cubit.dart:179:89 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\blocs\sme_profile_cubit\sme_profile_cubit.dart:180:87 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\blocs\sme_profile_cubit\sme_profile_cubit.dart:181:82 - curly_braces_in_flow_control_structures
+warning - Unused import: 'package:partnex/features/auth/presentation/pages/onboarding/revenue_expenses_page.dart' - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:11:8 - unused_import
+warning - Unused import: 'package:partnex/features/auth/presentation/blocs/auth_event.dart' - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:16:8 - unused_import
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:186:33 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:210:33 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:224:33 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\auth\presentation\pages\onboarding\business_profile_page.dart:238:33 - curly_braces_in_flow_control_structures
+
+flutter : 25 issues 
+found. (ran in 1.8s)
+At line:1 char:1
++ flutter analyze lib\f
+eatures\auth\presentati
+on\pages\signup_page.da
+rt ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (25 issues fou   
+ nd. (ran in 1.8s):    
+String) [], Remote    
+Exception
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 

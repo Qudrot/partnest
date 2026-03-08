@@ -290,7 +290,7 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                             'Year ${profileState.annualRevenueYear2} Revenue': missingYear2 
                                 ? 'MISSING (Required for AI)' 
                                 : '₦${profileState.annualRevenueAmount2.toStringAsFixed(0)}',
-                            if (profileState.annualRevenueYear3 != null)
+                            if (profileState.annualRevenueYear3 != null && (profileState.annualRevenueAmount3 ?? 0) > 0)
                               'Year ${profileState.annualRevenueYear3} Revenue': '₦${(profileState.annualRevenueAmount3 ?? 0).toStringAsFixed(0)}',
                             'Monthly Expenses': '₦${profileState.monthlyAvgExpenses.toStringAsFixed(0)}',
                           },

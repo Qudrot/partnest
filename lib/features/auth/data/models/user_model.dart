@@ -16,6 +16,7 @@ class UserModel {
     final UserRole role;
     final String? profilePicture;
     final bool profileCompleted;
+    final String? position;
 
     UserModel({
         required this.id,
@@ -24,6 +25,7 @@ class UserModel {
         required this.role,
         this.profilePicture,
         this.profileCompleted = false,
+        this.position,
     });
 
     factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);

@@ -13,6 +13,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
   role: $enumDecode(_$UserRoleEnumMap, json['role']),
   profilePicture: json['profilePicture'] as String?,
   profileCompleted: json['profileCompleted'] as bool? ?? false,
+  position: json['position'] as String?,
 );
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
@@ -22,6 +23,7 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
   'role': _$UserRoleEnumMap[instance.role]!,
   'profilePicture': instance.profilePicture,
   'profileCompleted': instance.profileCompleted,
+  'position': instance.position,
 };
 
 const _$UserRoleEnumMap = {

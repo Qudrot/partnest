@@ -17,6 +17,8 @@ import 'package:partnex/features/auth/presentation/pages/login_page.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/business_profile_page.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/investor_onboarding_page.dart';
 import 'package:partnex/features/auth/data/models/user_model.dart';
+import 'package:partnex/core/theme/widgets/sme_about_section.dart';
+import 'package:partnex/features/auth/presentation/pages/dashboard/bio_edit_screen.dart';
 
 class ProfileManagementPage extends StatefulWidget {
   const ProfileManagementPage({super.key});
@@ -194,6 +196,23 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                       ],
                     ),
                   ),
+
+                  const SizedBox(height: AppSpacing.md),
+
+                  // About Section (SME only)
+                  if (!isInvestor)
+                    SmeAboutSection(
+                      bio: profileState.bio.isNotEmpty ? profileState.bio : null,
+                      onEditBio: () => uiService.navigateTo(
+                        BioEditScreen(
+                          initialBio: profileState.bio,
+                          initialWebsite: profileState.websiteUrl,
+                          initialWhatsapp: profileState.whatsappNumber,
+                          initialLinkedin: profileState.linkedinUrl,
+                          initialTwitter: profileState.twitterHandle,
+                        ),
+                      ),
+                    ),
 
                   const SizedBox(height: AppSpacing.xxl),
 

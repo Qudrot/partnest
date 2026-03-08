@@ -16,6 +16,7 @@ abstract class AuthRepository {
     required String password,
     required String name,
     required String role,
+    String? position,
   });
 
   //Session management function, it check if user exist on app start
