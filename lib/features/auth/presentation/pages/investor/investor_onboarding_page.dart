@@ -6,10 +6,11 @@ import 'package:partnex/core/theme/app_typography.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
 import 'package:partnex/core/theme/widgets/custom_input_field.dart';
+import 'package:partnex/core/theme/widgets/custom_dropdown_field.dart';
 import 'package:partnex/core/services/ui_service.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_bloc.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_event.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_state.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/sme_discovery_feed_page.dart';
 
 class InvestorOnboardingPage extends StatefulWidget {
@@ -23,10 +24,10 @@ class InvestorOnboardingPage extends StatefulWidget {
 
 class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
   final _companyController = TextEditingController();
 
+  String? _investorType;
+  String? _investmentRange;
   final Set<String> _selectedSectors = {};
 
   final List<String> _sectors = [
@@ -41,10 +42,18 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
     'Other',
   ];
 
+  final List<String> _investmentRanges = [
+    'Under \$10K',
+    '\$10K - \$50K',
+    '\$50K - \$100K',
+    '\$100K - \$500K',
+    '\$500K - \$1M',
+    '\$1M - \$5M',
+    '\$5M+',
+  ];
+
   @override
   void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
     _companyController.dispose();
     super.dispose();
   }
@@ -53,13 +62,22 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
     uiService.replaceWith(const SmeDiscoveryFeedPage());
   }
 
+  bool get _isFormValid {
+    if (_investorType == null || _investmentRange == null) return false;
+    if ((_investorType == 'Fund / Institution' || _investorType == 'Corporate') && 
+        _companyController.text.trim().isEmpty) return false;
+    return true;
+  }
+
   void _submitProfile() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
         SubmitInvestorProfileEvent({
-          'name': _nameController.text.trim(),
-          'email': _emailController.text.trim(),
-          'company': _companyController.text.trim(),
+          'investorType': _investorType,
+          'company': (_investorType == 'Fund / Institution' || _investorType == 'Corporate') 
+              ? _companyController.text.trim() 
+              : null,
+          'investmentRange': _investmentRange,
           'sectors': _selectedSectors.toList(),
         }, isEditing: widget.isEditing),
       );
@@ -73,6 +91,9 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
         if (state is InvestorProfileSubmissionError) {
           uiService.showSnackBar(state.message, isError: true);
         }
+        if (state is InvestorProfileSubmittedSuccess) {
+           _navigateToFeed();
+        }
       },
       builder: (context, state) {
         final isLoading = state is InvestorProfileSubmitting;
@@ -81,24 +102,19 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
           appBar: AppBar(
             backgroundColor: AppColors.neutralWhite,
             elevation: 0,
-            leading: IconButton(
-              icon: const Icon(
-                LucideIcons.arrowLeft,
-                color: AppColors.slate900,
-              ),
-              onPressed: () {
-                if (Navigator.canPop(context)) {
-                  uiService.goBack();
-                } else {
-                  _navigateToFeed();
-                }
-              },
-            ),
+            leading: widget.isEditing
+                ? IconButton(
+                    icon: const Icon(LucideIcons.arrowLeft, color: AppColors.slate900),
+                    onPressed: () => uiService.goBack(),
+                  )
+                : null,
+            automaticallyImplyLeading: false,
             title: Text(
               'Complete Your Profile',
-              style: AppTypography.textTheme.titleMedium?.copyWith(
+              style: AppTypography.textTheme.bodyLarge?.copyWith(
                 color: AppColors.slate900,
                 fontWeight: FontWeight.w600,
+                fontSize: 18,
               ),
             ),
             centerTitle: true,
@@ -109,85 +125,93 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0,
-                      vertical: 16.0,
+                      horizontal: AppSpacing.xl,
+                      vertical: AppSpacing.md,
                     ),
                     child: Form(
                       key: _formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          CustomInputField(
-                            label: 'Full Name',
-                            controller: _nameController,
-                            placeholder: 'John Doe',
-                            validator: (val) {
-                              if (val == null || val.trim().length < 2) {
-                                return 'Please enter at least 2 characters';
-                              }
-                              return null;
-                            },
+                          // Question 1: Investor Type
+                          Text(
+                            'What type of investor are you?',
+                            style: AppTypography.textTheme.bodyMedium?.copyWith(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.slate900,
+                            ),
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: AppSpacing.smd),
+                          _buildInvestorTypeOption('Individual Investor'),
+                          _buildInvestorTypeOption('Fund / Institution'),
+                          _buildInvestorTypeOption('Corporate', isLast: true),
 
-                          CustomInputField(
-                            label: 'Email',
-                            controller: _emailController,
-                            placeholder: 'you@example.com',
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (val) {
-                              if (val == null || val.isEmpty) {
-                                return 'Email is required';
-                              }
-                              if (!RegExp(
-                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-                              ).hasMatch(val)) {
-                                return 'Please enter a valid email';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 24),
+                          if (_investorType == 'Fund / Institution' || _investorType == 'Corporate') ...[
+                            const SizedBox(height: AppSpacing.md),
+                            CustomInputField(
+                              label: 'Company Name',
+                              controller: _companyController,
+                              placeholder: 'e.g., Acme Ventures',
+                              onChanged: (_) => setState(() {}),
+                              validator: (val) {
+                                if (val == null || val.trim().isEmpty) {
+                                  return 'Company name is required';
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
 
-                          CustomInputField(
-                            label: 'Company (Optional)',
-                            controller: _companyController,
-                            placeholder: 'e.g., Acme Ventures',
-                            validator: (val) {
-                              if (val != null &&
-                                  val.isNotEmpty &&
-                                  val.length < 2) {
-                                return 'Please enter at least 2 characters';
-                              }
-                              return null;
+                          const SizedBox(height: AppSpacing.xl),
+
+                          // Question 2: Investment Range
+                          Text(
+                            "What's your investment range?",
+                            style: AppTypography.textTheme.bodyMedium?.copyWith(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.slate900,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.smd),
+                          CustomDropdownField(
+                            label: '',
+                            placeholder: 'Select range...',
+                            value: _investmentRange,
+                            items: _investmentRanges,
+                            onChanged: (val) {
+                              setState(() {
+                                _investmentRange = val;
+                              });
                             },
                           ),
-                          const SizedBox(height: 32),
+
+                          const SizedBox(height: AppSpacing.xxl),
 
                           Text(
                             'Investment Interests (Optional)',
-                            style: AppTypography.textTheme.titleMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.slate900,
-                                ),
+                            style: AppTypography.textTheme.bodyMedium?.copyWith(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.slate900,
+                            ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppSpacing.xs),
                           Text(
                             'Select sectors...',
                             style: AppTypography.textTheme.bodyMedium?.copyWith(
                               color: AppColors.slate600,
+                              fontSize: 14,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppSpacing.md),
 
                           Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
+                            spacing: AppSpacing.sm,
+                            runSpacing: AppSpacing.sm,
                             children: _sectors.map((sector) {
-                              final isSelected = _selectedSectors.contains(
-                                sector,
-                              );
+                              final isSelected = _selectedSectors.contains(sector);
                               return InkWell(
                                 onTap: () {
                                   setState(() {
@@ -198,22 +222,18 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
                                     }
                                   });
                                 },
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(AppRadius.xxl),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
+                                    horizontal: AppSpacing.md,
+                                    vertical: AppSpacing.sm,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? AppColors.trustBlue
-                                        : AppColors.neutralWhite,
+                                    color: isSelected ? AppColors.trustBlue : AppColors.neutralWhite,
                                     border: Border.all(
-                                      color: isSelected
-                                          ? AppColors.trustBlue
-                                          : AppColors.slate300,
+                                      color: isSelected ? AppColors.trustBlue : AppColors.slate300,
                                     ),
-                                    borderRadius: BorderRadius.circular(20),
+                                    borderRadius: BorderRadius.circular(AppRadius.xxl),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -224,21 +244,15 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
                                           size: 14,
                                           color: AppColors.neutralWhite,
                                         ),
-                                        const SizedBox(width: 4),
+                                        const SizedBox(width: AppSpacing.xs),
                                       ],
                                       Text(
                                         sector,
-                                        style: AppTypography
-                                            .textTheme
-                                            .bodyMedium
-                                            ?.copyWith(
-                                              color: isSelected
-                                                  ? AppColors.neutralWhite
-                                                  : AppColors.slate700,
-                                              fontWeight: isSelected
-                                                  ? FontWeight.w600
-                                                  : FontWeight.w500,
-                                            ),
+                                        style: AppTypography.textTheme.bodyMedium?.copyWith(
+                                          color: isSelected ? AppColors.neutralWhite : AppColors.slate700,
+                                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                          fontSize: 14,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -246,7 +260,7 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
                               );
                             }).toList(),
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: AppSpacing.xxl),
                         ],
                       ),
                     ),
@@ -255,7 +269,7 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
 
                 // Bottom Action Bar
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(AppSpacing.xl),
                   decoration: BoxDecoration(
                     color: AppColors.neutralWhite,
                     boxShadow: [
@@ -268,26 +282,27 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
                   ),
                   child: Column(
                     children: [
-                      SizedBox(
-                        width: double.infinity,
-                        child: CustomButton(
-                          text: 'Complete Profile',
-                          variant: ButtonVariant.primary,
-                          isLoading: isLoading,
-                          onPressed: _submitProfile,
-                        ),
+                      CustomButton(
+                        text: widget.isEditing ? 'Save Changes' : 'Complete Profile',
+                        variant: ButtonVariant.primary,
+                        isFullWidth: true,
+                        isDisabled: !_isFormValid || isLoading,
+                        isLoading: isLoading,
+                        onPressed: _submitProfile,
                       ),
-                      const SizedBox(height: 16),
-                      InkWell(
-                        onTap: _navigateToFeed,
-                        child: Text(
-                          'Skip for Now',
-                          style: AppTypography.textTheme.bodyMedium?.copyWith(
-                            color: AppColors.trustBlue,
-                            fontWeight: FontWeight.w600,
+                      if (!widget.isEditing) ...[
+                        const SizedBox(height: AppSpacing.md),
+                        InkWell(
+                          onTap: _navigateToFeed,
+                          child: Text(
+                            'Skip for Now',
+                            style: AppTypography.textTheme.bodyMedium?.copyWith(
+                              color: AppColors.trustBlue,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -296,6 +311,61 @@ class _InvestorOnboardingPageState extends State<InvestorOnboardingPage> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildInvestorTypeOption(String type, {bool isLast = false}) {
+    final isSelected = _investorType == type;
+    return GestureDetector(
+      onTap: () => setState(() => _investorType = type),
+      child: Container(
+        margin: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.smd),
+        padding: const EdgeInsets.all(AppSpacing.smd),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.successGreen.withOpacity(0.05) : AppColors.neutralWhite,
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          border: Border.all(
+            color: isSelected ? AppColors.successGreen : AppColors.slate200,
+            width: isSelected ? 1.5 : 1.0,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? AppColors.successGreen : AppColors.slate300,
+                  width: 2,
+                ),
+              ),
+              child: isSelected
+                  ? Center(
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.successGreen,
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: AppSpacing.smd),
+            Text(
+              type,
+              style: AppTypography.textTheme.bodyMedium?.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.slate900,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

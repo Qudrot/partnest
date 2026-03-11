@@ -13,21 +13,32 @@ class DataSourceBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUploaded = source == DataSource.uploaded;
+    final isBank = source == DataSource.bankData;
     
+    String label = 'Manual Data';
+    IconData icon = LucideIcons.pencil;
+    Color color = AppColors.slate600;
+    Color bgColor = AppColors.slate100;
+    Color borderColor = AppColors.slate200;
+
+    if (isUploaded || isBank) {
+      label = isBank ? 'Bank Data' : 'Uploaded Data';
+      icon = isBank ? LucideIcons.landmark : LucideIcons.fileCheck2;
+      color = AppColors.trustBlue;
+      bgColor = AppColors.trustBlue.withValues(alpha: 0.08);
+      borderColor = AppColors.trustBlue.withValues(alpha: 0.2);
+    }
+
     return Container(
-      padding: const EdgeInsets.symmetric(
+      padding: EdgeInsets.symmetric(
         horizontal: AppSpacing.sm,
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: isUploaded
-            ? AppColors.trustBlue.withValues(alpha: 0.08)
-            : AppColors.slate100,
+        color: bgColor,
         borderRadius: BorderRadius.circular(AppRadius.circular),
         border: Border.all(
-          color: isUploaded
-              ? AppColors.trustBlue.withValues(alpha: 0.2)
-              : AppColors.slate200,
+          color: borderColor,
           width: AppSizes.borderThin,
         ),
       ),
@@ -35,15 +46,15 @@ class DataSourceBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            isUploaded ? LucideIcons.fileCheck2 : LucideIcons.pencil,
+            icon,
             size: AppSizes.iconSm,
-            color: isUploaded ? AppColors.trustBlue : AppColors.slate600,
+            color: color,
           ),
-          const SizedBox(width: AppSpacing.xxs),
+          SizedBox(width: AppSpacing.xxs),
           Text(
-            isUploaded ? 'Uploaded Bank Statement' : 'Self-Reported',
+            label,
             style: AppTypography.labelSmaller.copyWith(
-              color: isUploaded ? AppColors.trustBlue : AppColors.slate600,
+              color: color,
             ),
           ),
         ],

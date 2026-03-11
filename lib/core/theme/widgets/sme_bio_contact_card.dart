@@ -45,7 +45,7 @@ class SmeBioContactCard extends StatelessWidget {
     String contactDisplay = contactParts.join(', ');
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.slate50,
@@ -90,11 +90,11 @@ class SmeBioContactCard extends StatelessWidget {
                     child: GestureDetector(
                       onTap: onReadMore,
                       child: Text(
-                        'Read More →',
+                        'Read More',
                         style: AppTypography.textTheme.bodyMedium?.copyWith(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          color: const Color(0xFF2563EB),
+                          color: AppColors.linkBlue,
                         ),
                       ),
                     ),
@@ -132,7 +132,7 @@ class SmeBioContactCard extends StatelessWidget {
 
           if (hasContact) ...[
             Text(
-              'Contact Person',
+              'Primary Contact',
               style: AppTypography.textTheme.bodyMedium?.copyWith(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,

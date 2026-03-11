@@ -5,9 +5,9 @@ import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_bloc.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_event.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_state.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_state.dart';
@@ -18,7 +18,7 @@ import 'package:partnex/features/auth/presentation/pages/onboarding/business_pro
 import 'package:partnex/features/auth/presentation/pages/investor/investor_onboarding_page.dart';
 import 'package:partnex/features/auth/data/models/user_model.dart';
 import 'package:partnex/core/theme/widgets/sme_about_section.dart';
-import 'package:partnex/features/auth/presentation/pages/dashboard/bio_edit_screen.dart';
+import 'package:partnex/features/auth/presentation/pages/dashboard/bio_edit_page.dart';
 
 class ProfileManagementPage extends StatefulWidget {
   const ProfileManagementPage({super.key});
@@ -136,7 +136,7 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: AppSpacing.md),
+                            SizedBox(width: AppSpacing.md),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,7 +155,7 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                                           fontSize: 20,
                                         ),
                                   ),
-                                  const SizedBox(height: AppSpacing.xs),
+                                  SizedBox(height: AppSpacing.xs),
                                   Text(
                                     isInvestor
                                         ? 'Verified Angel'
@@ -163,9 +163,9 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                                     style: AppTypography.textTheme.bodyMedium
                                         ?.copyWith(color: AppColors.slate600),
                                   ),
-                                  const SizedBox(height: AppSpacing.sm),
+                                  SizedBox(height: AppSpacing.sm),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(
+                                    padding: EdgeInsets.symmetric(
                                       horizontal: AppSpacing.sm,
                                       vertical: 2,
                                     ),
@@ -192,19 +192,19 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: AppSpacing.smd),
+                        SizedBox(height: AppSpacing.smd),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: AppSpacing.md),
+                  SizedBox(height: AppSpacing.md),
 
                   // About Section (SME only)
                   if (!isInvestor)
                     SmeAboutSection(
                       bio: profileState.bio.isNotEmpty ? profileState.bio : null,
                       onEditBio: () => uiService.navigateTo(
-                        BioEditScreen(
+                        BioEditPage(
                           initialBio: profileState.bio,
                           initialWebsite: profileState.websiteUrl,
                           initialWhatsapp: profileState.whatsappNumber,
@@ -214,7 +214,7 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                       ),
                     ),
 
-                  const SizedBox(height: AppSpacing.xxl),
+                  SizedBox(height: AppSpacing.xxl),
 
                   // Actions Section
                   Text(
@@ -223,7 +223,7 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                       color: AppColors.slate600,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.smd),
+                  SizedBox(height: AppSpacing.smd),
                   Container(
                     decoration: BoxDecoration(
                       color: AppColors.neutralWhite,
@@ -259,7 +259,7 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                     ),
                   ),
 
-                  const SizedBox(height: AppSpacing.xxl),
+                  SizedBox(height: AppSpacing.xxl),
 
                   // Settings Section
                   Text(
@@ -268,7 +268,7 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                       color: AppColors.slate600,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.smd),
+                  SizedBox(height: AppSpacing.smd),
                   Container(
                     decoration: BoxDecoration(
                       color: AppColors.neutralWhite,
@@ -306,7 +306,7 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                     ),
                   ),
 
-                  const SizedBox(height: AppSpacing.xxxxl),
+                  SizedBox(height: AppSpacing.xxxxl),
 
                   CustomButton(
                     text: 'Log Out',
@@ -321,7 +321,7 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                     },
                   ),
 
-                  const SizedBox(height: AppSpacing.xl),
+                  SizedBox(height: AppSpacing.xl),
 
                     // Danger Zone
                   CustomButton(
@@ -334,7 +334,7 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                     onPressed: () {},
                   ),
                   
-                  const SizedBox(height: AppSpacing.xxl),
+                  SizedBox(height: AppSpacing.xxl),
                 ],
               );
             },

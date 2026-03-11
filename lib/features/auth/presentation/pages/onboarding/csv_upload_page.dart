@@ -16,9 +16,9 @@ import 'package:partnex/features/auth/presentation/pages/onboarding/business_pro
 import 'package:partnex/features/auth/presentation/pages/onboarding/review_confirm_page.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_state.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_bloc.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_event.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_state.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_cubit.dart';
 import 'package:partnex/features/auth/presentation/pages/dashboard/analysis_state_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -154,7 +154,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
         ),
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -168,13 +168,13 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                     child: ProgressIndicatorWidget(progress: 0.60),
                   ),
                 if (!widget.isUpdatingRecord)
-                  const SizedBox(height: AppSpacing.xl),
+                  SizedBox(height: AppSpacing.xl),
                 // Text(
                 //   'Upload Your Financial Data',
                 //   style: AppTypography.textTheme.displaySmall,
                 //   textAlign: TextAlign.center,
                 // ),
-                const SizedBox(height: AppSpacing.sm),
+                SizedBox(height: AppSpacing.sm),
                 Text(
                   'Upload a CSV file with your financial information. We\'ll parse and validate it for you.',
                   style: AppTypography.textTheme.bodyMedium?.copyWith(
@@ -182,7 +182,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: AppSpacing.xxl),
+                SizedBox(height: AppSpacing.xxl),
 
                 // Upload Area
                 GestureDetector(
@@ -225,7 +225,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                                 size: AppSpacing.xxxxl,
                                 color: AppColors.trustBlue,
                               ),
-                              const SizedBox(height: AppSpacing.md),
+                              SizedBox(height: AppSpacing.md),
                               Text(
                                 'Tap to upload from your device',
                                 style: AppTypography.textTheme.bodyLarge
@@ -234,7 +234,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                                       fontWeight: FontWeight.w500,
                                     ),
                               ),
-                              const SizedBox(height: AppSpacing.xs),
+                              SizedBox(height: AppSpacing.xs),
                               Text(
                                 '.csv files only • Max 5 MB',
                                 style: AppTypography.textTheme.bodySmall
@@ -247,7 +247,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.md),
+                SizedBox(height: AppSpacing.md),
 
                 // Template Download
                 // Row(
@@ -283,12 +283,12 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                 //     ),
                 //   ],
                 // ),
-                const SizedBox(height: AppSpacing.xl),
+                SizedBox(height: AppSpacing.xl),
 
                 // Validation Feedback
                 if (_isSuccess)
                   Container(
-                    padding: const EdgeInsets.all(AppSpacing.md),
+                    padding: EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
                       color: AppColors.successGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppRadius.md),
@@ -303,7 +303,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                           color: AppColors.successGreen,
                           size: 20,
                         ),
-                        const SizedBox(width: AppSpacing.smd),
+                        SizedBox(width: AppSpacing.smd),
                         Expanded(
                           child: Text(
                             '$_fileName parsed successfully. ${_parsedData.length} total rows detected.',
@@ -319,7 +319,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
 
                 if (_isError)
                   Container(
-                    padding: const EdgeInsets.all(AppSpacing.md),
+                    padding: EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
                       color: AppColors.dangerRed.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppRadius.md),
@@ -334,7 +334,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                           color: AppColors.dangerRed,
                           size: 20,
                         ),
-                        const SizedBox(width: AppSpacing.smd),
+                        SizedBox(width: AppSpacing.smd),
                         Expanded(
                           child: Text(
                             _errorMessage,
@@ -348,7 +348,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                     ),
                   ),
 
-                const SizedBox(height: AppSpacing.xl),
+                SizedBox(height: AppSpacing.xl),
 
                 // Data Preview (Dynamic)
                 if (_isSuccess && _parsedData.isNotEmpty)
@@ -360,7 +360,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                           'Data Preview (first few rows)',
                           style: AppTypography.textTheme.labelLarge,
                         ),
-                        const SizedBox(height: AppSpacing.sm),
+                        SizedBox(height: AppSpacing.sm),
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
@@ -384,7 +384,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
 
                 // Navigation Buttons
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                  padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
                   child: Row(
                     children: [
                       Expanded(
@@ -394,7 +394,7 @@ class _CsvUploadPageState extends State<CsvUploadPage> {
                           onPressed: () => uiService.goBack(),
                         ),
                       ),
-                      const SizedBox(width: AppSpacing.smd),
+                      SizedBox(width: AppSpacing.smd),
                       Expanded(
                         child: BlocBuilder<AuthBloc, AuthState>(
                           builder: (context, authState) {

@@ -203,7 +203,7 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage>
     }
 
     return ListView(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: EdgeInsets.all(AppSpacing.md),
       children: [
         Text(
           'Select up to 3 SMEs to compare side-by-side.',
@@ -211,7 +211,7 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage>
             color: AppColors.slate600,
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
+        SizedBox(height: AppSpacing.md),
         ..._watchlist.map((sme) => _buildWatchlistCard(sme)),
       ],
     );
@@ -232,21 +232,21 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage>
               size: AppSpacing.avatar,
               color: AppColors.slate300,
             ),
-            const SizedBox(height: AppSpacing.md),
+            SizedBox(height: AppSpacing.md),
             Text(
               'No SMEs selected',
               style: AppTypography.textTheme.headlineSmall?.copyWith(
                 color: AppColors.slate900,
               ),
             ),
-            const SizedBox(height: AppSpacing.sm),
+            SizedBox(height: AppSpacing.sm),
             Text(
               'Select SMEs from your watchlist to compare',
               style: AppTypography.textTheme.bodyMedium?.copyWith(
                 color: AppColors.slate500,
               ),
             ),
-            const SizedBox(height: AppSpacing.xl),
+            SizedBox(height: AppSpacing.xl),
             CustomButton(
               text: 'Go to Watchlist',
               variant: ButtonVariant.tertiary,
@@ -264,7 +264,7 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage>
         _buildComparisonHeader(),
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: EdgeInsets.all(AppSpacing.md),
             children: [_buildComparisonTable(comparingItems)],
           ),
         ),
@@ -278,21 +278,21 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(LucideIcons.heart, size: AppSpacing.avatar, color: AppColors.slate300),
-          const SizedBox(height: AppSpacing.md),
+          SizedBox(height: AppSpacing.md),
           Text(
             'No companies yet',
             style: AppTypography.textTheme.headlineSmall?.copyWith(
               color: AppColors.slate900,
             ),
           ),
-          const SizedBox(height: AppSpacing.sm),
+          SizedBox(height: AppSpacing.sm),
           Text(
             'Start adding companies to your watchlist',
             style: AppTypography.textTheme.bodyMedium?.copyWith(
               color: AppColors.slate500,
             ),
           ),
-          const SizedBox(height: AppSpacing.xl),
+          SizedBox(height: AppSpacing.xl),
           CustomButton(
             text: 'Explore Companies',
             variant: ButtonVariant.tertiary,
@@ -306,7 +306,7 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage>
   Widget _buildComparisonHeader() {
     return Container(
       color: AppColors.neutralWhite,
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
       decoration: const BoxDecoration(
         border: Border(bottom: BorderSide(color: AppColors.slate200, width: 1)),
       ),
@@ -342,7 +342,7 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage>
     final isSelected = _selectedForComparison.contains(sme['id']);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.smd),
+      margin: EdgeInsets.only(bottom: AppSpacing.smd),
       decoration: BoxDecoration(
         color: AppColors.neutralWhite,
         borderRadius: BorderRadius.circular(AppRadius.md),
@@ -362,7 +362,7 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage>
               _navigateToProfile, // Routing directly to correct component on entire card tap
           borderRadius: BorderRadius.circular(AppRadius.md),
           child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: EdgeInsets.all(AppSpacing.md),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -385,7 +385,7 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage>
                     },
                   ),
                 ),
-                const SizedBox(width: AppSpacing.smd),
+                SizedBox(width: AppSpacing.smd),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -423,18 +423,18 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage>
                           ),
                         ],
                       ),
-                      const SizedBox(height: AppSpacing.xs),
+                      SizedBox(height: AppSpacing.xs),
                       Text(
                         sme['industry'],
                         style: AppTypography.textTheme.bodySmall?.copyWith(
                           color: AppColors.slate600,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.smd),
+                      SizedBox(height: AppSpacing.smd),
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(
+                            padding: EdgeInsets.symmetric(
                               horizontal: AppSpacing.sm,
                               vertical: 2,
                             ),
@@ -451,7 +451,7 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage>
                                   ),
                             ),
                           ),
-                          const SizedBox(width: AppSpacing.sm),
+                          SizedBox(width: AppSpacing.sm),
                           Text(
                             sme['growthSignal'],
                             style: AppTypography.textTheme.bodySmall?.copyWith(
@@ -502,7 +502,7 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage>
             ...items.map(
               (item) => DataColumn(
                 label: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                  padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -514,8 +514,8 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage>
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.only(top: AppSpacing.xs),
-                        padding: const EdgeInsets.symmetric(
+                        margin: EdgeInsets.only(top: AppSpacing.xs),
+                        padding: EdgeInsets.symmetric(
                           horizontal: AppSpacing.sm,
                           vertical: 2,
                         ),
@@ -557,7 +557,7 @@ class _ComparisonWatchlistPageState extends State<ComparisonWatchlistPage>
                   );
                   return DataCell(
                     Container(
-                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      padding: EdgeInsets.all(AppSpacing.sm),
                       decoration: isBest
                           ? BoxDecoration(
                               color: AppColors.successGreen.withValues(

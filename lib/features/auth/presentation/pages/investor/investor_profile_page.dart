@@ -4,9 +4,9 @@ import 'package:partnex/core/theme/app_colors.dart';
 import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_bloc.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_event.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_state.dart';
 import 'package:partnex/features/auth/presentation/pages/login_page.dart';
 import 'package:partnex/core/services/ui_service.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/investor_onboarding_page.dart';
@@ -50,11 +50,11 @@ class _InvestorProfilePageState extends State<InvestorProfilePage> {
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.xl),
+          padding: EdgeInsets.all(AppSpacing.xl),
           children: [
             if (!isProfileCompleted)
               Padding(
-                padding: const EdgeInsets.only(bottom: 24),
+                padding: EdgeInsets.only(bottom: 24),
                 child: EmptyProfileCard(
                   variant: 'first-time',
                   completionPercentage: 0,
@@ -65,16 +65,17 @@ class _InvestorProfilePageState extends State<InvestorProfilePage> {
               ),
             if (isProfileCompleted)
               Container(
-                padding: const EdgeInsets.all(AppSpacing.xl),
+                width: double.infinity,
+                padding: EdgeInsets.all(AppSpacing.xl),
                 decoration: BoxDecoration(
                   color: AppColors.neutralWhite,
-                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(color: AppColors.slate200),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.slate200.withValues(alpha: 0.5),
-                      blurRadius: AppRadius.sm,
-                      offset: const Offset(0, 2),
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -84,7 +85,8 @@ class _InvestorProfilePageState extends State<InvestorProfilePage> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(AppSpacing.smd),
+                          width: 56,
+                          height: 56,
                           decoration: BoxDecoration(
                             color: AppColors.trustBlue.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
@@ -95,41 +97,60 @@ class _InvestorProfilePageState extends State<InvestorProfilePage> {
                             size: 28,
                           ),
                         ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Verified Investor',
-                                style: AppTypography.textTheme.headlineMedium
-                                    ?.copyWith(
-                                      color: AppColors.slate900,
-                                      fontSize: 20,
-                                    ),
-                              ),
-                              const SizedBox(height: AppSpacing.xs),
-                              Text(
-                                'Your submitted investment preferences are actively matching you with credible SMEs on the platform.',
-                                style: AppTypography.textTheme.bodyMedium
-                                    ?.copyWith(color: AppColors.slate600),
-                              ),
-                            ],
+                        const SizedBox(width: 16),
+                        Text(
+                          'Verified Investor',
+                          style: AppTypography.textTheme.headlineSmall?.copyWith(
+                            color: AppColors.slate900,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ),
+                    const SizedBox(height: 24),
+                    Container(
+                      height: 1,
+                      width: double.infinity,
+                      color: AppColors.slate100,
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    if (authState is AuthAuthenticated) ...[
+                      _buildProfileDetail(
+                        LucideIcons.briefcase, 
+                        'Investor Type', 
+                        authState.user.investorType ?? 'Fund / Institution',
+                      ),
+                      if (authState.user.company != null && authState.user.company!.isNotEmpty)
+                        _buildProfileDetail(
+                          LucideIcons.building2, 
+                          'Company', 
+                          authState.user.company!,
+                        ),
+                      _buildProfileDetail(
+                        LucideIcons.dollarSign, 
+                        'Investment Range', 
+                        authState.user.investmentRange ?? '₦50M - ₦200M',
+                      ),
+                      if (authState.user.sectors != null && authState.user.sectors!.isNotEmpty)
+                        _buildProfileDetail(
+                          LucideIcons.layoutGrid, 
+                          'Interests', 
+                          authState.user.sectors!.join(', '),
+                        ),
+                    ],
                   ],
                 ),
               ),
-            const SizedBox(height: AppSpacing.xxl),
+            SizedBox(height: AppSpacing.xxl),
             Text(
               'Actions',
               style: AppTypography.textTheme.labelLarge?.copyWith(
                 color: AppColors.slate600,
               ),
             ),
-            const SizedBox(height: AppSpacing.smd),
+            SizedBox(height: AppSpacing.smd),
             Container(
               decoration: BoxDecoration(
                 color: AppColors.neutralWhite,
@@ -185,14 +206,14 @@ class _InvestorProfilePageState extends State<InvestorProfilePage> {
               ),
             ),
 
-            const SizedBox(height: AppSpacing.xxxxl),
+            SizedBox(height: AppSpacing.xxxxl),
 
             CustomButton(
               onPressed: () {
                 context.read<AuthBloc>().add(LogoutEvent());
-                uiService.clearAndNavigateTo(const LoginPage());
               },
               variant: ButtonVariant.primary,
+              isFullWidth: true,
               icon: const Icon(
                 LucideIcons.logOut,
                 size: 16,
@@ -201,12 +222,13 @@ class _InvestorProfilePageState extends State<InvestorProfilePage> {
               text: 'Log Out',
             ),
 
-            const SizedBox(height: AppSpacing.xl),
+            SizedBox(height: AppSpacing.xl),
 
                     // Danger Zone
                   CustomButton(
                     text: 'Delete Account',
                     variant: ButtonVariant.dangerTertiary,
+                    isFullWidth: true,
                     icon: const Icon(
                       LucideIcons.trash,
                       size: 16,
@@ -214,9 +236,45 @@ class _InvestorProfilePageState extends State<InvestorProfilePage> {
                     onPressed: () {},
                   ),
                   
-                  const SizedBox(height: AppSpacing.xxl),
+            SizedBox(height: AppSpacing.xxl),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildProfileDetail(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: AppColors.slate500),
+          const SizedBox(width: AppSpacing.smd),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: AppTypography.textTheme.labelMedium?.copyWith(
+                    color: AppColors.slate500,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: AppTypography.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.slate900,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -291,7 +349,7 @@ class _EmptyProfileCardState extends State<EmptyProfileCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.xl),
+      padding: EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
         color: AppColors.slate50,
         borderRadius: BorderRadius.circular(AppRadius.md),
@@ -313,7 +371,7 @@ class _EmptyProfileCardState extends State<EmptyProfileCard> {
                 size: AppSpacing.xl,
                 color: AppColors.slate600,
               ),
-              const SizedBox(width: AppSpacing.smd),
+              SizedBox(width: AppSpacing.smd),
               Expanded(
                 child: Text(
                   _title,
@@ -326,7 +384,7 @@ class _EmptyProfileCardState extends State<EmptyProfileCard> {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.smd),
+          SizedBox(height: AppSpacing.smd),
           Text(
             _copyText,
             style: AppTypography.textTheme.bodyMedium?.copyWith(
@@ -336,7 +394,7 @@ class _EmptyProfileCardState extends State<EmptyProfileCard> {
               color: AppColors.slate600,
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
+          SizedBox(height: AppSpacing.md),
 
           // CTA Section
           CustomButton(
@@ -355,7 +413,7 @@ class _EmptyProfileCardState extends State<EmptyProfileCard> {
           // Progress Section
           if (widget.completionPercentage != null &&
               widget.completionPercentage! > 0) ...[
-            const SizedBox(height: AppSpacing.md),
+            SizedBox(height: AppSpacing.md),
             Container(
               width: double.infinity,
               height: 6,
@@ -377,7 +435,7 @@ class _EmptyProfileCardState extends State<EmptyProfileCard> {
                 ),
               ),
             ),
-            const SizedBox(height: AppSpacing.sm),
+            SizedBox(height: AppSpacing.sm),
             Text(
               '${widget.completionPercentage!.toInt()}% Complete (${widget.completedSections} of ${widget.totalSections} sections)',
               style: AppTypography.textTheme.bodySmall?.copyWith(

@@ -43,7 +43,7 @@ class DeepDiveEvidencePage extends StatelessWidget {
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
           children: [
             // Score Summary / Assessment Box
             Container(
@@ -68,7 +68,7 @@ class DeepDiveEvidencePage extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                           horizontal: 8,
                           vertical: 4,
                         ),
@@ -262,7 +262,7 @@ class DeepDiveEvidencePage extends StatelessWidget {
               ),
             ],
           ),
-          childrenPadding: const EdgeInsets.only(
+          childrenPadding: EdgeInsets.only(
             left: 16,
             right: 16,
             bottom: 16,
@@ -304,7 +304,7 @@ class DeepDiveEvidencePage extends StatelessWidget {
               String key = m.keys.first;
               String val = m.values.first;
               return Padding(
-                padding: const EdgeInsets.only(bottom: 6.0),
+                padding: EdgeInsets.only(bottom: 6.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -408,7 +408,7 @@ class DeepDiveEvidencePage extends StatelessWidget {
     IconData iconData = LucideIcons.fileText,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.slate50,

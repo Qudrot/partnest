@@ -45,7 +45,7 @@ class InputMethodSelectionPage extends StatelessWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+          padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -55,7 +55,7 @@ class InputMethodSelectionPage extends StatelessWidget {
                   child: ProgressIndicatorWidget(progress: 0.40),
                 ),
               if (!isUpdatingRecord)
-                const SizedBox(height: AppSpacing.md),
+                SizedBox(height: AppSpacing.md),
               Text(
                 'Choose the method that works best for you. You can always edit your information later.',
                 style: AppTypography.textTheme.bodyMedium?.copyWith(
@@ -63,7 +63,7 @@ class InputMethodSelectionPage extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: AppSpacing.xl),
+              SizedBox(height: AppSpacing.xl),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -89,7 +89,7 @@ class InputMethodSelectionPage extends StatelessWidget {
                           );
                         },
                       ),
-                      const SizedBox(height: AppSpacing.md),
+                      SizedBox(height: AppSpacing.md),
                       _MethodCard(
                         title: 'CSV Upload',
                         description:
@@ -113,7 +113,7 @@ class InputMethodSelectionPage extends StatelessWidget {
                           );
                         },
                       ),
-                      const SizedBox(height: AppSpacing.xl),
+                      SizedBox(height: AppSpacing.xl),
                       CustomButton(
                         text: 'Need help? Contact support',
                         variant: ButtonVariant.tertiary,
@@ -177,7 +177,7 @@ class _MethodCardState extends State<_MethodCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: double.infinity,
-        padding: const EdgeInsets.all(AppSpacing.md),
+        padding: EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(AppRadius.md),
@@ -189,7 +189,7 @@ class _MethodCardState extends State<_MethodCard> {
             Row(
               children: [
                 Icon(widget.icon, color: AppColors.slate700, size: AppSpacing.xl),
-                const SizedBox(width: AppSpacing.smd),
+                SizedBox(width: AppSpacing.smd),
                 Text(
                   widget.title,
                   style: AppTypography.textTheme.headlineSmall?.copyWith(
@@ -198,17 +198,17 @@ class _MethodCardState extends State<_MethodCard> {
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.smd),
+            SizedBox(height: AppSpacing.smd),
             Text(
               widget.description,
               style: AppTypography.textTheme.bodyMedium?.copyWith(
                 color: AppColors.slate600,
               ),
             ),
-            const SizedBox(height: AppSpacing.md),
+            SizedBox(height: AppSpacing.md),
             ...widget.benefits.map(
               (benefit) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                padding: EdgeInsets.only(bottom: AppSpacing.sm),
                 child: Row(
                   children: [
                     const Icon(
@@ -216,7 +216,7 @@ class _MethodCardState extends State<_MethodCard> {
                       color: AppColors.successGreen,
                       size: AppSpacing.md,
                     ),
-                    const SizedBox(width: AppSpacing.sm),
+                    SizedBox(width: AppSpacing.sm),
                     Text(
                       benefit,
                       style: AppTypography.textTheme.bodySmall?.copyWith(
@@ -227,7 +227,7 @@ class _MethodCardState extends State<_MethodCard> {
                 ),
               ),
             ),
-            const SizedBox(height: AppSpacing.md),
+            SizedBox(height: AppSpacing.md),
             SizedBox(
               width: double.infinity,
               child: CustomButton(

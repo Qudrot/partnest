@@ -116,7 +116,7 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
       curve: Curves.easeInOut,
       child: isVisible
           ? Container(
-              margin: const EdgeInsets.only(top: 20, left: 16),
+              margin: EdgeInsets.only(top: 20, left: 16),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: AppColors.slate50,
@@ -166,7 +166,7 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
 
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: Form(
                   key: _formKey,
                   child: Column(

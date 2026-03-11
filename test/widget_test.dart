@@ -50,7 +50,10 @@ Widget _wrapWithBlocs(Widget child) {
   return MultiBlocProvider(
     providers: [
       BlocProvider<AuthBloc>(
-        create: (_) => AuthBloc(authRepository: _FakeAuthRepository()),
+        create: (_) => AuthBloc(
+          authRepository: _FakeAuthRepository(),
+          smeProfileCubit: SmeProfileCubit(),
+        ),
       ),
       BlocProvider<SmeProfileCubit>(create: (_) => SmeProfileCubit()),
     ],
@@ -256,7 +259,10 @@ void main() {
   // ── AuthBloc states (pure state assertions, no widget pump) ──────────────
   group('AuthBloc state assertions', () {
     test('AuthInitial is the correct starting state type', () {
-      final bloc = AuthBloc(authRepository: _FakeAuthRepository());
+      final bloc = AuthBloc(
+        authRepository: _FakeAuthRepository(),
+        smeProfileCubit: SmeProfileCubit(),
+      );
       expect(bloc.state, isA<AuthInitial>());
       bloc.close();
     });

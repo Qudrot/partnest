@@ -21,5 +21,12 @@ class AppColors {
   static const Color warningOrange = Color(0xFFF97316); // moderate-risk signals
   static const Color dangerRed = Color(0xFFEF4444);
 
+  // Surface & Accent Shades
+  static const Color linkBlue = Color(0xFF2563EB);
+  static const Color successBg = Color(0xFFDCFCE7);
+  static const Color warningBg = Color(0xFFFEF3C7);
+  static const Color warningAmberText = Color(0xFFD97706);
+  static const Color successGreenText = Color(0xFF16A34A);
+
   static const Color neutralGray = Color(0xFF6B7280);
 }

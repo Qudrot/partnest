@@ -9,7 +9,7 @@ import 'package:partnex/core/theme/widgets/metric_mini_card.dart';
 import 'package:partnex/core/theme/widgets/data_source_badge.dart';
 import 'package:partnex/core/theme/widgets/sme_bio_contact_card.dart';
 import 'package:partnex/features/auth/data/models/sme_profile_data.dart';
-import 'package:partnex/features/auth/presentation/pages/investor/investor_full_bio_screen.dart';
+import 'package:partnex/features/auth/presentation/pages/investor/investor_full_bio_page.dart';
 
 
 // ---------------------------------------------------------------------------
@@ -49,7 +49,7 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
           topRight: Radius.circular(16),
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -88,29 +88,53 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
               ],
             ),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildSocialOption(
-                    'WhatsApp',
-                    'assets/icons/whatsapp.png',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildSocialOption(
-                    'LinkedIn',
-                    'assets/icons/linkedin.png',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildSocialOption(
-                    'Twitter',
-                    'assets/icons/twitter.png',
-                  ),
-                ),
-              ],
+            Builder(
+              builder: (context) {
+                final hasWhatsapp = widget.whatsappNumber != null && widget.whatsappNumber!.isNotEmpty;
+                final hasLinkedin = widget.linkedinUrl != null && widget.linkedinUrl!.isNotEmpty;
+                final hasTwitter = widget.twitterHandle != null && widget.twitterHandle!.isNotEmpty;
+                
+                if (hasWhatsapp || hasLinkedin || hasTwitter) {
+                  return Column(
+                    children: [
+                      Row(
+                        children: [
+                          if (hasWhatsapp)
+                            Expanded(
+                              child: _buildSocialOption(
+                                'WhatsApp',
+                                'assets/icons/whatsapp.png',
+                              ),
+                            ),
+                          if (hasWhatsapp && (hasLinkedin || hasTwitter)) const SizedBox(width: 12),
+                          if (hasLinkedin)
+                            Expanded(
+                              child: _buildSocialOption(
+                                'LinkedIn',
+                                'assets/icons/linkedin.png',
+                              ),
+                            ),
+                          if (hasLinkedin && hasTwitter) const SizedBox(width: 12),
+                          if (hasTwitter)
+                            Expanded(
+                              child: _buildSocialOption(
+                                'Twitter',
+                                'assets/icons/twitter.png',
+                              ),
+                            ),
+                          
+                          // Empty space filler if less than 3 socials
+                          if (!hasWhatsapp && !hasLinkedin) const Spacer(),
+                          if (!hasWhatsapp && !hasTwitter) const Spacer(),
+                          if (!hasLinkedin && !hasTwitter) const Spacer(),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  );
+                }
+                return const SizedBox.shrink();
+              },
             ),
             // const SizedBox(height: 24),
             // Container(
@@ -159,13 +183,13 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
                 LucideIcons.phone,
               ),
             if (widget.phoneNumber != null && widget.phoneNumber!.isNotEmpty)
-              const SizedBox(height: 12),
-            if (widget.website != null && widget.website!.isNotEmpty)
-              _buildDirectContact(
-                'Website',
-                widget.website!,
-                LucideIcons.globe,
-              ),
+            //   const SizedBox(height: 12),
+            // if (widget.website != null && widget.website!.isNotEmpty)
+            //   _buildDirectContact(
+            //     'Website',
+            //     widget.website!,
+            //     LucideIcons.globe,
+            //   ),
             const SizedBox(height: 16),
           ],
         ),
@@ -180,7 +204,7 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
         onTap: () {},
         borderRadius: BorderRadius.circular(AppRadius.sm),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+          padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
           decoration: BoxDecoration(
             color: AppColors.slate50,
             border: Border.all(color: AppColors.slate200),
@@ -190,7 +214,7 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(assetPath, width: 32, height: 32),
-              const SizedBox(height: AppSpacing.sm),
+              SizedBox(height: AppSpacing.sm),
               Text(
                 label,
                 style: AppTypography.textTheme.bodyMedium?.copyWith(
@@ -311,10 +335,10 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
           children: [
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                padding: EdgeInsets.symmetric(vertical: 16.0),
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -353,7 +377,7 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '${widget.sme.industry} • ${widget.sme.location} • ${widget.sme.yearsOfOperation} years',
+                                '${widget.sme.industry} • ${widget.sme.displayLocation} • ${widget.sme.yearsOfOperationText}',
                                 style: AppTypography.textTheme.bodyMedium
                                     ?.copyWith(
                                       fontSize: 13,
@@ -386,11 +410,11 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: AppSpacing.xl),
 
                   Container(
-                    margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                    padding: const EdgeInsets.all(AppSpacing.md),
+                    margin: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    padding: EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
                       color: AppColors.slate50,
                       border: Border.all(color: AppColors.slate200),
@@ -429,7 +453,7 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            SizedBox(width: AppSpacing.md),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -442,7 +466,7 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
                                           fontWeight: FontWeight.w600,
                                         ),
                                   ),
-                                  const SizedBox(height: AppSpacing.xs),
+                                  SizedBox(height: AppSpacing.xs),
                                   Text(
                                     'Generated today at ${TimeOfDay.now().format(context)}',
                                     style: AppTypography.textTheme.bodySmall
@@ -450,7 +474,7 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
                                           color: AppColors.slate500,
                                         ),
                                   ),
-                                  const SizedBox(height: AppSpacing.sm),
+                                  SizedBox(height: AppSpacing.sm),
                                   DataSourceBadge(source: widget.sme.dataSource),
                                 ],
                               ),
@@ -460,11 +484,11 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppSpacing.md),
 
                   // KEY METRICS GRID
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         final isMobile = constraints.maxWidth < 640;
@@ -509,36 +533,42 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  SizedBox(height: AppSpacing.xl),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: SmeBioContactCard(
-                      bio: widget.sme.bio,
-                      contactPersonName: widget.sme.contactPersonName,
-                      contactPersonTitle: widget.sme.contactPersonTitle,
-                      smeId: widget.sme.id,
-                      smeName: widget.sme.companyName,
-                      onReadMore: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => InvestorFullBioScreen(
-                              smeName: widget.sme.companyName,
-                              bio: widget.sme.bio,
-                              contactPersonName: widget.sme.contactPersonName,
-                              contactPersonTitle: widget.sme.contactPersonTitle,
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                      child: SmeBioContactCard(
+                        bio: widget.sme.bio,
+                        contactPersonName: widget.sme.contactPersonName,
+                        contactPersonTitle: widget.sme.contactPersonTitle,
+                        smeId: widget.sme.id,
+                        smeName: widget.sme.companyName,
+                        onReadMore: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => InvestorFullBioPage(
+                                smeName: widget.sme.companyName,
+                                bio: widget.sme.bio,
+                                contactPersonName: widget.sme.contactPersonName,
+                                contactPersonTitle: widget.sme.contactPersonTitle,
+                                whatsappNumber: widget.sme.whatsappNumber,
+                                linkedinUrl: widget.sme.linkedinUrl,
+                                twitterHandle: widget.sme.twitterHandle,
+                                email: widget.sme.email,
+                                phoneNumber: widget.sme.phoneNumber,
+                                website: widget.sme.website,
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppSpacing.md),
 
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -560,29 +590,14 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
                         //   ),
                         // ),
                         // const SizedBox(height: 12),
-                        const DriverCard(
-                          driverName: 'Revenue Growth & Stability',
-                          riskLevel: DriverRiskLevel.critical,
-                          percentage: 25,
-                          impactPoints: -14.4,
-                          description:
-                              'Measures your business\'s revenue trajectory. You have a -57.8% YoY growth rate. Consistent growth is key to credibility.',
-                        ),
-                        const DriverCard(
-                          driverName: 'Profitability & Expense Management',
-                          riskLevel: DriverRiskLevel.good,
-                          percentage: 65,
-                          impactPoints: 8.2,
-                          description:
-                              'Measures your operational efficiency and margin health. Strong cost controls reflect disciplined financial management.',
-                        ),
-                        const DriverCard(
-                          driverName: 'Debt Management & Leverage',
-                          riskLevel: DriverRiskLevel.excellent,
-                          percentage: 85,
-                          impactPoints: 12.1,
-                          description:
-                              'Measures your financial leverage and debt repayment capacity. Your debt service ratio is 25%, which is healthy and indicates strong ability to meet obligations.',
+                        ...widget.sme.drivers.map(
+                          (driver) => DriverCard(
+                            driverName: driver.name,
+                            riskLevel: driver.riskLevel,
+                            percentage: driver.percentage,
+                            impactPoints: driver.impactPoints,
+                            description: driver.description,
+                          ),
                         ),
                       ],
                     ),
@@ -592,7 +607,7 @@ class _SmeProfileExpandedPageState extends State<SmeProfileExpandedPage> {
             ),
 
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.smd),
               decoration: BoxDecoration(
                 color: AppColors.neutralWhite,
                 border: Border(top: BorderSide(color: AppColors.slate200)),

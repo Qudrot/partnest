@@ -77,7 +77,7 @@ class CustomInputField extends StatelessWidget {
               }
               return AppColors.slate100;
             }),
-            contentPadding: contentPadding ?? const EdgeInsets.symmetric(
+            contentPadding: contentPadding ?? EdgeInsets.symmetric(
               vertical: 12,
               horizontal: 16,
             ),

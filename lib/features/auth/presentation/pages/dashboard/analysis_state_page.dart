@@ -8,9 +8,9 @@ import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/core/theme/widgets/partnex_logo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_bloc.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_event.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_state.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_state.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_cubit.dart';
@@ -205,7 +205,7 @@ class _AnalysisStatePageState extends State<AnalysisStatePage> {
         children: [
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               child: Column(
                 children: [
                   const SizedBox(height: 24),
@@ -306,7 +306,7 @@ class _AnalysisStatePageState extends State<AnalysisStatePage> {
                   const Spacer(),
                   if (!_isError)
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 24.0),
+                      padding: EdgeInsets.only(bottom: 24.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -596,7 +596,7 @@ class _NumberStreamAnimationState extends State<NumberStreamAnimation> {
     
     // Randomize visual properties
     final value = _random.nextInt(90) + 10; // 10 to 99
-    final sizes = [40.0, 16.0, 24.0, 8.0, 32.0, 12.0, 20.0];
+    final sizes = [32.0, 16.0, 24.0, 8.0, 12.0, 12.0, 20.0];
     final fontSize = sizes[_random.nextInt(sizes.length)];
     final weights = [FontWeight.w600, FontWeight.w700, FontWeight.w800, FontWeight.w900, FontWeight.bold];
     final fontWeight = weights[_random.nextInt(weights.length)];

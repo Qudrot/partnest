@@ -1,8 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:partnex/core/theme/app_colors.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_state.dart';
+import 'package:partnex/core/theme/widgets/driver_card.dart';
+
+class DriverMetric {
+  final String name;
+  final DriverRiskLevel riskLevel;
+  final double percentage;
+  final double impactPoints;
+  final String description;
+
+  const DriverMetric({
+    required this.name,
+    required this.riskLevel,
+    required this.percentage,
+    required this.impactPoints,
+    required this.description,
+  });
+}
 
 class SmeCardData {
+  List<DriverMetric> get drivers {
+    return [
+      DriverMetric(
+        name: 'Revenue Growth & Stability',
+        riskLevel: _mapToDriverRisk(revenueTrendSignal),
+        percentage: yoyGrowth.clamp(0, 100),
+        impactPoints: (score * 0.3),
+        description: 'Evaluates your year-over-year revenue trajectory. Current growth: ${yoyGrowth.toStringAsFixed(1)}%.',
+      ),
+      DriverMetric(
+        name: 'Profitability & Expense Management',
+        riskLevel: _mapToDriverRisk(profitMarginSignal),
+        percentage: profitMargin.clamp(0, 100),
+        impactPoints: (score * 0.25),
+        description: 'Measures operational efficiency. Current profit margin: ${profitMargin.toStringAsFixed(1)}%.',
+      ),
+      DriverMetric(
+        name: 'Debt & Liability Management',
+        riskLevel: _mapToDriverRisk(liabilitiesRatioSignal),
+        percentage: (100 - liabilitiesRatio).clamp(0, 100),
+        impactPoints: (score * 0.2),
+        description: 'Evaluates debt relative to total revenue. Your liability ratio is ${liabilitiesRatio.toStringAsFixed(1)}%.',
+      ),
+    ];
+  }
+
+  DriverRiskLevel _mapToDriverRisk(String signal) {
+    final s = signal.toLowerCase();
+    if (s.contains('positive') || s.contains('healthy') || s.contains('low') || s.contains('excellent')) return DriverRiskLevel.excellent;
+    if (s.contains('good') || s.contains('strong')) return DriverRiskLevel.good;
+    if (s.contains('moderate')) return DriverRiskLevel.moderate;
+    if (s.contains('declining') || s.contains('high') || s.contains('needs work')) return DriverRiskLevel.needsWork;
+    return DriverRiskLevel.critical;
+  }
+
   final String id;
   final String companyName;
   final String industry;
@@ -30,6 +82,8 @@ class SmeCardData {
 
   // Computed fields for UI:
   String get employeesText => '$numberOfEmployees employees';
+  String get yearsOfOperationText => '$yearsOfOperation ${yearsOfOperation == 1 ? 'yr' : 'yrs'}';
+  String get displayLocation => location.split(',').first.trim();
   String get revenueText => '₦${(annualRevenue / 1000).toStringAsFixed(0)}K';
   
   bool get isGrowthPositive => yoyGrowth >= 0;
@@ -40,8 +94,8 @@ class SmeCardData {
   bool get trustStable => true;
 
   // Metric Signals Implementation
-  static const Color _positiveColor = Color(0xFF10B981);
-  static const Color _moderateColor = Color(0xFFF97316);
+  static const Color _positiveColor = AppColors.successGreen;
+  static const Color _moderateColor = AppColors.warningOrange;
   static const Color _concerningColor = AppColors.dangerRed;
   static const Color _criticalColor = AppColors.dangerRed;
 
@@ -182,10 +236,10 @@ class SmeCardData {
   Color get scoreColor {
     final lowerRisk = riskLevel.toLowerCase();
     if (lowerRisk.contains('low') || score >= 80)
-      return const Color(0xFF10B981);
+      return AppColors.successGreen;
     if (lowerRisk.contains('medium') || score >= 50)
-      return const Color(0xFFF59E0B);
-    return const Color(0xFFEF4444);
+      return AppColors.warningAmber;
+    return AppColors.dangerRed;
   }
 
   const SmeCardData({

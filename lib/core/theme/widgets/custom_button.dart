@@ -20,8 +20,11 @@ class CustomButton extends StatelessWidget {
     this.variant = ButtonVariant.primary,
     this.isLoading = false,
     this.isDisabled = false,
+    this.isFullWidth = false,
     this.icon,
   });
+
+  final bool isFullWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +54,7 @@ class CustomButton extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppRadius.button),
             ),
-            padding: const EdgeInsets.symmetric(
+            padding: EdgeInsets.symmetric(
               vertical: AppSpacing.smd,
               horizontal: AppSpacing.xl,
             ),
@@ -83,7 +86,7 @@ class CustomButton extends StatelessWidget {
               ),
             )
           : Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (icon != null) ...[icon!, const SizedBox(width: 8)],
@@ -109,7 +112,7 @@ class CustomButton extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppRadius.button),
             ),
-            padding: const EdgeInsets.symmetric(
+            padding: EdgeInsets.symmetric(
               vertical: AppSpacing.smd,
               horizontal: AppSpacing.xl,
             ),
@@ -137,7 +140,7 @@ class CustomButton extends StatelessWidget {
               ),
             )
           : Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (icon != null) ...[icon!, const SizedBox(width: 8)],
@@ -159,7 +162,7 @@ class CustomButton extends StatelessWidget {
       style:
           TextButton.styleFrom(
             backgroundColor: Colors.transparent,
-            padding: const EdgeInsets.symmetric(
+            padding: EdgeInsets.symmetric(
               vertical: AppSpacing.smd,
               horizontal: AppSpacing.xl,
             ),
@@ -190,7 +193,7 @@ class CustomButton extends StatelessWidget {
               ),
             )
           : Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (icon != null) ...[icon!, const SizedBox(width: 8)],
@@ -215,7 +218,7 @@ class CustomButton extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppRadius.button),
             ),
-            padding: const EdgeInsets.symmetric(
+            padding: EdgeInsets.symmetric(
               vertical: AppSpacing.smd,
               horizontal: AppSpacing.xl,
             ),
@@ -247,7 +250,7 @@ class CustomButton extends StatelessWidget {
               ),
             )
           : Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (icon != null) ...[icon!, const SizedBox(width: 8)],
@@ -275,7 +278,7 @@ class CustomButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.button),
         ),
-        padding: const EdgeInsets.symmetric(
+        padding: EdgeInsets.symmetric(
           vertical: AppSpacing.smd,
           horizontal: AppSpacing.xl,
         ),
@@ -303,7 +306,7 @@ class CustomButton extends StatelessWidget {
               ),
             )
           : Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (icon != null) ...[
@@ -333,7 +336,7 @@ class CustomButton extends StatelessWidget {
       onPressed: isDisabled || isLoading ? null : onPressed,
       style: TextButton.styleFrom(
         backgroundColor: Colors.transparent,
-        padding: const EdgeInsets.symmetric(
+        padding: EdgeInsets.symmetric(
           vertical: AppSpacing.smd,
           horizontal: AppSpacing.xl,
         ),
@@ -364,7 +367,7 @@ class CustomButton extends StatelessWidget {
               ),
             )
           : Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (icon != null) ...[
@@ -374,7 +377,7 @@ class CustomButton extends StatelessWidget {
                     ),
                     child: icon!,
                   ),
-                  const SizedBox(width: AppSpacing.sm)
+                  SizedBox(width: AppSpacing.sm)
                 ],
                 Text(
                   text,

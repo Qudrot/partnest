@@ -1,14 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:partnex/features/auth/data/repositories/auth_repository.dart';
-import 'package:partnex/core/services/ui_service.dart';
-import 'package:partnex/features/auth/presentation/pages/dashboard/credibility_dashboard_page.dart';
-import 'package:partnex/features/auth/presentation/pages/investor/sme_discovery_feed_page.dart';
-import 'package:partnex/features/auth/presentation/pages/onboarding/business_profile_page.dart';
-import 'package:partnex/features/auth/presentation/pages/onboarding/input_method_selection_page.dart';
-import 'package:partnex/features/auth/presentation/pages/investor/investor_onboarding_page.dart';
-import 'package:partnex/features/auth/presentation/pages/investor/investor_profile_page.dart';
-import 'package:partnex/features/auth/presentation/pages/login_page.dart';
-import 'package:partnex/features/auth/presentation/pages/signup_page.dart';
 import 'package:partnex/features/auth/data/models/user_model.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -45,26 +36,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       emit(AuthAuthenticated(user));
-      if (user.role == UserRole.investor) {
-        uiService.replaceWith(const SmeDiscoveryFeedPage());
-      } else {
-        if (user.profileCompleted) {
-          uiService.replaceWith(const CredibilityDashboardPage());
-        } else {
-          // Direct to Business Profile (Step 1) first
-          uiService.replaceWith(const BusinessProfilePage());
-        }
-      }
     } catch (e) {
       final msg = e.toString().replaceAll('Exception: ', '');
       emit(AuthError(msg));
-      if (msg.contains('REGISTRATION_REDIRECT')) {
-        final displayMsg = msg.split('|')[0];
-        uiService.showSnackBar(displayMsg);
-        uiService.replaceWith(SignupPage(emailPrefill: event.email));
-      } else {
-        uiService.showSnackBar(msg, isError: true);
-      }
     }
   }
 
@@ -87,16 +61,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       emit(AuthAuthenticated(user));
-      if (user.role == UserRole.investor) {
-        uiService.replaceWith(const InvestorOnboardingPage());
-      } else {
-        // Direct to Business Profile (Step 1) first
-        uiService.replaceWith(const BusinessProfilePage());
-      }
     } catch (e) {
       final msg = e.toString().replaceAll('Exception: ', '');
       emit(AuthError(msg));
-      uiService.showSnackBar(msg, isError: true);
     }
   }
 
@@ -115,7 +82,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e) {
       final msg = e.toString().replaceAll('Exception: ', '');
       emit(SmeProfileSubmissionError(msg));
-      uiService.showSnackBar(msg, isError: true);
     }
   }
 
@@ -124,16 +90,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       await authRepository.submitInvestorProfile(event.profileData);
       emit(InvestorProfileSubmittedSuccess());
-      if (event.isEditing) {
-        uiService.showSnackBar('Your investment preferences have been successfully updated.');
-        uiService.replaceWith(const InvestorProfilePage());
-      } else {
-        uiService.replaceWith(const SmeDiscoveryFeedPage());
-      }
     } catch (e) {
       final msg = e.toString().replaceAll('Exception: ', '');
       emit(InvestorProfileSubmissionError(msg));
-      uiService.showSnackBar(msg, isError: true);
     }
   }
 
@@ -141,13 +100,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       await authRepository.logout();
-      
       emit(AuthUnauthenticated());
-      uiService.clearAndNavigateTo(const LoginPage());
     } catch (e) {
       final msg = e.toString().replaceAll('Exception: ', '');
       emit(AuthError(msg));
-      uiService.showSnackBar(msg, isError: true);
     }
   }
 }

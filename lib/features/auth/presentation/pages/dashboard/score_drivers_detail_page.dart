@@ -80,7 +80,7 @@ class ScoreDriversDetailPage extends StatelessWidget {
 
           return SafeArea(
             child: ListView(
-              padding: const EdgeInsets.symmetric(
+              padding: EdgeInsets.symmetric(
                 horizontal: AppSpacing.md,
                 vertical: AppSpacing.xl,
               ),
@@ -96,9 +96,9 @@ class ScoreDriversDetailPage extends StatelessWidget {
                         fontSize: 28,
                       ),
                     ),
-                    const SizedBox(width: AppSpacing.smd),
+                    SizedBox(width: AppSpacing.smd),
                     Container(
-                      padding: const EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 4,
                       ),
@@ -223,7 +223,7 @@ class ScoreDriversDetailPage extends StatelessWidget {
     required List<String> items,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
+      padding: EdgeInsets.only(bottom: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -238,7 +238,7 @@ class ScoreDriversDetailPage extends StatelessWidget {
           const SizedBox(height: 8),
           ...items.map((item) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 4.0),
+              padding: EdgeInsets.only(bottom: 4.0),
               child: Text(
                 item,
                 style: AppTypography.textTheme.bodyMedium?.copyWith(

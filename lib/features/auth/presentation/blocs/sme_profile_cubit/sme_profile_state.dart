@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 enum CsvProcessingStatus { initial, processing, success, error }
-enum DataSource { uploaded, selfReported }
+enum DataSource { uploaded, selfReported, bankData }
 
 class SmeProfileState extends Equatable {
   // Step 1: Business Profile

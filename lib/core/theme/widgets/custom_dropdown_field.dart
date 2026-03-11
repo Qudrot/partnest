@@ -51,7 +51,7 @@ class CustomDropdownField extends StatelessWidget {
               }
               return AppColors.slate100;
             }),
-            contentPadding: const EdgeInsets.symmetric(
+            contentPadding: EdgeInsets.symmetric(
               vertical: 12,
               horizontal: 16,
             ),

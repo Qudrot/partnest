@@ -60,10 +60,10 @@ class _DriverCardState extends State<DriverCard> {
         return AppColors.dangerRed.withValues(alpha: 0.1);
       case DriverRiskLevel.needsWork:
       case DriverRiskLevel.moderate:
-        return const Color(0xFFFEF3C7);
+        return AppColors.warningBg;
       case DriverRiskLevel.good:
       case DriverRiskLevel.excellent:
-        return const Color(0xFFDCFCE7);
+        return AppColors.successBg;
     }
   }
 
@@ -73,10 +73,10 @@ class _DriverCardState extends State<DriverCard> {
         return AppColors.dangerRed;
       case DriverRiskLevel.needsWork:
       case DriverRiskLevel.moderate:
-        return const Color(0xFFD97706);
+        return AppColors.warningAmberText;
       case DriverRiskLevel.good:
       case DriverRiskLevel.excellent:
-        return const Color(0xFF16A34A);
+        return AppColors.successGreenText;
     }
   }
 
@@ -86,16 +86,16 @@ class _DriverCardState extends State<DriverCard> {
         return AppColors.dangerRed;
       case DriverRiskLevel.needsWork:
       case DriverRiskLevel.moderate:
-        return const Color(0xFFF97316);
+        return AppColors.warningOrange;
       case DriverRiskLevel.good:
-        return const Color(0xFFEAB308);
+        return AppColors.warningAmber;
       case DriverRiskLevel.excellent:
-        return const Color(0xFF10B981);
+        return AppColors.successGreen;
     }
   }
 
   Color get _impactPointsColor => widget.impactPoints > 0
-      ? const Color(0xFF10B981)
+      ? AppColors.successGreen
       : AppColors.dangerRed;
 
   @override
@@ -106,7 +106,7 @@ class _DriverCardState extends State<DriverCard> {
       label: '${widget.driverName} driver card',
       expanded: _isExpanded,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: AppColors.neutralWhite,
           borderRadius: BorderRadius.circular(8),
@@ -194,7 +194,7 @@ class _DriverCardState extends State<DriverCard> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.only(
+                                padding: EdgeInsets.only(
                                   top: 8,
                                 ), // Maintained spacing
                                 child: Text(
@@ -223,7 +223,7 @@ class _DriverCardState extends State<DriverCard> {
                                   ),
                                   const SizedBox(width: 8),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(
+                                    padding: EdgeInsets.symmetric(
                                       horizontal: 8,
                                       vertical: 4,
                                     ),

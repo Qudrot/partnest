@@ -17,6 +17,10 @@ class UserModel {
     final String? profilePicture;
     final bool profileCompleted;
     final String? position;
+    final String? investorType;
+    final String? company;
+    final String? investmentRange;
+    final List<String>? sectors;
 
     UserModel({
         required this.id,
@@ -26,6 +30,10 @@ class UserModel {
         this.profilePicture,
         this.profileCompleted = false,
         this.position,
+        this.investorType,
+        this.company,
+        this.investmentRange,
+        this.sectors,
     });
 
     factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);

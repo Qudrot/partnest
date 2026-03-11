@@ -12,9 +12,9 @@ import 'package:partnex/features/auth/presentation/pages/onboarding/revenue_expe
 import 'package:partnex/features/auth/presentation/pages/onboarding/review_confirm_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_bloc.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_event.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_state.dart';
 import 'package:partnex/features/auth/presentation/pages/dashboard/analysis_state_page.dart';
 import 'package:partnex/core/services/ui_service.dart';
 
@@ -47,6 +47,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
   final _yearsController = TextEditingController();
   final _employeesController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _otherIndustryController = TextEditingController();
 
   String? _selectedIndustry;
 
@@ -66,10 +67,10 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
   bool get _isFormValid {
     // Basic validation to enable Next button
     return _nameController.text.length >= 2 &&
-        _selectedIndustry != null &&
         _locationController.text.isNotEmpty &&
         _yearsController.text.isNotEmpty &&
-        _employeesController.text.isNotEmpty;
+        _employeesController.text.isNotEmpty &&
+        (_selectedIndustry != 'Other' || _otherIndustryController.text.isNotEmpty);
   }
 
   void _onFieldChanged(String value) {
@@ -113,6 +114,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
     _yearsController.dispose();
     _employeesController.dispose();
     _phoneController.dispose();
+    _otherIndustryController.dispose();
     super.dispose();
   }
 
@@ -156,7 +158,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                 // Progress Indicator
                 if (!widget._inEditMode)
                   Padding(
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                       horizontal: AppSpacing.md,
                       vertical: AppSpacing.xs,
                     ),
@@ -165,11 +167,11 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                     ),
                   ),
                 if (!widget._inEditMode)
-                  const SizedBox(height: AppSpacing.xl),
+                  SizedBox(height: AppSpacing.xl),
 
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -187,7 +189,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: AppSpacing.lg),
+                          SizedBox(height: AppSpacing.lg),
                           CustomDropdownField(
                             label: 'Industry/Sector',
                             placeholder: 'Select industry...',
@@ -196,10 +198,28 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                             onChanged: (val) {
                               setState(() {
                                 _selectedIndustry = val;
+                                if (val != 'Other') {
+                                  _otherIndustryController.clear();
+                                }
                               });
                             },
                           ),
-                          const SizedBox(height: AppSpacing.lg),
+                          if (_selectedIndustry == 'Other') ...[
+                            SizedBox(height: AppSpacing.lg),
+                            CustomInputField(
+                              label: 'Specific Industry',
+                              placeholder: 'e.g., Renewable Energy',
+                              controller: _otherIndustryController,
+                              onChanged: _onFieldChanged,
+                              validator: (val) {
+                                if (_selectedIndustry == 'Other' && (val == null || val.isEmpty)) {
+                                  return 'Please specify your industry';
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                          SizedBox(height: AppSpacing.lg),
                           CustomInputField(
                             label: 'Location',
                             placeholder: 'e.g., Lagos, Nigeria',
@@ -211,7 +231,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: AppSpacing.lg),
+                          SizedBox(height: AppSpacing.lg),
                           CustomInputField(
                             label: 'Years of Operation',
                             placeholder: 'e.g., 5',
@@ -225,7 +245,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: AppSpacing.lg),
+                          SizedBox(height: AppSpacing.lg),
                           CustomInputField(
                             label: 'Number of Employees',
                             placeholder: 'e.g., 25',
@@ -239,7 +259,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: AppSpacing.lg),
+                          SizedBox(height: AppSpacing.lg),
                           CustomInputField(
                             label: 'Phone Number',
                             placeholder: 'e.g., +234 805 678 9012',
@@ -250,7 +270,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: AppSpacing.xxl),
+                          SizedBox(height: AppSpacing.xxl),
                         ],
                       ),
                     ),
@@ -259,7 +279,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
 
                 // Navigation Buttons
                 Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
+                  padding: EdgeInsets.all(AppSpacing.md),
                   child: Row(
                     children: [
                       Expanded(
@@ -269,7 +289,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                           onPressed: () => uiService.goBack(),
                         ),
                       ),
-                      const SizedBox(width: AppSpacing.smd),
+                      SizedBox(width: AppSpacing.smd),
                       Expanded(
                         child: CustomButton(
                           text: widget._inEditMode
@@ -284,7 +304,9 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                                   .read<SmeProfileCubit>()
                                   .updateBusinessProfile(
                                     businessName: _nameController.text,
-                                    industry: _selectedIndustry!,
+                                    industry: _selectedIndustry == 'Other' 
+                                        ? _otherIndustryController.text.trim()
+                                        : _selectedIndustry!,
                                     location: _locationController.text,
                                     yearsOfOperation: int.parse(
                                       _yearsController.text,

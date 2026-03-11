@@ -67,7 +67,7 @@ class _SplashPageState extends State<SplashPage> {
             return FadeTransition(opacity: animation, child: child);
           },
           // Increased duration for a smoother, more elegant fade
-          transitionDuration: const Duration(milliseconds: 800), 
+          transitionDuration: const Duration(milliseconds: 600), 
         ),
         (route) => false,
       );
@@ -79,21 +79,30 @@ class _SplashPageState extends State<SplashPage> {
     return Scaffold(
       backgroundColor: AppColors.neutralWhite,
       body: Center(
-        // Removed the FadeTransition and ScaleTransition to make it completely static
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const PartnexLogo(size: 48, variant: PartnexLogoVariant.brandCombo),
-            const SizedBox(height: 4),
-            Text(
-              'Your SME credibility platform',
-              style: AppTypography.textTheme.bodySmall?.copyWith(
-                color: AppColors.slate600,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.98, end: 1.02),
+          duration: const Duration(seconds: 5),
+          builder: (context, scale, child) {
+            return Transform.scale(
+              scale: scale,
+              child: child,
+            );
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const PartnexLogo(size: 48, variant: PartnexLogoVariant.brandCombo),
+              const SizedBox(height: 4),
+              Text(
+                'Your SME credibility platform',
+                style: AppTypography.textTheme.bodySmall?.copyWith(
+                  color: AppColors.slate600,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

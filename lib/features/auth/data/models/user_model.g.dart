@@ -14,6 +14,12 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
   profilePicture: json['profilePicture'] as String?,
   profileCompleted: json['profileCompleted'] as bool? ?? false,
   position: json['position'] as String?,
+  investorType: json['investorType'] as String?,
+  company: json['company'] as String?,
+  investmentRange: json['investmentRange'] as String?,
+  sectors: (json['sectors'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
 );
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
@@ -24,6 +30,10 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
   'profilePicture': instance.profilePicture,
   'profileCompleted': instance.profileCompleted,
   'position': instance.position,
+  'investorType': instance.investorType,
+  'company': instance.company,
+  'investmentRange': instance.investmentRange,
+  'sectors': instance.sectors,
 };
 
 const _$UserRoleEnumMap = {

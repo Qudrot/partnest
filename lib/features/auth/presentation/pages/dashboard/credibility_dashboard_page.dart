@@ -99,7 +99,7 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
             ),
             body: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -116,7 +116,7 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                         color: AppColors.trustBlue,
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.xl),
+                    SizedBox(height: AppSpacing.xl),
                     Text(
                       'Welcome to Partnex!',
                       style: AppTypography.textTheme.headlineMedium?.copyWith(
@@ -125,7 +125,7 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.smd),
+                    SizedBox(height: AppSpacing.smd),
                     Text(
                       'No credibility score yet. Submit your business profile to generate your AI-powered credibility score.',
                       textAlign: TextAlign.center,
@@ -134,7 +134,7 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                         fontSize: 14,
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.xxl),
+                    SizedBox(height: AppSpacing.xxl),
                     CustomButton(
                       text: 'Explore SMEs (Investor)',
                       variant: ButtonVariant.primary,
@@ -260,7 +260,7 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
           ),
           body: SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(
+              padding: EdgeInsets.symmetric(
                 horizontal: 16.0,
                 vertical: 16.0,
               ),
@@ -306,7 +306,7 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                         ),
                         const SizedBox(height: 12),
                         Container(
-                          padding: const EdgeInsets.symmetric(
+                          padding: EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 8,
                           ),
@@ -434,7 +434,7 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                           .take(3)
                           .map((driver) {
                             return Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
+                              padding: EdgeInsets.only(bottom: 12),
                               child: _buildDriverBar(
                                 driverName: driver.name,
                                 percentage: driver.scoreValue / 100,
@@ -450,12 +450,14 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
                   CustomButton(
                     text: 'Apply for Funding',
                     variant: ButtonVariant.primary,
-                    onPressed: () {},
+                    isFullWidth: true,
+                    onPressed: () => _showComingSoonBottomSheet(context),
                   ),
                   const SizedBox(height: 12),
                   CustomButton(
                     text: 'View Detailed Breakdown',
                     variant: ButtonVariant.secondary,
+                    isFullWidth: true,
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -473,13 +475,79 @@ class _CredibilityDashboardPageState extends State<CredibilityDashboardPage> {
     );
   }
 
+  void _showComingSoonBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        padding: EdgeInsets.all(AppSpacing.xl),
+        decoration: BoxDecoration(
+          color: AppColors.neutralWhite,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.slate200,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            SizedBox(height: AppSpacing.xl),
+            Container(
+              padding: EdgeInsets.all(AppSpacing.lg),
+              decoration: BoxDecoration(
+                color: AppColors.trustBlue.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                LucideIcons.rocket,
+                size: 48,
+                color: AppColors.trustBlue,
+              ),
+            ),
+            SizedBox(height: AppSpacing.xl),
+            Text(
+              'Coming Soon!',
+              style: AppTypography.textTheme.headlineMedium?.copyWith(
+                color: AppColors.slate900,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: AppSpacing.md),
+            Text(
+              'We\'re working with top institutional investors to bring you the best funding opportunities directly on Partnex.',
+              textAlign: TextAlign.center,
+              style: AppTypography.textTheme.bodyMedium?.copyWith(
+                color: AppColors.slate600,
+                height: 1.5,
+              ),
+            ),
+            SizedBox(height: AppSpacing.xxl),
+            CustomButton(
+              text: 'Got it, thanks!',
+              variant: ButtonVariant.primary,
+              isFullWidth: true,
+              onPressed: () => Navigator.pop(context),
+            ),
+            SizedBox(height: AppSpacing.md),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildDriverBar({
     required String driverName,
     required double percentage,
     required Color statusColor,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: AppColors.neutralWhite,
         border: Border.all(color: AppColors.slate200),

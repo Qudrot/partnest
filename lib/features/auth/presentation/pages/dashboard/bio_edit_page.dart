@@ -7,14 +7,14 @@ import 'package:partnex/core/theme/widgets/custom_button.dart';
 import 'package:partnex/core/services/ui_service.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 
-class BioEditScreen extends StatefulWidget {
+class BioEditPage extends StatefulWidget {
   final String initialBio;
   final String initialWebsite;
   final String initialWhatsapp;
   final String initialLinkedin;
   final String initialTwitter;
 
-  const BioEditScreen({
+  const BioEditPage({
     super.key,
     this.initialBio = '',
     this.initialWebsite = '',
@@ -24,10 +24,10 @@ class BioEditScreen extends StatefulWidget {
   });
 
   @override
-  State<BioEditScreen> createState() => _BioEditScreenState();
+  State<BioEditPage> createState() => _BioEditPageState();
 }
 
-class _BioEditScreenState extends State<BioEditScreen> {
+class _BioEditPageState extends State<BioEditPage> {
   late final TextEditingController _bioController;
   late final TextEditingController _websiteController;
   late final TextEditingController _whatsappController;
@@ -43,7 +43,23 @@ class _BioEditScreenState extends State<BioEditScreen> {
     _whatsappController = TextEditingController(text: widget.initialWhatsapp);
     _linkedinController = TextEditingController(text: widget.initialLinkedin);
     _twitterController = TextEditingController(text: widget.initialTwitter);
-    _bioController.addListener(() => setState(() {}));
+    _bioController.addListener(_onFieldChanged);
+    _websiteController.addListener(_onFieldChanged);
+    _whatsappController.addListener(_onFieldChanged);
+    _linkedinController.addListener(_onFieldChanged);
+    _twitterController.addListener(_onFieldChanged);
+  }
+
+  void _onFieldChanged() {
+    setState(() {});
+  }
+
+  bool get _isDirty {
+    return _bioController.text.trim() != widget.initialBio.trim() ||
+           _websiteController.text.trim() != widget.initialWebsite.trim() ||
+           _whatsappController.text.trim() != widget.initialWhatsapp.trim() ||
+           _linkedinController.text.trim() != widget.initialLinkedin.trim() ||
+           _twitterController.text.trim() != widget.initialTwitter.trim();
   }
 
   @override
@@ -80,7 +96,12 @@ class _BioEditScreenState extends State<BioEditScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
-          onPressed: () => uiService.goBack(),
+          onPressed: () {
+            if (!_isDirty) {
+              uiService.showSnackBar('Profile confirmed with no changes.');
+            }
+            uiService.goBack();
+          },
         ),
         title: Text(
           'Edit Bio',
@@ -134,7 +155,7 @@ class _BioEditScreenState extends State<BioEditScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
-                  borderSide: const BorderSide(color: Color(0xFF2563EB), width: 1.5),
+                  borderSide: const BorderSide(color: AppColors.linkBlue, width: 1.5),
                 ),
                 contentPadding: const EdgeInsets.all(12),
               ),
@@ -146,7 +167,7 @@ class _BioEditScreenState extends State<BioEditScreen> {
             Align(
               alignment: Alignment.centerRight,
               child: Padding(
-                padding: const EdgeInsets.only(top: 4),
+                padding: EdgeInsets.only(top: 4),
                 child: Text(
                   '${_bioController.text.trim().isEmpty ? 0 : _bioController.text.trim().split(RegExp(r'\s+')).length} / 1000 words',
                   style: AppTypography.textTheme.bodySmall?.copyWith(
@@ -211,7 +232,7 @@ class _BioEditScreenState extends State<BioEditScreen> {
             CustomButton(
               text: _isSaving ? 'Saving...' : 'Save Bio',
               variant: ButtonVariant.primary,
-              isDisabled: _isSaving,
+              isDisabled: _isSaving || !_isDirty,
               isLoading: _isSaving,
               onPressed: _handleSave,
             ),
@@ -269,7 +290,7 @@ class _BioEditScreenState extends State<BioEditScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
-              borderSide: const BorderSide(color: Color(0xFF2563EB), width: 1.5),
+              borderSide: const BorderSide(color: AppColors.linkBlue, width: 1.5),
             ),
             contentPadding: const EdgeInsets.all(12),
           ),

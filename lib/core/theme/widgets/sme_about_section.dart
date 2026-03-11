@@ -69,7 +69,7 @@ class SmeAboutSection extends StatelessWidget {
                         style: AppTypography.textTheme.bodyMedium?.copyWith(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          color: const Color(0xFF2563EB),
+                          color: AppColors.linkBlue,
                         ),
                       ),
                     ),
@@ -96,11 +96,11 @@ class SmeAboutSection extends StatelessWidget {
                     child: GestureDetector(
                       onTap: onEditBio,
                       child: Text(
-                        'Edit Bio',
+                        'Add Bio',
                         style: AppTypography.textTheme.bodyMedium?.copyWith(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          color: const Color(0xFF2563EB),
+                          color: AppColors.linkBlue,
                         ),
                       ),
                     ),

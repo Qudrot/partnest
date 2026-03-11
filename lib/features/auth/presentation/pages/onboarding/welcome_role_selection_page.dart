@@ -15,7 +15,7 @@ class WelcomeRoleSelectionPage extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -85,7 +85,7 @@ class WelcomeRoleSelectionPage extends StatelessWidget {
 
               // Footer
               // Padding(
-              //   padding: const EdgeInsets.only(bottom: 24.0, top: 16.0),
+              //   padding: EdgeInsets.only(bottom: 24.0, top: 16.0),
               //   child: Text.rich(
               //     TextSpan(
               //       text: 'By continuing, you agree to our ',

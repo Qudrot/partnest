@@ -10,9 +10,9 @@ import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
 import 'package:partnex/core/theme/widgets/custom_progress_indicator.dart';
 import 'package:partnex/core/theme/app_sizes.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_bloc.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_event.dart';
-import 'package:partnex/features/auth/presentation/blocs/auth_state.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_bloc.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_event.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_state.dart';
 import 'package:partnex/features/auth/presentation/blocs/score_cubit/score_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_state.dart';
@@ -79,8 +79,8 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
     String editLabel = 'Edit',
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.md),
+      margin: EdgeInsets.symmetric(vertical: AppSpacing.md),
+      padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.slate50,
         borderRadius: BorderRadius.circular(AppRadius.md),
@@ -101,11 +101,11 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                 ),
             ],
           ),
-          const SizedBox(height: AppSpacing.smd),
+          SizedBox(height: AppSpacing.smd),
           ...data.entries.map((entry) {
             bool isMissingError = entry.value.toString().contains('MISSING');
             return Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.smd),
+              padding: EdgeInsets.only(bottom: AppSpacing.smd),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -165,37 +165,37 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
               children: [
                 if (!widget.isUpdatingRecord)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
                     child: Column(
                       children: [
                         const ProgressIndicatorWidget(progress: 1.0),
                       ],
                     ),
                   ),
-                const SizedBox(height: AppSpacing.md),
+                SizedBox(height: AppSpacing.md),
 
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
                     child: Column(
                       children: [
                         if (missingYear2 && widget.isDocumentUpload)
                           Container(
-                            padding: const EdgeInsets.all(AppSpacing.smd),
-                            margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                            padding: EdgeInsets.all(AppSpacing.smd),
+                            margin: EdgeInsets.only(bottom: AppSpacing.md),
                             decoration: BoxDecoration(color: AppColors.warningAmber.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(AppRadius.md), border: Border.all(color: AppColors.warningAmber)),
                             child: Row(children: [
                               const Icon(LucideIcons.alertTriangle, color: AppColors.warningAmber, size: 20),
-                              const SizedBox(width: AppSpacing.smd),
+                              SizedBox(width: AppSpacing.smd),
                               Expanded(child: Text("Your statement only contained 1 year of data. The AI requires at least 2 years. Please tap 'Edit' below to add your previous year's revenue.", style: TextStyle(color: AppColors.warningAmber, fontSize: 13, fontWeight: FontWeight.w600))),
                             ]),
                           ),
 
                         if (widget.isDocumentUpload)
                           Padding(
-                            padding: const EdgeInsets.only(bottom: AppSpacing.md, top: AppSpacing.xs),
+                            padding: EdgeInsets.only(bottom: AppSpacing.md, top: AppSpacing.xs),
                             child: Container(
-                              padding: const EdgeInsets.all(AppSpacing.md),
+                              padding: EdgeInsets.all(AppSpacing.md),
                               decoration: BoxDecoration(
                                 color: AppColors.trustBlue.withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(AppRadius.md),
@@ -209,7 +209,7 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                                     color: AppColors.trustBlue,
                                     size: AppSizes.iconSmd,
                                   ),
-                                  const SizedBox(width: AppSpacing.smd),
+                                  SizedBox(width: AppSpacing.smd),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,7 +221,7 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                                             color: AppColors.slate900,
                                           ),
                                         ),
-                                        const SizedBox(height: AppSpacing.xs),
+                                        SizedBox(height: AppSpacing.xs),
                                         Text(
                                           'The financial values below were intelligently extracted directly from your document.',
                                           style: AppTypography.textTheme.bodySmall?.copyWith(
@@ -320,7 +320,7 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                             onEdit: _rePickDocument,
                           ),
 
-                        const SizedBox(height: AppSpacing.xl),
+                        SizedBox(height: AppSpacing.xl),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -332,7 +332,7 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                                 activeColor: AppColors.trustBlue,
                               ),
                             ),
-                            const SizedBox(width: AppSpacing.smd),
+                            SizedBox(width: AppSpacing.smd),
                             Expanded(
                               child: GestureDetector(
                                 onTap: () => setState(() => _isConfirmed = !_isConfirmed),
@@ -341,18 +341,18 @@ class _ReviewConfirmPageState extends State<ReviewConfirmPage> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: AppSpacing.xxl),
+                        SizedBox(height: AppSpacing.xxl),
                       ],
                     ),
                   ),
                 ),
 
                 Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
+                  padding: EdgeInsets.all(AppSpacing.md),
                   child: Row(
                     children: [
                       Expanded(child: CustomButton(text: 'Previous', variant: ButtonVariant.secondary, isDisabled: isSubmitting, onPressed: () => Navigator.pop(context))),
-                      const SizedBox(width: AppSpacing.smd),
+                      SizedBox(width: AppSpacing.smd),
                       Expanded(
                         child: CustomButton(
                           text: widget.isUpdatingRecord ? 'Generate Score' : 'Generate Score',

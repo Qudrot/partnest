@@ -198,7 +198,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                       color: AppColors.slate900,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.xs),
+                  SizedBox(height: AppSpacing.xs),
                   CustomInputField(
                     label: '',
                     controller: yearCtrl,
@@ -220,7 +220,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                 ],
               ),
             ),
-            const SizedBox(width: AppSpacing.sm),
+            SizedBox(width: AppSpacing.sm),
             Expanded(
               flex: isMobile ? 60 : 55,
               child: Column(
@@ -234,14 +234,14 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                       color: AppColors.slate900,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.xs),
+                  SizedBox(height: AppSpacing.xs),
                   CustomCurrencyField(
                     label: '',
                     placeholder: 'e.g., 5,000,000',
                     controller: amountCtrl,
                     onChanged: _onFieldChanged,
                     fillColor: AppColors.neutralWhite,
-                    contentPadding: const EdgeInsets.symmetric(
+                    contentPadding: EdgeInsets.symmetric(
                       horizontal: AppSpacing.smd,
                       vertical: AppSpacing.sm,
                     ),
@@ -253,7 +253,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: AppSpacing.xs),
+                  SizedBox(height: AppSpacing.xs),
                   Text(
                     helperText,
                     style: AppTypography.textTheme.bodySmall?.copyWith(
@@ -299,7 +299,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: AppSpacing.md,
                   vertical: AppSpacing.md,
                 ),
@@ -310,7 +310,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                     children: [
                       if (!widget.isEditing && !widget.isUpdatingRecord)
                         Padding(
-                          padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                          padding: EdgeInsets.only(bottom: AppSpacing.xl),
                           child: ProgressIndicatorWidget(progress: 0.60),
                         ),
                       Text(
@@ -321,7 +321,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                           color: AppColors.slate900,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.xs),
+                      SizedBox(height: AppSpacing.xs),
                       Text(
                         'Provide at least 2 years of revenue data',
                         style: AppTypography.textTheme.bodySmall?.copyWith(
@@ -329,7 +329,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                           color: AppColors.slate600,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.md),
+                      SizedBox(height: AppSpacing.md),
 
                       _buildRevenueRow(
                         yearCtrl: _year1Controller,
@@ -338,7 +338,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                             'Annual revenue for ${_year1Controller.text}',
                         isMobile: isMobile,
                       ),
-                      const SizedBox(height: AppSpacing.smd),
+                      SizedBox(height: AppSpacing.smd),
 
                       _buildRevenueRow(
                         yearCtrl: _year2Controller,
@@ -347,7 +347,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                             'Annual revenue for ${_year2Controller.text}',
                         isMobile: isMobile,
                       ),
-                      const SizedBox(height: AppSpacing.smd),
+                      SizedBox(height: AppSpacing.smd),
 
                       // YEAR 3 LOGIC (UPDATED WITH DELETE BUTTON)
                       if (_showYear3) ...[
@@ -357,7 +357,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                             color: AppColors.slate600,
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.sm),
+                        SizedBox(height: AppSpacing.sm),
                         _buildRevenueRow(
                           yearCtrl: _year3Controller,
                           amountCtrl: _amount3Controller,
@@ -388,7 +388,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                             },
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.smd),
+                        SizedBox(height: AppSpacing.smd),
                       ] else ...[
                         CustomButton(
                           text: 'Add Another Year',
@@ -407,7 +407,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                           },
                         ),
                       ],
-                      const SizedBox(height: AppSpacing.xl),
+                      SizedBox(height: AppSpacing.xl),
 
                       Text(
                         'Monthly Financials (Average)',
@@ -417,7 +417,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                           color: AppColors.slate900,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.xs),
+                      SizedBox(height: AppSpacing.xs),
                       Text(
                         'Average monthly figures for the last 12 months',
                         style: AppTypography.textTheme.bodySmall?.copyWith(
@@ -425,7 +425,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                           color: AppColors.slate600,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.md),
+                      SizedBox(height: AppSpacing.md),
 
                       Text(
                         'Monthly Revenue',
@@ -435,19 +435,19 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                           color: AppColors.slate900,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.xs),
+                      SizedBox(height: AppSpacing.xs),
                       CustomCurrencyField(
                         label: '',
                         placeholder: 'e.g., 500,000',
                         controller: _monthlyRevController,
                         onChanged: _onFieldChanged,
                         fillColor: AppColors.neutralWhite,
-                        contentPadding: const EdgeInsets.symmetric(
+                        contentPadding: EdgeInsets.symmetric(
                           horizontal: AppSpacing.smd,
                           vertical: AppSpacing.sm,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.md),
+                      SizedBox(height: AppSpacing.md),
 
                       Text(
                         'Monthly Expenses',
@@ -457,14 +457,14 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                           color: AppColors.slate900,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.xs),
+                      SizedBox(height: AppSpacing.xs),
                       CustomCurrencyField(
                         label: '',
                         placeholder: 'e.g., 300,000',
                         controller: _monthlyExpController,
                         onChanged: _onFieldChanged,
                         fillColor: AppColors.neutralWhite,
-                        contentPadding: const EdgeInsets.symmetric(
+                        contentPadding: EdgeInsets.symmetric(
                           horizontal: AppSpacing.smd,
                           vertical: AppSpacing.sm,
                         ),
@@ -477,9 +477,9 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                       ),
 
                       if (_profitMargin != null || _annualProfit != null) ...[
-                        const SizedBox(height: AppSpacing.xl),
+                        SizedBox(height: AppSpacing.xl),
                         Container(
-                          padding: const EdgeInsets.all(AppSpacing.md),
+                          padding: EdgeInsets.all(AppSpacing.md),
                           decoration: BoxDecoration(
                             color: AppColors.slate50,
                             borderRadius: BorderRadius.circular(AppRadius.md),
@@ -493,7 +493,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                                 style: AppTypography.textTheme.labelLarge
                                     ?.copyWith(color: AppColors.slate900),
                               ),
-                              const SizedBox(height: AppSpacing.smd),
+                              SizedBox(height: AppSpacing.smd),
                               if (_profitMargin != null) ...[
                                 Row(
                                   mainAxisAlignment:
@@ -514,7 +514,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: AppSpacing.sm),
+                                SizedBox(height: AppSpacing.sm),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -537,7 +537,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                               ],
                               if (_annualProfit != null &&
                                   _profitMargin != null)
-                                const SizedBox(height: AppSpacing.sm),
+                                SizedBox(height: AppSpacing.sm),
                               if (_annualProfit != null)
                                 Row(
                                   mainAxisAlignment:
@@ -562,7 +562,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                           ),
                         ),
                       ],
-                      const SizedBox(height: AppSpacing.xxl),
+                      SizedBox(height: AppSpacing.xxl),
                     ],
                   ),
                 ),
@@ -570,7 +570,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
             ),
 
             Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
+              padding: EdgeInsets.all(AppSpacing.md),
               child: Row(
                 children: [
                   Expanded(
@@ -580,7 +580,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.smd),
+                  SizedBox(width: AppSpacing.smd),
                   Expanded(
                     child: CustomButton(
                       text: widget.isEditing ? 'Save Changes' : 'Next',
