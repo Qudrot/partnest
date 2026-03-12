@@ -5,6 +5,9 @@ import 'package:partnex/core/theme/app_colors.dart';
 import 'package:partnex/core/theme/app_typography.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
 import 'package:partnex/core/services/ui_service.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_bloc.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_event.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_state.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 
 class BioEditPage extends StatefulWidget {
@@ -83,61 +86,73 @@ class _BioEditPageState extends State<BioEditPage> {
       twitterHandle: _twitterController.text.trim(),
     );
 
-    uiService.showSnackBar('Bio updated successfully');
-    uiService.goBack();
+    // Save to backend but skip score generation
+    final state = context.read<SmeProfileCubit>().state;
+    context.read<AuthBloc>().add(SubmitSmeProfileEvent(state.toMap(), shouldGenerateScore: false));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.neutralWhite,
-      appBar: AppBar(
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is SmeProfileSubmittedSuccess) {
+          setState(() => _isSaving = false);
+          uiService.showSnackBar('Profile updated successfully');
+          uiService.goBack();
+        } else if (state is SmeProfileSubmissionError) {
+          setState(() => _isSaving = false);
+          uiService.showSnackBar(state.message, isError: true);
+        }
+      },
+      child: Scaffold(
         backgroundColor: AppColors.neutralWhite,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
-          onPressed: () {
-            if (!_isDirty) {
-              uiService.showSnackBar('Profile confirmed with no changes.');
-            }
-            uiService.goBack();
-          },
-        ),
-        title: Text(
-          'Edit Bio',
-          style: AppTypography.textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-            color: AppColors.slate900,
+        appBar: AppBar(
+          backgroundColor: AppColors.neutralWhite,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
+            onPressed: () {
+              if (!_isDirty) {
+                uiService.showSnackBar('Profile confirmed with no changes.');
+              }
+              uiService.goBack();
+            },
+          ),
+          title: Text(
+            'Edit Bio',
+            style: AppTypography.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              color: AppColors.slate900,
+            ),
+          ),
+          centerTitle: false,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1.0),
+            child: Container(color: AppColors.slate200, height: 1.0),
           ),
         ),
-        centerTitle: false,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: AppColors.slate200, height: 1.0),
-        ),
-      ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // Bio Section
-            Text(
-              'About Your Business',
-              style: AppTypography.textTheme.bodyMedium?.copyWith(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.slate900,
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              // Bio Section
+              Text(
+                'About Your Business',
+                style: AppTypography.textTheme.bodyMedium?.copyWith(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.slate900,
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _bioController,
-              maxLength: 7000,
-              maxLines: 8,
-              minLines: 6,
-              buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
-              decoration: InputDecoration(
+              const SizedBox(height: 12),
+              TextField(
+                controller: _bioController,
+                maxLength: 7000,
+                maxLines: 8,
+                minLines: 6,
+                buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
+                decoration: InputDecoration(
                 hintText: 'Tell investors about your business, mission, team, and achievements...',
                 hintStyle: AppTypography.textTheme.bodyMedium?.copyWith(
                   fontSize: 14,
@@ -241,8 +256,9 @@ class _BioEditPageState extends State<BioEditPage> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildSocialField({
     required IconData icon,

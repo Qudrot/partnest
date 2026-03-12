@@ -76,7 +76,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       };
       
       // The profileData map will be sent to the repository's API call
-      final score = await authRepository.submitSmeProfile(fullData);
+      final score = await authRepository.submitSmeProfile(
+        fullData,
+        shouldGenerateScore: event.shouldGenerateScore,
+      );
       emit(SmeProfileSubmittedSuccess(score));
     } catch (e) {
       final msg = e.toString().replaceAll('Exception: ', '');

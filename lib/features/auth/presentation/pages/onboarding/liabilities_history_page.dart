@@ -9,7 +9,12 @@ import 'package:partnex/core/theme/widgets/custom_progress_indicator.dart';
 import 'package:partnex/core/theme/widgets/custom_yes_no_field.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/review_confirm_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:partnex/core/services/ui_service.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_bloc.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_event.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_state.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
+import 'package:partnex/features/auth/presentation/pages/dashboard/analysis_state_page.dart';
 
 class LiabilitiesHistoryPage extends StatefulWidget {
   final bool isEditing;
@@ -130,27 +135,36 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Liabilities & History',
-          style: AppTypography.textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-            color: AppColors.slate900,
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, authState) {
+        if (authState is SmeProfileSubmittedSuccess && widget.isEditing) {
+          // If we were editing, we move to analysis page because everything here is meaningful
+          uiService.navigateTo(const AnalysisStatePage());
+        } else if (authState is SmeProfileSubmissionError) {
+          uiService.showSnackBar(authState.message, isError: true);
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
+            onPressed: () => Navigator.pop(context),
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+          title: Text(
+            'Liabilities & History',
+            style: AppTypography.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+              color: AppColors.slate900,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: SafeArea(
+        body: SafeArea(
         child: Column(
           children: [
             if (!widget.isEditing && !widget.isUpdatingRecord)
@@ -416,7 +430,9 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
                               );
 
                           if (widget.isEditing) {
-                            Navigator.pop(context);
+                            // Save to backend and re-score (everything here is meaningful)
+                            final state = context.read<SmeProfileCubit>().state;
+                            context.read<AuthBloc>().add(SubmitSmeProfileEvent(state.toMap(), shouldGenerateScore: true));
                           } else {
                             Navigator.push(
                               context,
@@ -437,6 +453,7 @@ class _LiabilitiesHistoryPageState extends State<LiabilitiesHistoryPage> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

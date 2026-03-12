@@ -603,14 +603,13 @@ class _NumberStreamAnimationState extends State<NumberStreamAnimation> {
     final color = _colors[_random.nextInt(_colors.length)];
     final angle = (_random.nextDouble() * 0.8) - 0.4; // -0.4 to 0.4 radians
 
-    // Randomize movement path (within reasonable bounds of a 120x120 box)
-    // -1.8 to 1.8 bounds to ensure we span the edges
-    final startX = (_random.nextDouble() * 3.6) - 1.8;
-    final startY = (_random.nextDouble() * 3.6) - 1.8;
+    // Randomize movement path (keep completely within bounds -0.8 to 0.8 to avoid edges)
+    final startX = (_random.nextDouble() * 1.6) - 0.8;
+    final startY = (_random.nextDouble() * 1.6) - 0.8;
     
-    // End coordinate drifts away from start coordinate
-    final endX = startX + ((_random.nextDouble() * 1.5) - 0.75);
-    final endY = startY + ((_random.nextDouble() * 1.5) - 0.75);
+    // End coordinate drifts away from start coordinate slightly
+    final endX = startX + ((_random.nextDouble() * 0.4) - 0.2);
+    final endY = startY + ((_random.nextDouble() * 0.4) - 0.2);
 
     setState(() {
       _numbers.add(

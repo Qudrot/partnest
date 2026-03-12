@@ -8,6 +8,7 @@ import 'package:partnex/core/theme/widgets/driver_card.dart';
 import 'package:partnex/core/theme/widgets/metric_mini_card.dart';
 import 'package:partnex/core/theme/widgets/data_source_badge.dart';
 import 'package:partnex/core/theme/widgets/sme_bio_contact_card.dart';
+import 'package:partnex/core/utils/url_helper.dart';
 import 'package:partnex/features/auth/data/models/sme_profile_data.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/investor_full_bio_page.dart';
 
@@ -104,6 +105,7 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
                               child: _buildSocialOption(
                                 'WhatsApp',
                                 'assets/icons/whatsapp.png',
+                                onTap: () => UrlHelper.launchWhatsApp(widget.whatsappNumber!),
                               ),
                             ),
                           if (hasWhatsapp && (hasLinkedin || hasTwitter)) const SizedBox(width: 12),
@@ -112,6 +114,7 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
                               child: _buildSocialOption(
                                 'LinkedIn',
                                 'assets/icons/linkedin.png',
+                                onTap: () => UrlHelper.launchWebsite(widget.linkedinUrl!),
                               ),
                             ),
                           if (hasLinkedin && hasTwitter) const SizedBox(width: 12),
@@ -120,6 +123,7 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
                               child: _buildSocialOption(
                                 'Twitter',
                                 'assets/icons/twitter.png',
+                                onTap: () => UrlHelper.launchWebsite('https://twitter.com/${widget.twitterHandle!.replaceAll('@', '')}'),
                               ),
                             ),
                           
@@ -136,43 +140,13 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
                 return const SizedBox.shrink();
               },
             ),
-            // const SizedBox(height: 24),
-            // Container(
-            //   padding: const EdgeInsets.all(12),
-            //   decoration: BoxDecoration(
-            //     color: AppColors.slate50,
-            //     borderRadius: BorderRadius.circular(6),
-            //   ),
-            //   child: Column(
-            //     crossAxisAlignment: CrossAxisAlignment.start,
-            //     children: [
-            //       Text(
-            //         message,
-            //         style: AppTypography.textTheme.bodyMedium?.copyWith(
-            //           fontSize: 12,
-            //           color: AppColors.slate600,
-            //         ),
-            //       ),
-            //       const SizedBox(height: 8),
-            //       InkWell(
-            //         onTap: () {},
-            //         child: Text(
-            //           'Edit message',
-            //           style: AppTypography.textTheme.bodySmall?.copyWith(
-            //             fontSize: 12,
-            //             color: AppColors.trustBlue,
-            //           ),
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
             const SizedBox(height: 24),
             if (widget.email != null && widget.email!.isNotEmpty)
               _buildDirectContact(
                 'Email',
                 widget.email!,
                 LucideIcons.mail,
+                onTap: () => UrlHelper.launchEmail(widget.email!),
               ),
             if (widget.email != null && widget.email!.isNotEmpty)
               const SizedBox(height: 12),
@@ -181,15 +155,17 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
                 'Phone',
                 widget.phoneNumber!,
                 LucideIcons.phone,
+                onTap: () => UrlHelper.launchPhone(widget.phoneNumber!),
               ),
             if (widget.phoneNumber != null && widget.phoneNumber!.isNotEmpty)
-            //   const SizedBox(height: 12),
-            // if (widget.website != null && widget.website!.isNotEmpty)
-            //   _buildDirectContact(
-            //     'Website',
-            //     widget.website!,
-            //     LucideIcons.globe,
-            //   ),
+              const SizedBox(height: 12),
+            if (widget.website != null && widget.website!.isNotEmpty)
+              _buildDirectContact(
+                'Website',
+                widget.website!,
+                LucideIcons.globe,
+                onTap: () => UrlHelper.launchWebsite(widget.website!),
+              ),
             const SizedBox(height: 16),
           ],
         ),
@@ -197,11 +173,11 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
     );
   }
 
-  Widget _buildSocialOption(String label, String assetPath) {
+  Widget _buildSocialOption(String label, String assetPath, {required VoidCallback onTap}) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {},
+        onTap: onTap,
         borderRadius: BorderRadius.circular(AppRadius.sm),
         child: Container(
           padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
@@ -230,14 +206,19 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
     );
   }
 
-  Widget _buildDirectContact(String label, String value, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: AppColors.slate400),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildDirectContact(String label, String value, IconData icon, {required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4.0),
+        child: Row(
           children: [
+            Icon(icon, size: 16, color: AppColors.slate400),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
             Text(
               label,
               style: AppTypography.textTheme.labelSmall?.copyWith(
@@ -256,6 +237,8 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
           ],
         ),
       ],
+        ),
+      ),
     );
   }
 }

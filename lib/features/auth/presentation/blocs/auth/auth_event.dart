@@ -41,11 +41,12 @@ class SignupEvent extends AuthEvent {
 class SubmitSmeProfileEvent extends AuthEvent {
   // This event captures all the onboarding data from the multi-step form.
   final Map<String, dynamic> profileData;
+  final bool shouldGenerateScore;
 
-  const SubmitSmeProfileEvent(this.profileData);
+  const SubmitSmeProfileEvent(this.profileData, {this.shouldGenerateScore = true});
 
   @override
-  List<Object?> get props => [profileData];
+  List<Object?> get props => [profileData, shouldGenerateScore];
 }
 
 class SubmitInvestorProfileEvent extends AuthEvent {

@@ -10,6 +10,8 @@ import 'package:partnex/features/auth/presentation/blocs/auth/auth_state.dart';
 import 'package:partnex/core/services/ui_service.dart';
 import 'package:partnex/features/auth/presentation/pages/investor/investor_onboarding_page.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
+import 'package:partnex/features/auth/data/repositories/mock_sme_data.dart'; // <-- Mock Data Import
+import 'package:partnex/features/auth/presentation/pages/dashboard/faq_page.dart';
 
 class InvestorProfilePage extends StatefulWidget {
   const InvestorProfilePage({super.key});
@@ -119,24 +121,36 @@ class _InvestorProfilePageState extends State<InvestorProfilePage> {
                       _buildProfileDetail(
                         LucideIcons.briefcase, 
                         'Investor Type', 
-                        authState.user.investorType ?? 'Fund / Institution',
+                        authState.user.investorType ?? MockSmeData.getMockInvestorProfile()['investorType'],
                       ),
                       if (authState.user.company != null && authState.user.company!.isNotEmpty)
                         _buildProfileDetail(
                           LucideIcons.building2, 
                           'Company', 
                           authState.user.company!,
+                        )
+                      else 
+                        _buildProfileDetail(
+                          LucideIcons.building2, 
+                          'Company', 
+                          MockSmeData.getMockInvestorProfile()['company'],
                         ),
                       _buildProfileDetail(
                         LucideIcons.dollarSign, 
                         'Investment Range', 
-                        authState.user.investmentRange ?? '₦50M - ₦200M',
+                        authState.user.investmentRange ?? MockSmeData.getMockInvestorProfile()['investmentRange'],
                       ),
                       if (authState.user.sectors != null && authState.user.sectors!.isNotEmpty)
                         _buildProfileDetail(
                           LucideIcons.layoutGrid, 
                           'Interests', 
                           authState.user.sectors!.join(', '),
+                        )
+                      else
+                        _buildProfileDetail(
+                          LucideIcons.layoutGrid, 
+                          'Interests', 
+                          (MockSmeData.getMockInvestorProfile()['sectors'] as List<String>).join(', '),
                         ),
                     ],
                   ],
@@ -180,30 +194,33 @@ class _InvestorProfilePageState extends State<InvestorProfilePage> {
                       const InvestorOnboardingPage(isEditing: true),
                     ),
                   ),
-                  Divider(height: 1, color: AppColors.slate200),
-                  ListTile(
-                    leading: const Icon(
-                      LucideIcons.settings,
-                      color: AppColors.slate600,
-                      size: 20,
-                    ),
-                    title: Text(
-                      'Account Settings',
-                      style: AppTypography.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.slate900,
-                        fontWeight: FontWeight.w500,
+                    Divider(height: 1, color: AppColors.slate200),
+                    ListTile(
+                      leading: const Icon(
+                        LucideIcons.helpCircle,
+                        color: AppColors.slate600,
+                        size: 20,
+                      ),
+                      title: Text(
+                        'FAQ & Help',
+                        style: AppTypography.textTheme.bodyMedium?.copyWith(
+                          color: AppColors.slate900,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      trailing: const Icon(
+                        LucideIcons.chevronRight,
+                        size: 16,
+                        color: AppColors.slate400,
+                      ),
+                      onTap: () => uiService.navigateTo(
+                        FaqPage(isInvestor: true),
                       ),
                     ),
-                    trailing: const Icon(
-                      LucideIcons.chevronRight,
-                      size: 16,
-                      color: AppColors.slate400,
-                    ),
-                    onTap: () {},
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+
 
             SizedBox(height: AppSpacing.xxxxl),
 

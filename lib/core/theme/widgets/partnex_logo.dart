@@ -91,16 +91,6 @@ class PartnexLogo extends StatelessWidget {
               letterSpacing: -renderSize * 0.02,
             ),
           ),
-          // TextSpan(
-          //   text: 'nex',
-          //   style: AppTypography.textTheme.displayLarge?.copyWith(
-          //     fontSize: renderSize * 0.85,
-          //     fontWeight: FontWeight.w500,
-          //     color: tSecondary,
-          //     height: 1.0,
-          //     letterSpacing: -renderSize * 0.02,
-          //   ),
-          // ),
         ],
       ),
     );

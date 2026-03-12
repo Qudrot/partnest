@@ -194,7 +194,7 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<CredibilityScore> submitSmeProfile(Map<String, dynamic> data) async {
+  Future<CredibilityScore> submitSmeProfile(Map<String, dynamic> data, {bool shouldGenerateScore = true}) async {
     try {
       // Resolve the token: prefer the static in-memory cache
       // (set at login/signup), fall back to SecureStorage (app restarts).
@@ -328,15 +328,21 @@ class ApiAuthRepository implements AuthRepository {
         }
       }
 
-     
-      // 3. Run Credibility Score
-      if (kDebugMode) {
-        print('RUNNING SCORE GENERATION with payload: ${jsonEncode(payload)}');
-      }
-
       try {
         await _secureStorage.write(key: 'cached_sme_profile', value: jsonEncode(data));
       } catch (_) {}
+
+      // 3. Run Credibility Score (Selective)
+      if (!shouldGenerateScore) {
+        if (kDebugMode) {
+          print('SKIPPING SCORE GENERATION as requested. Fetching existing score.');
+        }
+        return await getMyScore();
+      }
+
+      if (kDebugMode) {
+        print('RUNNING SCORE GENERATION with payload: ${jsonEncode(payload)}');
+      }
 
       final scoreResponse = await apiClient.dio.post(
         '/api/score/run',

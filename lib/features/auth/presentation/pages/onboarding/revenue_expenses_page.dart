@@ -9,7 +9,12 @@ import 'package:partnex/core/theme/widgets/custom_input_field.dart';
 import 'package:partnex/features/auth/presentation/pages/onboarding/liabilities_history_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:partnex/core/theme/app_sizes.dart';
+import 'package:partnex/core/services/ui_service.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_bloc.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_event.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_state.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
+import 'package:partnex/features/auth/presentation/pages/dashboard/analysis_state_page.dart';
 
 class RevenueExpensesPage extends StatefulWidget {
   final bool isEditing;
@@ -126,7 +131,11 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
   void initState() {
     super.initState();
     final profileState = context.read<SmeProfileCubit>().state;
-    if (profileState.annualRevenueYear1 > 0) {
+    
+    // If it's a completely new blank record, we leave inputs completely blank
+    final bool isBlankNewRecord = !widget.isEditing && widget.isUpdatingRecord;
+
+    if (!isBlankNewRecord && profileState.annualRevenueYear1 > 0) {
       _year1Controller.text = profileState.annualRevenueYear1.toString();
       _amount1Controller.text = profileState.annualRevenueAmount1
           .toStringAsFixed(0);
@@ -141,16 +150,24 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
         _showYear3 = true;
       }
 
-      if (profileState.monthlyAvgRevenue != null) {
+      if (profileState.monthlyAvgRevenue != null && profileState.monthlyAvgRevenue! > 0) {
         _monthlyRevController.text = profileState.monthlyAvgRevenue!
             .toStringAsFixed(0);
       }
-      _monthlyExpController.text = profileState.monthlyAvgExpenses
-          .toStringAsFixed(0);
+      if (profileState.monthlyAvgExpenses > 0) {
+        _monthlyExpController.text = profileState.monthlyAvgExpenses
+            .toStringAsFixed(0);
+      }
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _onFieldChanged('');
       });
+    } else if (isBlankNewRecord) {
+      final currentYear = DateTime.now().year;
+      _year1Controller.text = (currentYear - 2).toString();
+      _year2Controller.text = (currentYear - 1).toString();
+      _year3Controller.text = currentYear.toString();
+      // Everything else remains empty strings natively
     } else {
       final currentYear = DateTime.now().year;
       _year1Controller.text = (currentYear - 2).toString();
@@ -275,27 +292,36 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 640;
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.neutralWhite,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
-          iconSize: 20,
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Revenue & Expenses',
-          style: AppTypography.textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-            color: AppColors.slate900,
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, authState) {
+        if (authState is SmeProfileSubmittedSuccess && widget.isEditing) {
+          // If we were editing, we move to analysis page because everything here is meaningful
+          uiService.navigateTo(const AnalysisStatePage());
+        } else if (authState is SmeProfileSubmissionError) {
+          uiService.showSnackBar(authState.message, isError: true);
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors.neutralWhite,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(LucideIcons.chevronLeft, color: AppColors.slate900),
+            iconSize: 20,
+            onPressed: () => Navigator.pop(context),
           ),
+          title: Text(
+            'Revenue & Expenses',
+            style: AppTypography.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+              color: AppColors.slate900,
+            ),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      backgroundColor: AppColors.neutralWhite,
-      body: SafeArea(
+        backgroundColor: AppColors.neutralWhite,
+        body: SafeArea(
         child: Column(
           children: [
             Expanded(
@@ -636,7 +662,9 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
                           );
 
                           if (widget.isEditing) {
-                            Navigator.pop(context);
+                            // Save to backend and re-score (everything here is meaningful)
+                            final state = context.read<SmeProfileCubit>().state;
+                            context.read<AuthBloc>().add(SubmitSmeProfileEvent(state.toMap(), shouldGenerateScore: true));
                           } else {
                             Navigator.push(
                               context,
@@ -657,6 +685,7 @@ class _RevenueExpensesPageState extends State<RevenueExpensesPage> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

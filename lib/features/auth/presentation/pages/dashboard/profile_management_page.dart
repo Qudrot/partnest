@@ -19,6 +19,7 @@ import 'package:partnex/features/auth/presentation/pages/investor/investor_onboa
 import 'package:partnex/features/auth/data/models/user_model.dart';
 import 'package:partnex/core/theme/widgets/sme_about_section.dart';
 import 'package:partnex/features/auth/presentation/pages/dashboard/bio_edit_page.dart';
+import 'package:partnex/features/auth/presentation/pages/dashboard/faq_page.dart';
 
 class ProfileManagementPage extends StatefulWidget {
   const ProfileManagementPage({super.key});
@@ -295,6 +296,14 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
                           value: _notificationsEnabled,
                           onChanged: (val) =>
                               setState(() => _notificationsEnabled = val),
+                        ),
+                        Divider(height: 1, color: AppColors.slate200),
+                        _ActionTile(
+                          title: 'FAQ & Help',
+                          icon: LucideIcons.helpCircle,
+                          onTap: () => uiService.navigateTo(
+                            const FaqPage(),
+                          ),
                         ),
                         Divider(height: 1, color: AppColors.slate200),
                         _ActionTile(

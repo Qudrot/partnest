@@ -32,7 +32,7 @@ abstract class AuthRepository {
   Future<CredibilityScore> getMyScore();
 
   // Submits the SME onboarding data and returns the resulting CredibilityScore
-  Future<CredibilityScore> submitSmeProfile(Map<String, dynamic> data);
+  Future<CredibilityScore> submitSmeProfile(Map<String, dynamic> data, {bool shouldGenerateScore = true});
 
   // Submits the Investor onboarding data 
   Future<void> submitInvestorProfile(Map<String, dynamic> data);

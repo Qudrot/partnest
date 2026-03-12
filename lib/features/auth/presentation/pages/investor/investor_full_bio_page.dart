@@ -3,6 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:partnex/core/theme/app_colors.dart';
 import 'package:partnex/core/theme/app_sizes.dart';
 import 'package:partnex/core/theme/app_typography.dart';
+import 'package:partnex/core/utils/url_helper.dart';
 import 'package:partnex/core/theme/widgets/custom_button.dart';
 
 class InvestorFullBioPage extends StatelessWidget {
@@ -273,6 +274,7 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
                               child: _buildSocialOption(
                                 'WhatsApp',
                                 LucideIcons.messageSquare, // Fallback if asset missing
+                                onTap: () => UrlHelper.launchWhatsApp(widget.whatsappNumber!),
                               ),
                             ),
                           if (hasWhatsapp && (hasLinkedin || hasTwitter)) const SizedBox(width: 12),
@@ -281,6 +283,7 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
                               child: _buildSocialOption(
                                 'LinkedIn',
                                 LucideIcons.linkedin,
+                                onTap: () => UrlHelper.launchWebsite(widget.linkedinUrl!),
                               ),
                             ),
                           if (hasLinkedin && hasTwitter) const SizedBox(width: 12),
@@ -289,6 +292,7 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
                               child: _buildSocialOption(
                                 'Twitter',
                                 LucideIcons.twitter,
+                                onTap: () => UrlHelper.launchWebsite('https://twitter.com/${widget.twitterHandle!.replaceAll('@', '')}'),
                               ),
                             ),
                           
@@ -311,19 +315,22 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
                 'Email',
                 widget.email!,
                 LucideIcons.mail,
+                onTap: () => UrlHelper.launchEmail(widget.email!),
               ),
             if (widget.phoneNumber != null && widget.phoneNumber!.isNotEmpty)
               _buildContactListTile(
                 'Phone',
                 widget.phoneNumber!,
                 LucideIcons.phone,
+                onTap: () => UrlHelper.launchPhone(widget.phoneNumber!),
               ),
-            // if (widget.website != null && widget.website!.isNotEmpty)
-            //   _buildContactListTile(
-            //     'Website',
-            //     widget.website!,
-            //     LucideIcons.globe,
-            //   ),
+            if (widget.website != null && widget.website!.isNotEmpty)
+              _buildContactListTile(
+                'Website',
+                widget.website!,
+                LucideIcons.globe,
+                onTap: () => UrlHelper.launchWebsite(widget.website!),
+              ),
             
             const SizedBox(height: 16),
           ],
@@ -332,11 +339,10 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
     );
   }
 
-  Widget _buildSocialOption(String name, IconData icon) {
+  Widget _buildSocialOption(String name, IconData icon, {required VoidCallback onTap}) {
     return InkWell(
-      onTap: () {
-        // Handle social tap
-      },
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
@@ -361,8 +367,9 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
     );
   }
 
-  Widget _buildContactListTile(String label, String value, IconData icon) {
+  Widget _buildContactListTile(String label, String value, IconData icon, {required VoidCallback onTap}) {
     return ListTile(
+      onTap: onTap,
       contentPadding: EdgeInsets.zero,
       leading: Container(
         padding: const EdgeInsets.all(8),
@@ -387,9 +394,6 @@ class _MessageSmeBottomSheetState extends State<MessageSmeBottomSheet> {
         ),
       ),
       trailing: const Icon(LucideIcons.externalLink, size: 16, color: AppColors.slate400),
-      onTap: () {
-        // Handle contact tap
-      },
     );
   }
 }

@@ -12,6 +12,7 @@ import 'package:partnex/features/auth/presentation/pages/onboarding/review_confi
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:partnex/features/auth/presentation/blocs/sme_profile_cubit/sme_profile_cubit.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth/auth_bloc.dart';
+import 'package:partnex/features/auth/presentation/blocs/auth/auth_event.dart';
 import 'package:partnex/features/auth/presentation/blocs/auth/auth_state.dart';
 import 'package:partnex/features/auth/presentation/pages/dashboard/analysis_state_page.dart';
 import 'package:partnex/core/services/ui_service.dart';
@@ -302,27 +303,44 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                           isLoading: isSubmitting,
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              context
-                                  .read<SmeProfileCubit>()
-                                  .updateBusinessProfile(
-                                    businessName: _nameController.text,
-                                    industry: _selectedIndustry == 'Other' 
-                                        ? _otherIndustryController.text.trim()
-                                        : _selectedIndustry!,
-                                    location: _locationController.text,
-                                    yearsOfOperation: int.parse(
-                                      _yearsController.text,
-                                    ),
-                                    numberOfEmployees: int.parse(
-                                      _employeesController.text,
-                                    ),
-                                    phoneNumber: _phoneController.text.trim(),
-                                  );
+                              final profileCubit = context.read<SmeProfileCubit>();
+                              final oldState = profileCubit.state;
+                              
+                              final newYears = int.parse(_yearsController.text);
+                              final newEmployees = int.parse(_employeesController.text);
+                              
+                              // Meaningful fields that trigger re-scoring
+                              final bool meaningfulChanged = 
+                                  newYears != oldState.yearsOfOperation || 
+                                  newEmployees != oldState.numberOfEmployees;
+
+                              profileCubit.updateBusinessProfile(
+                                businessName: _nameController.text,
+                                industry: _selectedIndustry == 'Other' 
+                                    ? _otherIndustryController.text.trim()
+                                    : _selectedIndustry!,
+                                location: _locationController.text,
+                                yearsOfOperation: newYears,
+                                numberOfEmployees: newEmployees,
+                                phoneNumber: _phoneController.text.trim(),
+                              );
+
                               if (widget._inEditMode) {
-                                uiService.showSnackBar(
-                                  'Your profile has been successfully updated.',
+                                // Save to backend
+                                final newState = profileCubit.state;
+                                context.read<AuthBloc>().add(
+                                  SubmitSmeProfileEvent(
+                                    newState.toMap(), 
+                                    shouldGenerateScore: meaningfulChanged,
+                                  ),
                                 );
-                                uiService.goBack();
+                                
+                                if (meaningfulChanged) {
+                                  // Navigating to AnalysisStatePage happens in the BlocListener
+                                } else {
+                                  uiService.showSnackBar('Your profile has been successfully updated.');
+                                  uiService.goBack();
+                                }
                               } else if (widget.isDocumentUpload) {
                                 uiService.navigateTo(
                                   const ReviewConfirmPage(

@@ -325,7 +325,7 @@ class MockSmeData {
       },
       {
         "id": "mock_sme_16",
-        "business_name": "UrbanLogistics",
+        "business_name": "Urban Logistics",
         "industry_sector": "Logistics",
         "location": "Lagos, Nigeria",
         "years_of_operation": 5,
@@ -379,6 +379,17 @@ class MockSmeData {
         "created_at": _getRandomPastDate(85),
       },
     ];
+  }
+
+  /// Provides a realistic, professional mock profile for an investor.
+  /// Used as a fallback when the user's authentic data is absent or incomplete.
+  static Map<String, dynamic> getMockInvestorProfile() {
+    return {
+      "investorType": "Fund / Institution",
+      "company": "Acme Ventures",
+      "investmentRange": "\$500K - \$1M",
+      "sectors": ["Technology", "FinTech", "Agriculture"],
+    };
   }
 
   static String _getRandomPastDate(int maxDaysAgo) {
